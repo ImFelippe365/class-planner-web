@@ -4,6 +4,7 @@ module.exports = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/flowbite-react/**/*.js",
   ],
   theme: {
     extend: {
@@ -33,7 +34,7 @@ module.exports = {
         warning: "#E1A917",
         "ultra-violet": "#52489C",
         coffee: "#6D4C3D",
-        orange:"#FF8600",
+        orange: "#FF8600",
         "ultra-violet-transparent": "rgba(82,72,156,0.1)",
         "coffee-transparent": "rgba(109,76,61,0.1)",
         "orange-transparent": "rgba(255,134,0,0.1)",
@@ -42,7 +43,13 @@ module.exports = {
         "warning-transparent": "rgba(225,169,23,0.1)",
         "background-black-transparent": "rgba(0,0,0,0.6)",
       },
+      gridTemplateColumns: {
+        container: '330px auto'
+      }
     },
   },
-  plugins: [],
+  plugins: [
+    require('flowbite/plugin')
+  ]
+
 };
