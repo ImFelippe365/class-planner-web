@@ -1,10 +1,10 @@
 import { Sidebar } from "flowbite-react";
-import React from "react";
 import { Layers, GraduationCap, Briefcase, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React from "react";
 
-export default function NavigationSideBar() {
+export default function NavigationSideBar(): React.ReactNode {
   const NavigationItemStyles =
     "w-full py-4 px-6 flex items-center gap-4 justify-start rounded-lg font-semibold hover:bg-primary-background transition-all";
   const pathname = usePathname();
@@ -51,7 +51,9 @@ export default function NavigationSideBar() {
             <Link
               key={index.toString()}
               href={route.path}
-              className={`${NavigationItemStyles} ${pathname === route.path && 'bg-primary-background text-primary'}`}
+              className={`${NavigationItemStyles} ${
+                pathname === route.path && "bg-primary-background text-primary"
+              }`}
             >
               {route.icon}
               <p>{route.name}</p>
