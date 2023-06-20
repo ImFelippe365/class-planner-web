@@ -1,6 +1,6 @@
 'use client'
 
-import NavigationSideBar from '@/components/NavigationSideBar'
+import NavigationSideBar from '../components/NavigationSideBar'
 import './globals.css'
 import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
