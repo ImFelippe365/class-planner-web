@@ -1,11 +1,9 @@
-'use client'
-
-import Image from 'next/image'
+"use client";
 
 export default function Home() {
-  return (
-    <main>
-      <p>Tela inicial</p>
-    </main>
-  )
+	return (
+		<main>
+			<p>Tela inicial</p>
+		</main>
+	);
 }
