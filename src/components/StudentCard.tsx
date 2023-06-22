@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Crown, User, MoreVertical } from "lucide-react";
 import Image from "next/image";
 
-interface IStudentCardProps {
+interface StudentCardProps {
 	studentId: number | string;
 	registration: string;
 	name: string;
@@ -22,11 +22,11 @@ export default function StudentCard({
 	courseGrade,
 	classPeriod,
 	isClassLeader
-}: IStudentCardProps) {
+}: StudentCardProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
-		<div className="bg-white flex flex-row justify-between items-center max-w-sm py-4 px-4 rounded-2xl m-2 drop-shadow-sm	">
+		<div className="bg-white flex flex-row justify-between items-center max-w-sm py-4 px-4 rounded-2xl drop-shadow-sm	">
 			<div className="flex gap-x-4">
 				<User className="rounded-lg bg-primary-background w-12 h-12 p-3" color="#007EA7" />
 

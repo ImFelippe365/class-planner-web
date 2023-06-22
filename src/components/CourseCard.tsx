@@ -6,9 +6,10 @@ import { BookOpen } from "lucide-react";
 import { Users } from "lucide-react";
 import { Edit2 } from "lucide-react";
 import { Trash } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
-interface ICourseCardProps {
+interface CourseCardProps {
 	courseGrade: string;
 	courseName: string;
 }
@@ -16,7 +17,7 @@ interface ICourseCardProps {
 export default function CourseCard({
 	courseGrade,
 	courseName,
-}: ICourseCardProps): React.ReactNode {
+}: CourseCardProps): React.ReactNode {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -53,25 +54,25 @@ export default function CourseCard({
 
 					{isOpen && (
 						<div className="bg-white absolute top-5 flex flex-col items-start rounded-lg shadow-md p-3 w-40 left-[60%]">
-							<div className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
+							<Link href={`#`} className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
 								<BookOpen width={16} height={16} color="#000E1A" />
 								<p className="font-semibold text-xs">Ver disciplinas</p>
-							</div>
+							</Link>
 
-							<div className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
+							<Link href={`#`} className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
 								<Users width={16} height={16} color="#000E1A" />
 								<p className="font-semibold text-xs">Ver turmas</p>
-							</div>
+							</Link>
 
-							<div className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
+							<Link href={`#`} className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
 								<Edit2 width={16} height={16} color="#000E1A" />
 								<p className="font-semibold text-xs">Editar</p>
-							</div>
+							</Link>
 
-							<div className="flex flex-row w-full hover:bg-error-transparent rounded-lg cursor-pointer gap-3 items-center p-2">
+							<button className="flex flex-row w-full hover:bg-error-transparent rounded-lg cursor-pointer gap-3 items-center p-2">
 								<Trash width={16} height={16} color="#C92A2A" />
 								<p className="font-semibold text-xs text-error">Remover</p>
-							</div>
+							</button>
 						</div>
 					)}
 				</div>

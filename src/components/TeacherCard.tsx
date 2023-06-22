@@ -1,7 +1,7 @@
 import { ChevronRight, User } from "lucide-react";
 import Image from "next/image";
 
-interface ITeacherCardProps {
+interface TeacherCardProps {
 	teacherId: number | string;
 	registration: string;
 	name: string;
@@ -9,11 +9,11 @@ interface ITeacherCardProps {
 
 export default function TeacherCard({ 
 	teacherId, 
-	registration, 
+	registration,
 	name 
-}: ITeacherCardProps) {
+}: TeacherCardProps) {
 	return (
-		<div className="bg-white flex flex-row justify-between items-center max-w-sm py-4 px-4 rounded-2xl m-2 drop-shadow-sm">
+		<div className="bg-white flex flex-row justify-between items-center max-w-sm py-4 px-4 rounded-2xl drop-shadow-sm">
 			<div className="flex gap-x-4">
 				<User className="rounded-lg bg-primary-background w-12 h-12 p-3" color="#007EA7"/>
 

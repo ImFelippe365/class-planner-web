@@ -1,8 +1,10 @@
-interface ISearchBarProps{
+import React from "react";
+
+interface SearchBarProps{
 	placeholder: string;
 }
 
-export default function SearchBar({placeholder}: ISearchBarProps){
+export default function SearchBar({placeholder}: SearchBarProps): React.ReactNode{
 	return(
 		<div>
 			<form>   
