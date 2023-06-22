@@ -26,7 +26,7 @@ export default function CourseCard({
 				courseGrade == "Técnico Integrado"
 					? "bg-ultra-violet-transparent"
 					: "bg-coffee-transparent"
-			} rounded-xl w-56 p-4 items-center`}
+			} rounded-xl p-4 items-center	py-2`}
 		>
 			<div className="flex flex-row justify-between items-center">
 				<GraduationCap
@@ -54,17 +54,26 @@ export default function CourseCard({
 
 					{isOpen && (
 						<div className="bg-white absolute top-5 flex flex-col items-start rounded-lg shadow-md p-3 w-40 left-[60%]">
-							<Link href={`#`} className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
+							<Link
+								href={`#`}
+								className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2"
+							>
 								<BookOpen width={16} height={16} color="#000E1A" />
 								<p className="font-semibold text-xs">Ver disciplinas</p>
 							</Link>
 
-							<Link href={`#`} className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
+							<Link
+								href={`#`}
+								className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2"
+							>
 								<Users width={16} height={16} color="#000E1A" />
 								<p className="font-semibold text-xs">Ver turmas</p>
 							</Link>
 
-							<Link href={`#`} className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
+							<Link
+								href={`#`}
+								className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2"
+							>
 								<Edit2 width={16} height={16} color="#000E1A" />
 								<p className="font-semibold text-xs">Editar</p>
 							</Link>
