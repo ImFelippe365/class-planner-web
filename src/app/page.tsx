@@ -1,9 +1,7 @@
 "use client";
 
+import SignIn from "./entrar/page";
+
 export default function Home() {
-	return (
-		<main>
-			<p>Tela inicial</p>
-		</main>
-	);
+	return <SignIn />;
 }
