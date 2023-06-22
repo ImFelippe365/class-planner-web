@@ -34,7 +34,7 @@ export default function RootLayout({ children }: ILayoutProps) {
 					) : (
 						<main className="grid grid-cols-container bg-background-color">
 							<NavigationSideBar />
-							{children}
+							<div className="max-w-[1264px] w-full mx-auto mt-16">{children}</div>
 						</main>
 					)}
 				</Flowbite>
