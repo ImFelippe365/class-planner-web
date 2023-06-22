@@ -6,7 +6,7 @@ import { Edit2 } from "lucide-react";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 
-interface IDisciplineCardProps {
+interface DisciplineCardProps {
 	period: string | number;
 	disciplineName: string;
 	courseGrade: string;
@@ -16,7 +16,7 @@ export default function DisciplineCard({
 	period,
 	disciplineName,
 	courseGrade,
-}: IDisciplineCardProps): React.ReactNode {
+}: DisciplineCardProps): React.ReactNode {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
