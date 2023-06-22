@@ -44,7 +44,11 @@ module.exports = {
 				"background-black-transparent": "rgba(0,0,0,0.6)",
 			},
 			gridTemplateColumns: {
-				container: '330px auto'
+				container: '330px auto',
+				cardsGrid: 'repeat(auto-fill, minmax(224px, 1fr))'
+			},
+			gridTemplateRows: {
+				// cardsGrid: 'repeat(auto-fill, 100px)'
 			}
 		},
 	},

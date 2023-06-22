@@ -30,7 +30,7 @@ export default function Breadcrumb({ title, children }: IBreadcrumbProps) {
 
 	return (
 		<header>
-			<section className="flex flex-row justify-between">
+			<section className="flex flex-row justify-between mb-8">
 				<h1 className="text-3xl text-black font-bold">{title}</h1>
 				{children}
 			</section>
