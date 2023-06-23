@@ -1,8 +1,5 @@
-"use client"
-
-import { useState } from "react";
-import { Crown, User, MoreVertical } from "lucide-react";
-import Image from "next/image";
+import { User } from "lucide-react";
+import Dropdown from "./Dropdown";
 
 interface StudentCardProps {
 	studentId: number | string;
@@ -23,8 +20,6 @@ export default function StudentCard({
 	classPeriod,
 	isClassLeader
 }: StudentCardProps) {
-	const [isOpen, setIsOpen] = useState(false);
-
 	return (
 		<div className="bg-white flex flex-row justify-between items-center max-w-sm py-4 px-4 rounded-2xl drop-shadow-sm	">
 			<div className="flex gap-x-4">
@@ -48,20 +43,7 @@ export default function StudentCard({
 			</div>
 
 			{!isClassLeader && (
-				<div className="relative">
-					<button onClick={() => setIsOpen((prev) => !prev)} className="ouline-none">
-						<MoreVertical className={`hover:bg-primary-background p-1 ${isOpen ? "bg-primary-background" : ""} rounded-full`} width={30} height={30} color="#007EA7" />
-					</button>
-
-					{isOpen && (
-						<div className="bg-white absolute top-5 flex flex-col items-start rounded-lg p-3 left[65%] w-56 drop-shadow-sm">
-							<div className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
-								<Crown width={15} height={15} color="#007EA7" />
-								<p className="font-semibold text-xs text-primary">Promover a líder de turma</p>
-							</div>
-						</div>
-					)}
-				</div>
+				<Dropdown cardType="student"/>
 			)}
 		</div>
 	)
