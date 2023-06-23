@@ -10,7 +10,7 @@ import {
 } from "flowbite-react";
 import { Controller, Control } from "react-hook-form";
 
-interface IInputProps extends TextInputProps {
+interface InputProps extends TextInputProps {
 	label?: string;
 	name: string;
 	control: Control<any>;
@@ -23,7 +23,7 @@ export default function Input({
 	control,
 	containerClassName,
 	...props
-}: IInputProps) {
+}: InputProps) {
 	return (
 		<div className={containerClassName}>
 			<Controller

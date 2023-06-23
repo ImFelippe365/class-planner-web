@@ -10,12 +10,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-interface IBreadcrumbProps {
+interface BreadcrumbProps {
 	title: string;
 	children?: React.ReactNode;
 }
 
-export default function Breadcrumb({ title, children }: IBreadcrumbProps) {
+export default function Breadcrumb({ title, children }: BreadcrumbProps) {
 	const pathname = usePathname();
 	const paths = pathname.split("/").slice(1);
 
