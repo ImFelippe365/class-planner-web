@@ -1,3 +1,4 @@
+import { SelectOptions } from "@/interfaces/Utils";
 import {
 	Label,
 	Select as FRSelect,
@@ -6,10 +7,12 @@ import {
 import React from "react";
 import { Control, Controller } from "react-hook-form";
 
+
+
 interface SelectProps extends FRSelectProps {
 	label?: string;
 	name: string;
-	options: string[] | number[];
+	options: SelectOptions[];
 	control: Control<any>;
 	containerClassName?: HTMLDivElement["className"];
 }
@@ -51,10 +54,12 @@ export default function Select({
 						defaultValue={""}
 						{...props}
 					>
-						<option disabled  value={""}>Selecione uma opção</option>
-						{options.map((option, index) => (
-							<option value={option} key={index}>
-								{option}
+						<option disabled value={""}>
+							Selecione uma opção
+						</option>
+						{options.map(({ label, value }, index) => (
+							<option value={value} key={index}>
+								{label}
 							</option>
 						))}
 					</FRSelect>

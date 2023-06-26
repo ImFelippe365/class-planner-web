@@ -35,8 +35,13 @@ export default function NavigationSideBar(): React.ReactNode {
 		},
 		{
 			name: "Estudantes",
-			icon: <Users />,
+			icon: <User />,
 			path: "estudantes",
+		},
+		{
+			name: "Turmas",
+			icon: <Users />,
+			path: "turmas",
 		},
 	];
 
