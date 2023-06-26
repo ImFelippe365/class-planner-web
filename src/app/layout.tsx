@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import { usePathname } from "next/navigation";
 import { ReactElement } from "react";
 import "./globals.css";
+import Provider from "@/hooks/Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,14 +30,18 @@ export default function RootLayout({ children }: LayoutProps) {
 			></script>
 			<body className={inter.className}>
 				<Flowbite>
-					{pathname === "/sign-in" ? (
-						children
-					) : (
-						<main className="grid grid-cols-container bg-background-color">
-							<NavigationSideBar />
-							<div className="max-w-[1264px] w-full mx-auto mt-16">{children}</div>
-						</main>
-					)}
+					<Provider>
+						{pathname === "/sign-in" ? (
+							children
+						) : (
+							<main className="grid grid-cols-container bg-background-color">
+								<NavigationSideBar />
+								<div className="max-w-[1264px] w-full mx-auto mt-16">
+									{children}
+								</div>
+							</main>
+						)}
+					</Provider>
 				</Flowbite>
 			</body>
 		</html>

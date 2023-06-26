@@ -3,6 +3,7 @@
 import Breadcrumb from "@/components/Breadcrumb";
 import Button from "@/components/Button";
 import CourseCard from "@/components/CourseCard";
+import { useGlobal } from "@/hooks/GlobalContext";
 import { Course } from "@/interfaces/Course";
 import { api } from "@/services/api";
 import { GraduationCap, Plus, Users } from "lucide-react";
@@ -10,14 +11,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function Courses(): React.ReactNode {
-	const [courses, setCourses] = useState<Course[]>([]);
-
 	const routes = useRouter();
-	const getAllCourses = async () => {
-		const { data } = await api.get("courses/");
-
-		setCourses(data);
-	};
+	const { courses, getAllCourses } = useGlobal();
 
 	useEffect(() => {
 		getAllCourses();
@@ -28,17 +23,8 @@ export default function Courses(): React.ReactNode {
 			<Breadcrumb title="Cursos">
 				<section className="flex flex-row gap-6">
 					<Button onClick={() => routes.push("cursos/novo")}>
-						<>
-							<GraduationCap className="mr-2" />
-							<p>Criar curso</p>
-						</>
-					</Button>
-
-					<Button>
-						<>
-							<Users className="mr-2" />
-							<p>Criar turma</p>
-						</>
+						<GraduationCap className="mr-2" />
+						<p>Criar curso</p>
 					</Button>
 				</section>
 			</Breadcrumb>

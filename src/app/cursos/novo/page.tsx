@@ -5,6 +5,7 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
 import { api } from "@/services/api";
+import { degrees } from "@/utils/schedules";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -44,12 +45,6 @@ export default function AddCourse() {
 		router.back();
 	};
 
-	const degrees = [
-		"Ensino superior",
-		"Ensino médio integrado ao curso técnico",
-		"Ensino técnico",
-	];
-
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="w-full">
 			<Breadcrumb title="Cadastrar curso" />
@@ -62,6 +57,7 @@ export default function AddCourse() {
 				placeholder="Digite o nome do curso"
 				label="Curso"
 			/>
+
 			<Input
 				containerClassName="mt-2"
 				control={control}
@@ -70,6 +66,7 @@ export default function AddCourse() {
 				placeholder="Ex.: Info"
 				label="Apelido"
 			/>
+
 			<Select
 				containerClassName="mt-2"
 				control={control}
@@ -78,6 +75,7 @@ export default function AddCourse() {
 				placeholder="Selecione um grau"
 				label="Grau"
 			/>
+
 			<Input
 				containerClassName="mt-2"
 				control={control}
@@ -87,7 +85,9 @@ export default function AddCourse() {
 				label="Carga horária"
 			/>
 
-			<Button isProcessing={isSubmitting} className="w-full mt-4" type="submit">Confirmar</Button>
+			<Button isProcessing={isSubmitting} className="w-full mt-4" type="submit">
+				Confirmar
+			</Button>
 		</form>
 	);
 }
