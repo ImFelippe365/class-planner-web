@@ -1,29 +1,27 @@
-import React, { InputHTMLAttributes } from "react";
 import {
-	CustomFlowbiteTheme,
-	FlowbiteTheme,
 	Label,
-	LabelProps,
-	TextInput,
-	TextInputProps,
-	useTheme,
+	Select as FRSelect,
+	SelectProps as FRSelectProps,
 } from "flowbite-react";
-import { Controller, Control } from "react-hook-form";
+import React from "react";
+import { Control, Controller } from "react-hook-form";
 
-interface InputProps extends TextInputProps {
+interface SelectProps extends FRSelectProps {
 	label?: string;
 	name: string;
+	options: string[] | number[];
 	control: Control<any>;
 	containerClassName?: HTMLDivElement["className"];
 }
 
-export default function Input({
+export default function Select({
 	label,
 	name,
+	options,
 	control,
 	containerClassName,
 	...props
-}: InputProps) {
+}: SelectProps) {
 	return (
 		<Controller
 			name={name}
@@ -33,25 +31,33 @@ export default function Input({
 				formState,
 				fieldState: { error },
 			}) => (
-				<div className={containerClassName}>
+				<div className={containerClassName} id="select">
 					{label && (
 						<div className="mb-1 block">
 							<Label
+								htmlFor={name}
 								color={error ? "failure" : props.color || "gray"}
-								htmlFor={props.id}
 								value={label}
 							/>
 						</div>
 					)}
-					<TextInput
+					<FRSelect
 						color={error ? "failure" : "gray"}
 						helperText={error?.message}
-						name={name}
 						onBlur={onBlur}
 						onChange={onChange}
 						ref={ref}
+						id={name}
+						defaultValue={""}
 						{...props}
-					/>
+					>
+						<option disabled  value={""}>Selecione uma opção</option>
+						{options.map((option, index) => (
+							<option value={option} key={index}>
+								{option}
+							</option>
+						))}
+					</FRSelect>
 				</div>
 			)}
 		/>

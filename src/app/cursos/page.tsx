@@ -4,13 +4,20 @@ import Breadcrumb from "@/components/Breadcrumb";
 import Button from "@/components/Button";
 import CourseCard from "@/components/CourseCard";
 import { Course } from "@/interfaces/Course";
+import { api } from "@/services/api";
 import { GraduationCap, Plus, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function Courses(): React.ReactNode {
 	const [courses, setCourses] = useState<Course[]>([]);
 
-	const getAllCourses = async () => {};
+	const routes = useRouter();
+	const getAllCourses = async () => {
+		const { data } = await api.get("courses/");
+
+		setCourses(data);
+	};
 
 	useEffect(() => {
 		getAllCourses();
@@ -20,7 +27,7 @@ export default function Courses(): React.ReactNode {
 		<div className="w-full">
 			<Breadcrumb title="Cursos">
 				<section className="flex flex-row gap-6">
-					<Button>
+					<Button onClick={() => routes.push("cursos/novo")}>
 						<>
 							<GraduationCap className="mr-2" />
 							<p>Criar curso</p>
@@ -36,9 +43,9 @@ export default function Courses(): React.ReactNode {
 				</section>
 			</Breadcrumb>
 
-			<section className="grid auto-rows-auto grid-cols-cardsGrid  gap-5">
-				{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((course) => (
-					<CourseCard key={course} courseGrade="teste" courseName="teste2" />
+			<section className="grid auto-rows-auto grid-cols-cardsGrid gap-5">
+				{courses.map(({ id, name, degree }) => (
+					<CourseCard key={id} courseGrade={degree} courseName={name} />
 				))}
 			</section>
 		</div>
