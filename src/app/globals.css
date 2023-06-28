@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* FullCalendar Styles */
+
+/* .fc-theme-standard td, .fc-theme-standard th {
+	border-color: transparent !important;
+} */
+
+.fc-theme-standard .fc-scrollgrid {
+	border-color: transparent !important;
+}
+
+.fc .fc-timegrid-col.fc-day-today {
+	background-color: transparent !important;
+}
