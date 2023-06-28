@@ -4,10 +4,10 @@ import { Tabs, theme } from 'flowbite-react';
 import { Clock, Users, BookOpen, User, AtSign, Mail } from 'lucide-react';
 import { api } from '@/services/api';
 import { Teacher } from '@/interfaces/Teacher';
-import AboutTeacher from '@/components/AboutTeacher';
 import ProfileButton from '@/components/ProfileButton';
 import { useEffect, useState } from 'react';
 import { flowbiteTheme } from '@/app/theme';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface TeacherProfileProps {
 	params: {
@@ -30,7 +30,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 
 	return (
-		<div className='px-9 pt-6'>
+		<>
+			<Breadcrumb title="Professores">
+				<section></section>
+			</Breadcrumb>
+
 			<div className='flex gap-4 items-center'>
 				<User className="rounded-lg bg-primary-background w-16 h-16 p-3" color="#007EA7" />
 
@@ -106,7 +110,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					</div>
 				</Tabs.Item>
 			</Tabs.Group>
-		</div>
+		</>
 	)
 }
 
