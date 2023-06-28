@@ -1,5 +1,5 @@
 import { Class, Course } from "@/interfaces/Course";
-import { CreateTeacher } from "@/interfaces/Teacher";
+import { Teacher } from "@/interfaces/Teacher";
 import { api, suapApi } from "@/services/api";
 import {
 	createContext,
@@ -18,9 +18,12 @@ interface GlobalContextValues {
 	setCourses: React.Dispatch<React.SetStateAction<Course[]>>;
 	classes: Class[];
 	setClasses: React.Dispatch<React.SetStateAction<Class[]>>;
+	teachers: Teacher[];
+	setTeachers: React.Dispatch<React.SetStateAction<Teacher[]>>;
 
 	getAllCourses: () => Promise<void>;
 	getAllClasses: () => Promise<void>;
+	getAllTeachers: () => Promise<void>;
 }
 
 const GlobalContext = createContext<GlobalContextValues>(
@@ -30,6 +33,7 @@ const GlobalContext = createContext<GlobalContextValues>(
 const GlobalProvider = ({ children }: GlobalProviderProps) => {
 	const [courses, setCourses] = useState<Course[]>([]);
 	const [classes, setClasses] = useState<Class[]>([]);
+	const [teachers, setTeachers] = useState<Teacher[]>([]);
 
 	const getAllCourses = useCallback(async () => {
 		const { data } = await api.get("courses/");
@@ -43,9 +47,16 @@ const GlobalProvider = ({ children }: GlobalProviderProps) => {
 		setClasses(data);
 	}, []);
 
+	const getAllTeachers = useCallback(async () => {
+		const { data } = await api.get("teachers/");
+
+		setTeachers(data);
+	}, []);
+
 	useEffect(() => {
 		getAllCourses();
 		getAllClasses();
+		getAllTeachers();
 	}, []);
 
 	return (
@@ -55,9 +66,12 @@ const GlobalProvider = ({ children }: GlobalProviderProps) => {
 				setCourses,
 				classes,
 				setClasses,
+				teachers,
+				setTeachers,
 
 				getAllCourses,
 				getAllClasses,
+				getAllTeachers,
 			}}
 		>
 			{children}
