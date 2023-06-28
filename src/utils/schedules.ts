@@ -13,6 +13,30 @@ export const shifts = [
 	},
 ];
 
+export const shiftsSchedule = {
+	Manhã: {
+		startHour: 7,
+		startMinute: 0,
+
+		endHour: 12,
+		endMinute: 0,
+	},
+	Tarde: {
+		startHour: 13,
+		startMinute: 0,
+
+		endHour: 18,
+		endMinute: 0,
+	},
+	Noite: {
+		startHour: 19,
+		startMinute: 0,
+
+		endHour: 22,
+		endMinute: 10,
+	},
+};
+
 export const degrees = [
 	{
 		label: "Ensino superior",

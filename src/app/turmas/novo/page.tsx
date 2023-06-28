@@ -13,7 +13,12 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-
+import WeekCalendar from "@/components/WeekCalendar";
+import { eventColors } from "@/utils/eventColors";
+import DraggrableDiscipline from "@/components/DraggrableDiscipline";
+import { Draggable } from "@fullcalendar/interaction";
+import { intervalEvents } from "@/utils/intervalEvents";
+import { Check } from "lucide-react";
 interface CreateClass {
 	course_id: string;
 	reference_period: number;
@@ -71,6 +76,23 @@ export default function AddClass() {
 	useEffect(() => {
 		getAllCourses();
 		getAllStudents();
+
+		// let draggableEl = document.getElementById("external-events") as HTMLElement;
+
+		// new Draggable(draggableEl, {
+		// 	itemSelector: ".fc-event",
+		// 	eventData: function (eventEl) {
+		// 		let title = eventEl.getAttribute("title");
+		// 		let id = eventEl.getAttribute("data");
+
+		// 		return {
+		// 			id: id,
+		// 			title: title,
+		// 			duration: "00:45:00",
+		// 			...eventColors.new,
+		// 		};
+		// 	},
+		// });
 	}, []);
 
 	const onSubmit = async (newClass: CreateClass) => {
@@ -84,53 +106,75 @@ export default function AddClass() {
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="w-full">
 			<Breadcrumb title="Cadastrar turma" />
+			<div className="grid grid-cols-2 gap-8 flex-1">
+				<section>
+					<Select
+						containerClassName="mt-2"
+						control={control}
+						options={coursesOptions}
+						name="course_id"
+						placeholder="Selecione um curso"
+						label="Curso"
+					/>
 
-			<Select
-				containerClassName="mt-2"
-				control={control}
-				options={coursesOptions}
-				name="course_id"
-				placeholder="Selecione um curso"
-				label="Curso"
-			/>
+					<Select
+						containerClassName="mt-2"
+						control={control}
+						options={shifts}
+						name="shift"
+						placeholder="Selecione um turno"
+						label="Turno"
+					/>
+				</section>
+				<section>
+					<Select
+						containerClassName="mt-2"
+						control={control}
+						disabled={!watch("course_id")}
+						options={
+							courses?.find(({ id }) => id.toString() === watch("course_id"))
+								?.degree === "Ensino superior"
+								? reference_periods
+								: reference_years
+						}
+						name="reference_period"
+						placeholder="Selecione um período de referência"
+						label="Período de referência"
+					/>
 
-			<Select
-				containerClassName="mt-2"
-				control={control}
-				options={shifts}
-				name="shift"
-				placeholder="Selecione um turno"
-				label="Turno"
-			/>
+					<Select
+						containerClassName="mt-2"
+						control={control}
+						disabled={!watch("course_id")}
+						options={studentsOptions}
+						name="class_leader_id"
+						placeholder="Selecione um líder de turma"
+						label="Líder de turma"
+					/>
+				</section>
 
-			<Select
-				containerClassName="mt-2"
-				control={control}
-				disabled={!watch("course_id")}
-				options={
-					courses?.find(({ id }) => id.toString() === watch("course_id"))
-						?.degree === "Ensino superior"
-						? reference_periods
-						: reference_years
-				}
-				name="reference_period"
-				placeholder="Selecione um período de referência"
-				label="Período de referência"
-			/>
-
-			<Select
-				containerClassName="mt-2"
-				control={control}
-				disabled={!watch("course_id")}
-				options={studentsOptions}
-				name="class_leader_id"
-				placeholder="Selecione um líder de turma"
-				label="Líder de turma"
-			/>
-
-			<Button isProcessing={isSubmitting} className="w-full mt-4" type="submit">
-				Confirmar
-			</Button>
+				{/* <div id="external-events" className="flex flex-col gap-2 mt-4">
+						<p>
+							<strong>Disciplinas</strong>
+						</p>
+						{disciplines.map((event: any, index) => {
+							return (
+								<DraggrableDiscipline
+									key={index}
+									id={event.id}
+									title={event.title}
+									quantity={2}
+								/>
+							);
+						})}
+					</div> */}
+			</div>
+			<section className="flex justify-end">
+				<Button isProcessing={isSubmitting} className="mt-6" type="submit">
+					{!isSubmitting && <Check className="mr-2 text-white" />}
+					<span>Cadastrar</span>
+				</Button>
+			</section>
 		</form>
 	);
 }
