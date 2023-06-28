@@ -34,4 +34,15 @@ export const flowbiteTheme: CustomFlowbiteTheme = {
     itemGroup:
       "list-none border-t border-gray-200 pt-3 first:mt-0 first:border-t-0 first:pt-0 dark:border-gray-700",
   },
+	tabitem: {
+      base: "flex items-center justify-center p-4 rounded-t-lg text-sm font-medium first:ml-0 disabled:cursor-not-allowed disabled:text-gray-400 disabled:dark:text-gray-500 focus:ring-4 focus:ring-cyan-300 focus:outline-none",
+      styles: {
+        default: {
+          base: "rounded-t-lg",
+          active: {
+            on: "bg-gray-100 text-primary dark:bg-gray-800 dark:text-cyan-500",
+            off: "text-gray-500 hover:bg-gray-50 hover:text-gray-600 "
+          },
+    },
+	},
 };

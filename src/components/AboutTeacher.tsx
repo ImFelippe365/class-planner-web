@@ -29,7 +29,7 @@ export default function AboutTeacher({
 
 				<div className="flex items-center gap-x-2">
 					<Clock className="w-4 h-4 text-primary-dark"/>
-					<span>{weekHours}h/semana</span>
+					<span>{weekHours}aulas/semana</span>
 				</div>
 			</div>
 		</div>
