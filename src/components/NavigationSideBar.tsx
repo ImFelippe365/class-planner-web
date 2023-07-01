@@ -46,18 +46,18 @@ export default function NavigationSideBar(): React.ReactNode {
 	];
 
 	return (
-		<aside className="h-[100vh] bg-white max-h-[100vh] w-[330px]">
-			<section className="fixed flex flex-col items-center gap-8 h-[100vh] bg-white max-h-[100vh] w-[330px] py-8 px-4">
+		<aside className="h-[100vh] bg-white max-h-[100vh] w-[280px]">
+			<section className="fixed flex flex-col items-center gap-8 h-[100vh] bg-white max-h-[100vh] w-[280px] py-8 px-4">
 				<h1 className="text-black text-2xl text-center font-bold">
 					Class Planner
 				</h1>
-				<header className="flex flex-row justify-start items-center gap-4 px-4 w-full">
+				<header className="flex flex-row flex-shrink-0 flex-grow-0 justify-start items-center gap-4 px-4 w-full">
 					<User
 						fontSize={48}
 						className="text-primary bg-primary-background rounded-full p-3 w-12 h-12"
 					/>
 					<div>
-						<h3 className="font-semibold text-black text-sm">
+						<h3 className="font-semibold text-black text-sm leading-tight">
 							Jeferson Queiroga Pereira
 						</h3>
 						<p className="text-gray text-xs">Professor</p>

@@ -15,4 +15,17 @@ export interface Class {
 	shift: Shifts;
 	class_leader_id?: number;
 }
-export interface Discipline {}
+
+
+export interface Discipline {
+	code: string,
+	id: number,
+	course_period: {
+		course_id: number,
+		period: number,
+	}[]
+	is_optional: boolean,
+	name: string,
+	workload_in_class: number,
+	workload_in_clock: number,
+}

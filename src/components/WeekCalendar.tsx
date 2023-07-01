@@ -12,9 +12,14 @@ import {
 } from "@fullcalendar/core";
 import { shortWeekdays } from "@/utils/dates";
 
-interface WeekCalendarProps extends CalendarOptions {}
+interface WeekCalendarProps extends CalendarOptions {
+	weekCalendarRef: (calendarRef: any) => void;
+}
 
-export default function WeekCalendar({ ...props }: WeekCalendarProps) {
+export default function WeekCalendar({
+	weekCalendarRef,
+	...props
+}: WeekCalendarProps) {
 	const DayHeader = (props: DayHeaderContentArg) => {
 		const date = new Date(props.date);
 		const weekdayName = date.getDate();
@@ -73,7 +78,7 @@ export default function WeekCalendar({ ...props }: WeekCalendarProps) {
 		${scheduleEndHours}:${scheduleEndMinutes}`;
 
 		return (
-			<div {...props} className="flex flex-col p-3">
+			<div {...props} className="flex flex-col p-3 text-white">
 				<span className="font-semibold">{title}</span>
 				<span className="font-normal">
 					{isDragging ? timeText : scheduleTime}
@@ -84,6 +89,7 @@ export default function WeekCalendar({ ...props }: WeekCalendarProps) {
 
 	return (
 		<FullCalendar
+			ref={(calendarRef) => weekCalendarRef(calendarRef)}
 			allDaySlot={false}
 			initialView="timeGridWeek"
 			plugins={[timeGridPlugin, interactionPlugin]}
@@ -109,7 +115,7 @@ export default function WeekCalendar({ ...props }: WeekCalendarProps) {
 			)}
 			eventClassNames={(props) =>
 				props.event.display !== "background"
-					? "border-l-4 border-l-red-500 border-solid rounded-l-none rounded-r-8 border-y-0 border-r-0 rounded-tr-2xl rounded-br-2xl"
+					? "border-none rounded-lg"
 					: "bg-yellow-500"
 			}
 			eventContent={ScheduleEvent}
