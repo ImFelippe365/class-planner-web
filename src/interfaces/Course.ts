@@ -15,4 +15,3 @@ export interface Class {
 	shift: Shifts;
 	class_leader_id?: number;
 }
-export interface Discipline {}

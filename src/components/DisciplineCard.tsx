@@ -2,14 +2,16 @@ import { BookOpen } from "lucide-react";
 import Dropdown from "./Dropdown";
 
 interface DisciplineCardProps {
+	disciplineId: number;
 	period: string | number;
-	disciplineName: string;
-	courseGrade: string;
+	name: string;
+	courseGrade: string | undefined;
 }
 
 export default function DisciplineCard({
+	disciplineId,
 	period,
-	disciplineName,
+	name,
 	courseGrade,
 }: DisciplineCardProps): React.ReactNode {
 	return (
@@ -22,9 +24,9 @@ export default function DisciplineCard({
 
 			<div className="text-primary mt-3 h-20">
 				<p className="text-xs">
-					{period}º {courseGrade == "Técnico Integrado" ? "Ano" : "Período"}
+					{period}º {courseGrade == "Ensino técnico" ? "Ano" : "Período"}
 				</p>
-				<p className="text-sm font-semibold mt-1 leading-4">{disciplineName}</p>
+				<p className="text-sm font-semibold mt-1 leading-4">{name}</p>
 			</div>
 		</div>
 	);

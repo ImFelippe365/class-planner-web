@@ -7,10 +7,11 @@ import { MoreVertical } from "lucide-react"
 
 interface DropdownProps {
 	cardType: "discipline" | "course" | "student";
+	courseId?: number;
 	courseGrade?: string;
 }
 
-export default function Dropdown({ cardType, courseGrade }: DropdownProps) {
+export default function Dropdown({ cardType, courseGrade, courseId }: DropdownProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -24,7 +25,7 @@ export default function Dropdown({ cardType, courseGrade }: DropdownProps) {
 						width={18}
 						height={18}
 						color={`${cardType == 'discipline' ? "#007EA7" :
-							courseGrade == "Técnico Integrado" ? "#52489C" : "#6D4C3D"}`}
+							courseGrade == "Ensino técnico" ? "#52489C" : "#6D4C3D"}`}
 						className="self-center"
 					/>
 				)
@@ -39,7 +40,7 @@ export default function Dropdown({ cardType, courseGrade }: DropdownProps) {
 
 							{cardType == 'course' && (
 								<>
-									<Link href={`#`} className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
+									<Link href={`/cursos/${courseId}/disciplinas`} className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2">
 										<BookOpen width={16} height={16} color="#000E1A" />
 										<p className="font-semibold text-xs">Ver disciplinas</p>
 									</Link>
