@@ -7,15 +7,17 @@ interface ClassCardProps {
 	period: string | number;
 	courseNickname: string;
 	courseGrade: string;
+	href: string
 }
 
 export default function ClassCard({
 	period,
 	courseNickname,
-	courseGrade
+	courseGrade,
+	href
 }: ClassCardProps): React.ReactNode {
 	return (
-		<Link href={`#`} className="bg-primary-background rounded-xl w-56 p-4 items-center drop-shadow-sm">
+		<Link href={href} className="bg-primary-background rounded-xl p-4 items-center drop-shadow-sm w-full">
 			<div className="flex flex-row justify-between">
 				<Users width={24} height={24} color="#007EA7" />
 			</div>

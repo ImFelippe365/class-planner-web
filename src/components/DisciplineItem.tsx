@@ -1,3 +1,4 @@
+import { formatDisciplineName } from "@/utils/formatDisciplineName";
 import { BookMarked, GripVertical } from "lucide-react";
 import React from "react";
 
@@ -15,11 +16,6 @@ export default function DisciplineItem({
 	availableQuantity,
 	...props
 }: DisciplineItemProps) {
-	const formattedDisciplineName = disciplineName
-		.replace(disciplineName.split("-")[0], "")
-		.slice(2)
-		.split("(")[0];
-
 	return (
 		<div
 			{...props}
@@ -42,7 +38,7 @@ export default function DisciplineItem({
 						{teacherName}
 					</span>
 					<span className="block text-black font-semibold leading-tight">
-						{formattedDisciplineName}
+						{formatDisciplineName(disciplineName)}
 					</span>
 				</div>
 			</div>

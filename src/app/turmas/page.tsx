@@ -22,10 +22,6 @@ export default function Classes() {
 		<div>
 			<Breadcrumb title="Turmas">
 				<section className="flex flex-row gap-6">
-					<Button onClick={() => routes.push(`turmas/${1}`)}>
-						<CalendarPlus className="mr-2" />
-						<p>Criar horário</p>
-					</Button>
 					<Button onClick={() => routes.push("turmas/novo")}>
 						<Users className="mr-2" />
 						<p>Criar turma</p>
@@ -34,11 +30,12 @@ export default function Classes() {
 			</Breadcrumb>
 
 			<section className="grid auto-rows-auto grid-cols-cardsGrid gap-5">
-				{classes.map(({ id, reference_period }) => (
+				{classes.map(({ id, course, reference_period }) => (
 					<ClassCard
 						key={id}
-						courseGrade="d"
-						courseNickname="23"
+						href={`turmas/${id}`}
+						courseGrade={course.degree}
+						courseNickname={course.name}
 						period={reference_period}
 					/>
 				))}

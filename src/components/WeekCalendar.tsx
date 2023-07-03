@@ -1,25 +1,34 @@
 import FullCalendar from "@fullcalendar/react";
-import React from "react";
+import React, { useCallback, useState } from "react";
 
-import interactionPlugin from "@fullcalendar/interaction";
+import interactionPlugin, { EventReceiveArg } from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import {
 	CalendarOptions,
 	DayHeaderContentArg,
+	EventChangeArg,
+	EventClickArg,
 	EventContentArg,
 	SlotLabelContentArg,
 	SlotLaneContentArg,
 } from "@fullcalendar/core";
 import { shortWeekdays } from "@/utils/dates";
-
-interface WeekCalendarProps extends CalendarOptions {
-	weekCalendarRef: (calendarRef: any) => void;
+import { useSchedule } from "@/hooks/ScheduleContext";
+import { formatTime } from "@/utils/formatTime";
+interface DisciplineSchedule {
+	discipline_id: number;
+	quantity: number;
+	weekday: number;
+	start_time: string;
+	end_time: string;
 }
+interface WeekCalendarProps extends CalendarOptions {}
 
-export default function WeekCalendar({
-	weekCalendarRef,
-	...props
-}: WeekCalendarProps) {
+export default function WeekCalendar({ ...props }: WeekCalendarProps) {
+	const { newWeekSchedules, setNewWeekSchedules } = useSchedule();
+
+	const [selectedSchedules, setSelectedSchedules] = useState<string[]>([]);
+
 	const DayHeader = (props: DayHeaderContentArg) => {
 		const date = new Date(props.date);
 		const weekdayName = date.getDate();
@@ -62,8 +71,9 @@ export default function WeekCalendar({
 
 		if (display === "background") return null;
 
-		const start = new Date(startStr);
-		const end = new Date(endStr);
+		const start = new Date(startStr) as any;
+		const end = new Date(endStr) as any;
+		const quantity = (end - start) / 60000 / 45;
 
 		const scheduleStartHours = start?.getHours();
 		const scheduleStartMinutes = start
@@ -74,22 +84,49 @@ export default function WeekCalendar({
 		const scheduleEndHours = end?.getHours();
 		const scheduleEndMinutes = end?.getMinutes().toString().padStart(2, "0");
 
-		const scheduleTime = `${scheduleStartHours}:${scheduleStartMinutes} -
+		const scheduleTime = `${scheduleStartHours}:${scheduleStartMinutes} até 
 		${scheduleEndHours}:${scheduleEndMinutes}`;
 
 		return (
-			<div {...props} className="flex flex-col p-3 text-white">
-				<span className="font-semibold">{title}</span>
-				<span className="font-normal">
+			<div
+				{...props}
+				className={`flex flex-1 justify-between flex-col p-3 text-white`}
+			>
+				<div>
+					<span className="font-normal text-xs block">
+						{quantity.toFixed(0)} {quantity > 1 ? "aulas" : "aula"}
+					</span>
+
+					<span className="font-semibold block overflow-hidden w-28">
+						{title}
+					</span>
+				</div>
+				<span className="font-normal text-xs">
 					{isDragging ? timeText : scheduleTime}
 				</span>
 			</div>
 		);
 	};
 
+	const onSelectSchedule = (props: EventClickArg) => {
+		const id = props.event._def.defId;
+		const alreadySelected = selectedSchedules.findIndex(
+			(schedule_id) => schedule_id === id
+		);
+		const newSelectedSchedules = [...selectedSchedules];
+
+		if (alreadySelected >= 0) {
+			newSelectedSchedules.splice(alreadySelected, 1);
+		} else {
+			newSelectedSchedules.push(id);
+		}
+
+		setSelectedSchedules(newSelectedSchedules);
+	};
+
 	return (
 		<FullCalendar
-			ref={(calendarRef) => weekCalendarRef(calendarRef)}
+			ref={(ref) => console.log(ref)}
 			allDaySlot={false}
 			initialView="timeGridWeek"
 			plugins={[timeGridPlugin, interactionPlugin]}
@@ -98,6 +135,7 @@ export default function WeekCalendar({
 			nowIndicator={false}
 			eventOverlap={false}
 			weekends={false}
+			height={"180vh"}
 			slotMinTime={{
 				hours: 13,
 			}}
@@ -107,17 +145,24 @@ export default function WeekCalendar({
 			slotDuration={{
 				minute: 5,
 			}}
+			eventClick={onSelectSchedule}
 			dayHeaderContent={DayHeader}
 			slotLabelContent={SlotLabel}
-			nowIndicatorContent={<div>teste</div>}
 			slotLaneContent={(props: SlotLaneContentArg) => (
-				<td className="bg-background-color h-8 border-collapse" {...props}></td>
+				<td className="bg-background-color !border-none" {...props}></td>
 			)}
-			eventClassNames={(props) =>
-				props.event.display !== "background"
-					? "border-none rounded-lg"
-					: "bg-yellow-500"
-			}
+			eventClassNames={(props) => {
+				const id = props.event._def.defId;
+				const alreadySelected = selectedSchedules.findIndex(
+					(schedule_id) => schedule_id === id
+				);
+
+				const selected = alreadySelected >= 0 ? "bg-warning" : "";
+
+				return props.event.display !== "background"
+					? `border-none rounded-lg ${selected}`
+					: "bg-yellow-500";
+			}}
 			eventContent={ScheduleEvent}
 			locale={"pt-BR"}
 			editable
