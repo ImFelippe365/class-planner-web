@@ -4,16 +4,18 @@ import Dropdown from "./Dropdown";
 interface CourseCardProps {
 	courseGrade: string;
 	courseName: string;
+	courseId: number;
 }
 
 export default function CourseCard({
 	courseGrade,
 	courseName,
+	courseId
 }: CourseCardProps): React.ReactNode {
 	return (
 		<div
 			className={`${
-				courseGrade == "Técnico Integrado"
+				courseGrade == "Ensino técnico"
 					? "bg-ultra-violet-transparent"
 					: "bg-coffee-transparent"
 			} rounded-xl p-4 items-center`}
@@ -23,16 +25,16 @@ export default function CourseCard({
 					width={29}
 					height={29}
 					color={`${
-						courseGrade == "Técnico Integrado" ? "#52489C" : "#6D4C3D"
+						courseGrade == "Ensino técnico" ? "#52489C" : "#6D4C3D"
 					}`}
 				/>
 
-				<Dropdown cardType="course" courseGrade={courseGrade}/>
+				<Dropdown cardType="course" courseId={courseId} courseGrade={courseGrade}/>
 			</div>
 
 			<div
 				className={`${
-					courseGrade == "Técnico Integrado"
+					courseGrade == "Ensino técnico"
 						? "text-ultra-violet"
 						: "text-coffee"
 				} mt-3 h-20`}

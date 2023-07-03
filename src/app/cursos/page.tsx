@@ -31,7 +31,7 @@ export default function Courses(): React.ReactNode {
 
 			<section className="grid auto-rows-auto grid-cols-cardsGrid gap-5">
 				{courses.map(({ id, name, degree }) => (
-					<CourseCard key={id} courseGrade={degree} courseName={name} />
+					<CourseCard key={id} courseId={id} courseGrade={degree} courseName={name} />
 				))}
 			</section>
 		</div>
