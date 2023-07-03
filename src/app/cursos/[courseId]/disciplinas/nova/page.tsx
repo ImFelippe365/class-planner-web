@@ -67,11 +67,11 @@ export default function AddDiscipline(): React.ReactNode {
 	const router = useRouter();
 
 	const onSubmit = async (newDiscipline: CreateDiscipline) => {
-		newDiscipline.workload_in_clock = Math.ceil((newDiscipline.workload_in_class*45)/60)
+		newDiscipline.workload_in_clock = Math.ceil((newDiscipline.workload_in_class * 45) / 60)
 		newDiscipline.is_optional = isOptional
 
 		const { data } = await api.post("disciplines/", newDiscipline);
-		
+
 		console.log(data);
 
 		router.back();
@@ -93,7 +93,7 @@ export default function AddDiscipline(): React.ReactNode {
 	}, [])
 
 	return (
-		<form className="w-full" onSubmit={handleSubmit(onSubmit, )}>
+		<form className="w-full" onSubmit={handleSubmit(onSubmit,)}>
 			<Breadcrumb title="Cadastrar disciplina" />
 
 			<Input
@@ -185,7 +185,6 @@ export default function AddDiscipline(): React.ReactNode {
 									: 'ano'}
 								 de referência`}
 							/>
-							{watch(`course.${index}.course_id`)}
 						</div>
 					)
 				})}
