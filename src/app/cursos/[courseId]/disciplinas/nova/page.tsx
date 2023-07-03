@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as yup from "yup";
 import { Control, Controller } from "react-hook-form";
@@ -34,8 +34,8 @@ export default function AddDiscipline(): React.ReactNode {
 	const schema = yup.object({
 		name: yup.string().required("Campo nome é obrigatório"),
 		code: yup.string().required("Campo código é obrigatório"),
-		workload_in_class: yup.number().required("Campo carga horária é obrigatório"),
-		is_optional: yup.boolean().required("Campo tipo é obrigatório"),
+		workload_in_class: yup.number().positive().required("Campo carga horária é obrigatório"),
+		is_optional: yup.boolean(),
 		course: yup.array(yup.object({
 			course_id: yup.string().required("Campo curso é obrigatório"),
 			period: yup.number().required("Campo período é obrigatório")
@@ -53,7 +53,7 @@ export default function AddDiscipline(): React.ReactNode {
 
 	const [courses, setCourses] = useState<Course[]>([]);
 	const [coursesOptions, setCoursesOptions] = useState<SelectOptions[]>([]);
-
+	const [isOptional, setIsOptional] = useState(false);
 
 	const { fields, append } = useFieldArray({
 		control,
@@ -64,14 +64,17 @@ export default function AddDiscipline(): React.ReactNode {
 		append({ course_id: '', period: 0 })
 	}
 
-	//const router = useRouter();
+	const router = useRouter();
 
 	const onSubmit = async (newDiscipline: CreateDiscipline) => {
-		const { data } = await api.post("disciplines/", newDiscipline);
+		newDiscipline.workload_in_clock = Math.ceil((newDiscipline.workload_in_class*45)/60)
+		newDiscipline.is_optional = isOptional
 
+		const { data } = await api.post("disciplines/", newDiscipline);
+		
 		console.log(data);
 
-		//router.back();
+		router.back();
 	};
 
 	const getAllCourses = async () => {
@@ -90,7 +93,7 @@ export default function AddDiscipline(): React.ReactNode {
 	}, [])
 
 	return (
-		<form className="w-full" onSubmit={handleSubmit(onSubmit)}>
+		<form className="w-full" onSubmit={handleSubmit(onSubmit, )}>
 			<Breadcrumb title="Cadastrar disciplina" />
 
 			<Input
@@ -101,21 +104,12 @@ export default function AddDiscipline(): React.ReactNode {
 				placeholder="Digite o nome da disciplina" label="Nome"
 			/>
 
-			<div className="mt-2">
-				<input
-					type="checkbox"
-					name="is_optional"
-					id="is_optional"
-					className="rounded"
-				/>
-
-				<Label htmlFor="is_optional" value=	"É optativa" />
-			</div>
-
-			{/* <Controller
+			<Controller
 				name="is_optional"
 				control={control}
 				render={({
+					field: { onBlur, onChange, ref },
+					formState,
 					fieldState: { error },
 				}) => (
 					<div className="mt-2 flex ">
@@ -123,17 +117,18 @@ export default function AddDiscipline(): React.ReactNode {
 						<div className="flex gap-2">
 							<Checkbox
 								id="is_optional"
+								onChange={() => setIsOptional(!isOptional)}
 							/>
 							<Label
 								color={error ? "failure" : "" || "gray"}
 								htmlFor={"is_optional"}
 								value="É optativa"
 							/>
+							{error?.message}
 						</div>
 					</div>
 				)}
-			/> */}
-
+			/>
 
 			<Input
 				containerClassName="mt-2"
@@ -152,12 +147,14 @@ export default function AddDiscipline(): React.ReactNode {
 			/>
 
 			<div>
-				<span>Cursos associados</span>
-				<Button
-					className="mt-2 w-fit self-end"
-					onClick={addCourseLink}>
-					Adicionar curso para disciplina
-				</Button>
+				<div className="mt-3 flex justify-between items-center">
+					<span className="font-semibold text-lg text-primary-dark flex-wrap">Cursos associados</span>
+					<Button
+						className="w-fit self-end"
+						onClick={addCourseLink}>
+						Adicionar curso para disciplina
+					</Button>
+				</div>
 
 				{fields.map((field, index) => {
 					return (
@@ -188,6 +185,7 @@ export default function AddDiscipline(): React.ReactNode {
 									: 'ano'}
 								 de referência`}
 							/>
+							{watch(`course.${index}.course_id`)}
 						</div>
 					)
 				})}
