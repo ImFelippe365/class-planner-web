@@ -18,12 +18,13 @@ export interface Discipline {
 
 export interface CourseDiscipline{
 	id: number;
-	discipline_id: {
+	discipline: {
 		id: number;
 		name: string;
 		degree: string;
 		course_load: number;
 		byname: string;
 	};
+	course_degree: string;
 	period: number;
 }

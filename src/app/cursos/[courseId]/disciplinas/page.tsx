@@ -7,10 +7,11 @@ import { useGlobal } from "@/hooks/GlobalContext";
 import Button from "@/components/Button";
 import { BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { api } from "@/services/api";
 import { CourseDiscipline, Discipline } from "@/interfaces/Discipline";
 import { Course } from "@/interfaces/Course";
+import DeleteModal from "@/components/DeleteModal";
 
 interface CourseDisciplineProps {
 	params: {
@@ -21,9 +22,9 @@ interface CourseDisciplineProps {
 export default function CourseDiscipline({ params }: CourseDisciplineProps)
 	: React.ReactNode {
 	const routes = useRouter();
+	const [openModal, setOpenModal] = useState<string | undefined>();
 
 	const [disciplines, setDisciplines] = useState<CourseDiscipline[]>([])
-	const [course, setCourse] = useState<Course>()
 
 	const getCourseDisciplines = async () => {
 		const { data } = await api.get(`/courses/${params.courseId}/disciplines/`)
@@ -31,14 +32,15 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 		setDisciplines(data)
 	}
 
-	const getCourse = async () => {
-		const { data } = await api.get(`/courses/${params.courseId}/`)
+	const deleteDisciplineLink = async (disciplineId: number) => {
+		await api.delete(`courses/${params.courseId}/disciplines/${disciplineId}/`)
 
-		setCourse(data)
+		getCourseDisciplines()
+
+		setOpenModal(undefined)
 	}
 
 	useEffect(() => {
-		getCourse();
 		getCourseDisciplines();
 	}, [])
 
@@ -46,7 +48,7 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 		<>
 			<Breadcrumb title="Disciplinas">
 				<section className="flex flex-row gap-6">
-					<Button onClick={() => routes.push(`cursos/${params.courseId}/disciplinas/nova`)}>
+					<Button onClick={() => routes.push(`disciplinas/nova`)}>
 						<BookOpen className="mr-2" />
 						<p>Criar disciplina</p>
 					</Button>
@@ -54,13 +56,22 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 			</Breadcrumb>
 
 			<section className="grid grid-cols-4 gap-5">
-				{disciplines.map(({ id, discipline_id, period }) => (
+				{disciplines.map(({ id, discipline, course_degree, period }) => (
 					<DisciplineCard
 						key={id}
-						disciplineId={id}
-						courseGrade={course?.degree}
-						name={discipline_id.name}
-						period={period} />
+						disciplineId={discipline.id}
+						courseGrade={course_degree}
+						name={discipline.name}
+						period={period}
+						courseId={params.courseId}
+					>
+						<DeleteModal key={id} type="discipline">
+							<Button key={id} color="sucess"
+								className="bg-success text-white" onClick={() => deleteDisciplineLink(discipline.id)}>
+								Confirmar
+							</Button>
+						</DeleteModal>
+					</DisciplineCard>
 				))}
 			</section>
 		</>
