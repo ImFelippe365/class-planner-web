@@ -35,9 +35,8 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 	const deleteDisciplineLink = async (disciplineId: number) => {
 		await api.delete(`courses/${params.courseId}/disciplines/${disciplineId}/`)
 
-		getCourseDisciplines()
-
-		setOpenModal(undefined)
+		setOpenModal(undefined);
+		getCourseDisciplines();
 	}
 
 	useEffect(() => {

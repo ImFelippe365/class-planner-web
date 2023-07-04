@@ -1,16 +1,19 @@
 import { GraduationCap } from "lucide-react";
 import Dropdown from "./Dropdown";
+import React from "react";
 
 interface CourseCardProps {
 	courseGrade: string;
 	courseName: string;
 	courseId: number;
+	children: React.ReactNode;
 }
 
 export default function CourseCard({
 	courseGrade,
 	courseName,
-	courseId
+	courseId,
+	children,
 }: CourseCardProps): React.ReactNode {
 	return (
 		<div
@@ -29,7 +32,9 @@ export default function CourseCard({
 					}`}
 				/>
 
-				<Dropdown cardType="course" courseId={courseId} courseGrade={courseGrade}/>
+				<Dropdown cardType="course" courseId={courseId} courseGrade={courseGrade}>
+					{children}
+				</Dropdown>
 			</div>
 
 			<div
