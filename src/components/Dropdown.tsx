@@ -1,17 +1,27 @@
 "use client";
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { BookOpen, Users, Edit2, Trash, Crown } from "lucide-react";
 import Link from "next/link";
 import { MoreVertical } from "lucide-react"
+import DeleteModal from "./DeleteModal";
+import Button from "./Button";
 
 interface DropdownProps {
 	cardType: "discipline" | "course" | "student";
 	courseId?: number;
 	courseGrade?: string;
+	disciplineId?: number;
+	children: React.ReactNode;
 }
 
-export default function Dropdown({ cardType, courseGrade, courseId }: DropdownProps) {
+export default function Dropdown({
+	cardType,
+	courseGrade,
+	courseId,
+	disciplineId,
+	children
+}: DropdownProps): React.ReactNode {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -29,7 +39,12 @@ export default function Dropdown({ cardType, courseGrade, courseId }: DropdownPr
 						className="self-center"
 					/>
 				)
-					: <MoreVertical className={`hover:bg-primary-background p-1 ${isOpen && "bg-primary-background"} rounded-full`} width={30} height={30} color="#007EA7" />
+					: <MoreVertical
+						className={`hover:bg-primary-background p-1 ${isOpen && "bg-primary-background"} rounded-full`}
+						width={30}
+						height={30}
+						color="#007EA7"
+					/>
 				}
 			</button>
 
@@ -57,10 +72,8 @@ export default function Dropdown({ cardType, courseGrade, courseId }: DropdownPr
 								<p className="font-semibold text-xs">Editar</p>
 							</Link>
 
-							<Link href={`#`} className="flex flex-row w-full hover:bg-error-transparent rounded-lg cursor-pointer gap-3 items-center p-2">
-								<Trash width={16} height={16} color="#C92A2A" />
-								<p className="font-semibold text-xs text-error">Remover</p>
-							</Link>
+							{children}
+
 						</div>
 					) : (
 						<div className="bg-white absolute top-5 flex flex-col items-start rounded-lg p-3 right-[0] w-56 drop-shadow-sm">

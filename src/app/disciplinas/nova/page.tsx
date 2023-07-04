@@ -38,7 +38,7 @@ export default function AddDiscipline(): React.ReactNode {
 		is_optional: yup.boolean(),
 		course: yup.array(yup.object({
 			course_id: yup.string().required("Campo curso é obrigatório"),
-			period: yup.number().required("Campo período é obrigatório")
+			period: yup.number().positive().required("Campo período é obrigatório").min(1, 'O período de referência deve ser maior que 0')
 		})).min(1, 'A disciplina precisa estar vinculada a pelo menos 1 curso'),
 	});
 
@@ -190,7 +190,7 @@ export default function AddDiscipline(): React.ReactNode {
 				})}
 			</div>
 
-			<Button isProcessing={isSubmitting} className="w-full mt-4" type="submit">
+			<Button isProcessing={isSubmitting} className="w-full my-4" type="submit">
 				Confirmar
 			</Button>
 		</form>

@@ -7,10 +7,11 @@ import { useGlobal } from "@/hooks/GlobalContext";
 import Button from "@/components/Button";
 import { BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { api } from "@/services/api";
 import { CourseDiscipline, Discipline } from "@/interfaces/Discipline";
 import { Course } from "@/interfaces/Course";
+import DeleteModal from "@/components/DeleteModal";
 
 interface CourseDisciplineProps {
 	params: {
@@ -21,9 +22,11 @@ interface CourseDisciplineProps {
 export default function CourseDiscipline({ params }: CourseDisciplineProps)
 	: React.ReactNode {
 	const routes = useRouter();
+	const [openModal, setOpenModal] = useState<string | undefined>();
 
 	const [disciplines, setDisciplines] = useState<CourseDiscipline[]>([])
 	const [course, setCourse] = useState<Course>()
+	//const { courseDisciplines, getCourseDisciplines } = useGlobal();
 
 	const getCourseDisciplines = async () => {
 		const { data } = await api.get(`/courses/${params.courseId}/disciplines/`)
@@ -31,6 +34,15 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 		setDisciplines(data)
 	}
 
+	const deleteDisciplineLink = async (disciplineId: number) => {
+		await api.delete(`courses/${params.courseId}/disciplines/${disciplineId}/`)
+
+		getCourseDisciplines()
+
+		setOpenModal(undefined)
+	}
+
+	//const response = getCourseDisciplines(params.courseId);
 	const getCourse = async () => {
 		const { data } = await api.get(`/courses/${params.courseId}/`)
 
@@ -46,7 +58,7 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 		<>
 			<Breadcrumb title="Disciplinas">
 				<section className="flex flex-row gap-6">
-					<Button onClick={() => routes.push(`cursos/${params.courseId}/disciplinas/nova`)}>
+					<Button onClick={() => routes.push(`disciplinas/nova`)}>
 						<BookOpen className="mr-2" />
 						<p>Criar disciplina</p>
 					</Button>
@@ -57,10 +69,19 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 				{disciplines.map(({ id, discipline_id, period }) => (
 					<DisciplineCard
 						key={id}
-						disciplineId={id}
+						disciplineId={discipline_id.id}
 						courseGrade={course?.degree}
 						name={discipline_id.name}
-						period={period} />
+						period={period}
+						courseId={params.courseId}
+					>
+						<DeleteModal key={id} type="discipline" courseId={params.courseId} disciplineId={discipline_id.id}>
+							<Button key={id} color="sucess"
+								className="bg-success text-white" onClick={() => deleteDisciplineLink(discipline_id.id)}>
+								Confirmar
+							</Button>
+						</DeleteModal>
+					</DisciplineCard>
 				))}
 			</section>
 		</>
