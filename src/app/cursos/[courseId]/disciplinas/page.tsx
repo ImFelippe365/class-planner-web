@@ -25,8 +25,6 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 	const [openModal, setOpenModal] = useState<string | undefined>();
 
 	const [disciplines, setDisciplines] = useState<CourseDiscipline[]>([])
-	const [course, setCourse] = useState<Course>()
-	//const { courseDisciplines, getCourseDisciplines } = useGlobal();
 
 	const getCourseDisciplines = async () => {
 		const { data } = await api.get(`/courses/${params.courseId}/disciplines/`)
@@ -42,15 +40,7 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 		setOpenModal(undefined)
 	}
 
-	//const response = getCourseDisciplines(params.courseId);
-	const getCourse = async () => {
-		const { data } = await api.get(`/courses/${params.courseId}/`)
-
-		setCourse(data)
-	}
-
 	useEffect(() => {
-		getCourse();
 		getCourseDisciplines();
 	}, [])
 
@@ -66,18 +56,18 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 			</Breadcrumb>
 
 			<section className="grid grid-cols-4 gap-5">
-				{disciplines.map(({ id, discipline_id, period }) => (
+				{disciplines.map(({ id, discipline, course_degree, period }) => (
 					<DisciplineCard
 						key={id}
-						disciplineId={discipline_id.id}
-						courseGrade={course?.degree}
-						name={discipline_id.name}
+						disciplineId={discipline.id}
+						courseGrade={course_degree}
+						name={discipline.name}
 						period={period}
 						courseId={params.courseId}
 					>
-						<DeleteModal key={id} type="discipline" courseId={params.courseId} disciplineId={discipline_id.id}>
+						<DeleteModal key={id} type="discipline">
 							<Button key={id} color="sucess"
-								className="bg-success text-white" onClick={() => deleteDisciplineLink(discipline_id.id)}>
+								className="bg-success text-white" onClick={() => deleteDisciplineLink(discipline.id)}>
 								Confirmar
 							</Button>
 						</DeleteModal>

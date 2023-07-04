@@ -8,24 +8,11 @@ import { Trash } from "lucide-react";
 
 interface DeleteModalProps {
 	type: "discipline" | "course";
-	courseId?: number;
-	disciplineId?: number;
 	children: React.ReactNode;
 }
 
-export default function DeleteModal({ type, courseId, disciplineId, children }: DeleteModalProps): React.ReactNode {
+export default function DeleteModal({ type, children }: DeleteModalProps): React.ReactNode {
 	const [openModal, setOpenModal] = useState<string | undefined>();
-	//const props = { openModal, setOpenModal };
-
-	const deleteDisciplineLink = async () => {
-		await api.delete(`courses/${courseId}/disciplines/${disciplineId}/`)
-		await api.get(`courses/${courseId}/disciplines/`)
-		setOpenModal(undefined)
-	}
-
-	const deleteCourse = async () => {
-		await api.delete(`courses/${courseId}/`)
-	}
 
 	return (
 		<>
