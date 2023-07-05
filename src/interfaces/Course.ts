@@ -43,3 +43,17 @@ export interface Discipline {
 	workload_in_clock: number;
 	taught_by: TaughtBy[];
 }
+export interface Schedule {
+	id: number;
+	quantity: number;
+	weekday: number;
+	start_time: string;
+	end_time: string;
+	class_id: number;
+	schedule_class: Class;
+	discipline_id: number;
+	discipline: Discipline;
+	canceled_class: any;
+	class_to_replace: any;
+	class_date: any;
+}

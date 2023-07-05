@@ -1,9 +1,10 @@
 import FullCalendar from "@fullcalendar/react";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import interactionPlugin, { EventReceiveArg } from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import {
+	CalendarApi,
 	CalendarOptions,
 	DayHeaderContentArg,
 	EventChangeArg,
@@ -14,20 +15,28 @@ import {
 } from "@fullcalendar/core";
 import { shortWeekdays } from "@/utils/dates";
 import { useSchedule } from "@/hooks/ScheduleContext";
-import { formatTime } from "@/utils/formatTime";
-interface DisciplineSchedule {
-	discipline_id: number;
-	quantity: number;
-	weekday: number;
-	start_time: string;
-	end_time: string;
+import Button from "./Button";
+import { Trash } from "lucide-react";
+
+interface SelectedSchedule {
+	id: string;
+	removeEvent: () => void;
 }
-interface WeekCalendarProps extends CalendarOptions {}
 
-export default function WeekCalendar({ ...props }: WeekCalendarProps) {
-	const { newWeekSchedules, setNewWeekSchedules } = useSchedule();
+interface WeekCalendarProps extends CalendarOptions {
+	getCalendarRef: (ref: any) => void;
+}
 
-	const [selectedSchedules, setSelectedSchedules] = useState<string[]>([]);
+export default function WeekCalendar({
+	getCalendarRef,
+	...props
+}: WeekCalendarProps) {
+	const calendarRef = useRef<any>(null);
+	// const { newWeekSchedules, setNewWeekSchedules } = useSchedule();
+
+	const [selectedSchedules, setSelectedSchedules] = useState<
+		SelectedSchedule[]
+	>([]);
 
 	const DayHeader = (props: DayHeaderContentArg) => {
 		const date = new Date(props.date);
@@ -109,64 +118,108 @@ export default function WeekCalendar({ ...props }: WeekCalendarProps) {
 	};
 
 	const onSelectSchedule = (props: EventClickArg) => {
-		const id = props.event._def.defId;
+		if (props.event.display === "background") return;
+
+		const selectedEvent = {
+			id: props.event.id,
+			removeEvent: props.event.remove,
+		};
 		const alreadySelected = selectedSchedules.findIndex(
-			(schedule_id) => schedule_id === id
+			(schedule) => schedule.id === selectedEvent.id
 		);
 		const newSelectedSchedules = [...selectedSchedules];
 
 		if (alreadySelected >= 0) {
 			newSelectedSchedules.splice(alreadySelected, 1);
 		} else {
-			newSelectedSchedules.push(id);
+			newSelectedSchedules.push(selectedEvent);
 		}
 
 		setSelectedSchedules(newSelectedSchedules);
 	};
 
+	const removeSelectedSchedules = () => {
+		selectedSchedules.forEach((element) => {
+			const eventExists = calendarRef?.current
+				.getApi()
+				.getEventById(element.id);
+
+			if (eventExists) {
+				eventExists.remove();
+			}
+		});
+
+		setSelectedSchedules([]);
+	};
+
+	useEffect(() => {
+		if (selectedSchedules.length > 0) setSelectedSchedules([]);
+	}, [props.editable]);
+
 	return (
-		<FullCalendar
-			ref={(ref) => console.log(ref)}
-			allDaySlot={false}
-			initialView="timeGridWeek"
-			plugins={[timeGridPlugin, interactionPlugin]}
-			droppable
-			headerToolbar={false}
-			nowIndicator={false}
-			eventOverlap={false}
-			weekends={false}
-			height={"180vh"}
-			slotMinTime={{
-				hours: 13,
-			}}
-			slotMaxTime={{
-				hours: 18,
-			}}
-			slotDuration={{
-				minute: 5,
-			}}
-			eventClick={onSelectSchedule}
-			dayHeaderContent={DayHeader}
-			slotLabelContent={SlotLabel}
-			slotLaneContent={(props: SlotLaneContentArg) => (
-				<td className="bg-background-color !border-none" {...props}></td>
+		<div>
+			{selectedSchedules.length > 0 && (
+				<section className="flex items-center justify-between bg-primary py-2 px-4 rounded-xl mb-3">
+					<span className="text-base text-white ">
+						Selecionado {selectedSchedules.length} horários
+					</span>
+					<Button
+						onClick={() => removeSelectedSchedules()}
+						size="xs"
+						className="transparent"
+						color="failure"
+					>
+						<Trash size={16} className="text-white mr-2" />
+						<span>Remover</span>
+					</Button>
+				</section>
 			)}
-			eventClassNames={(props) => {
-				const id = props.event._def.defId;
-				const alreadySelected = selectedSchedules.findIndex(
-					(schedule_id) => schedule_id === id
-				);
+			<FullCalendar
+				ref={(ref) => {
+					calendarRef.current = ref;
+					getCalendarRef(ref);
+				}}
+				allDaySlot={false}
+				initialView="timeGridWeek"
+				plugins={[timeGridPlugin, interactionPlugin]}
+				droppable
+				headerToolbar={false}
+				nowIndicator={false}
+				eventOverlap={false}
+				weekends={false}
+				height={"180vh"}
+				slotMinTime={{
+					hours: 13,
+				}}
+				slotMaxTime={{
+					hours: 18,
+				}}
+				slotDuration={{
+					minute: 5,
+				}}
+				eventClick={props.editable ? onSelectSchedule : () => {}}
+				dayHeaderContent={DayHeader}
+				slotLabelContent={SlotLabel}
+				slotLaneContent={(props: SlotLaneContentArg) => (
+					<td className="bg-background-color !border-none" {...props}></td>
+				)}
+				eventClassNames={(props) => {
+					const id = props.event.id;
+					const alreadySelected = selectedSchedules.findIndex(
+						(schedule) => schedule.id === id
+					);
 
-				const selected = alreadySelected >= 0 ? "bg-warning" : "";
+					const selected = alreadySelected >= 0 ? "opacity-50" : "";
 
-				return props.event.display !== "background"
-					? `border-none rounded-lg ${selected}`
-					: "bg-yellow-500";
-			}}
-			eventContent={ScheduleEvent}
-			locale={"pt-BR"}
-			editable
-			{...props}
-		/>
+					return props.event.display !== "background"
+						? `border-none rounded-lg ${selected}`
+						: "bg-yellow-500";
+				}}
+				eventContent={ScheduleEvent}
+				locale={"pt-BR"}
+				editable
+				{...props}
+			/>
+		</div>
 	);
 }

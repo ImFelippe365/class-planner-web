@@ -18,14 +18,16 @@ import DisciplineItem from "@/components/DisciplineItem";
 import Button from "@/components/Button";
 import { Draggable, EventReceiveArg } from "@fullcalendar/interaction";
 import { api } from "@/services/api";
-import { Class, Discipline } from "@/interfaces/Course";
+import { Class, Discipline, Shifts } from "@/interfaces/Course";
 import { formatDisciplineName } from "@/utils/formatDisciplineName";
 import { formatTime } from "@/utils/formatTime";
-import { EventChangeArg } from "@fullcalendar/core";
-import { reference_periods, shiftsSchedule } from "@/utils/schedules";
+import { EventChangeArg, EventRemoveArg } from "@fullcalendar/core";
+import { reference_periods, shifts, shiftsSchedule } from "@/utils/schedules";
 import { useSchedule } from "@/hooks/ScheduleContext";
 import { useGlobal } from "@/hooks/GlobalContext";
 import { useRouter } from "next/navigation";
+import uuidv4 from "@/utils/uuidv4";
+import { EventSchedule } from "@/interfaces/Schedule";
 
 interface ClassProps {
 	params: {
@@ -39,6 +41,7 @@ interface DisciplineSchedule {
 	weekday: number;
 	start_time: string;
 	end_time: string;
+	class_id?: string;
 }
 
 export default function Class({ params }: ClassProps) {
@@ -51,55 +54,74 @@ export default function Class({ params }: ClassProps) {
 		monthSchedules,
 		editableMode,
 		setEditableMode,
-		newWeekSchedules,
-		setNewWeekSchedules,
+
+		createSchedule,
+		changeSchedule,
+		removeSchedule,
 	} = useSchedule();
 	const { classes } = useGlobal();
 
 	const [classDetails, setClassDetails] = useState<Class>();
 	const [disciplines, setDisciplines] = useState<Discipline[]>([]);
 
-	const getClassDisciplines = async () => {
-		const { data } = await api.get(`/classes/${id}/disciplines/`);
-
-		setDisciplines(data);
-	};
+	const calendarRef = useRef<any>(null);
 
 	const getClassDetails = async () => {
-		const { data } = await api.get(`/classes/${id}/`);
+		const { data: classData } = await api.get(`/classes/${id}/`);
+		const { data: disciplinesData } = await api.get(
+			`/classes/${id}/disciplines/`
+		);
 
-		setClassDetails(data);
+		getWeekSchedules(id);
+		getMonthSchedules(id);
+
+		setDisciplines(disciplinesData);
+		setClassDetails(classData);
 	};
 
 	const onSubmitSchedules = () => {
+		const events = calendarRef.current.getApi().getEvents() as any[];
+		const newEvents = events
+			.filter((event) => event.id)
+			.map(async (event) => {
+				const start = event?.start as any;
+				const end = event?.end as any;
+				const quantity = (end - start) / 60000 / 45;
+
+				const weekday = (event.start?.getDay() as any) - 1;
+
+				const newEvent: DisciplineSchedule = {
+					discipline_id: event.extendedProps.discipline.id,
+					weekday,
+					start_time: formatTime(start),
+					end_time: formatTime(end),
+					quantity,
+					class_id: id,
+				};
+				let response = "";
+				if (event.extendedProps?.schedule_id) {
+					response = await changeSchedule(
+						event.extendedProps?.schedule_id,
+						newEvent
+					);
+				} else {
+					response = await createSchedule(newEvent);
+				}
+
+				return newEvent;
+			});
+
+		getClassDetails();
 		setEditableMode(false);
-	};
-
-	const onReceiveSchedule = (args: EventReceiveArg) => {
-		const start = args?.event?.start as any;
-		const end = args?.event?.end as any;
-		const quantity = (end - start) / 60000 / 45;
-		const weekday = (args.event.start?.getDay() as any) - 1;
-
-		const newEvent: DisciplineSchedule = {
-			discipline_id: Number(args.event.id),
-			weekday,
-			start_time: formatTime(start),
-			end_time: formatTime(end),
-			quantity,
-		};
-
-		const newSchedules = [...newWeekSchedules];
-		newSchedules.push(newEvent);
-		// console.log("Evento externo dropado 👍", newSchedules);
-
-		setNewWeekSchedules(newSchedules);
 	};
 
 	const onChangeSchedule = ({ event, oldEvent, revert }: EventChangeArg) => {
 		const start = event?.start as any;
 		const end = event?.end as any;
 		const quantity = (end - start) / 60000 / 45;
+
+		const scheduleStart = formatTime(oldEvent?.start as any);
+		const scheduleEnd = formatTime(oldEvent?.end as any);
 
 		// Fazer verificação da hora que o horário INICIAL foi inserido, > 7, > 12, > 19
 		if (
@@ -125,41 +147,46 @@ export default function Class({ params }: ClassProps) {
 		if (((end - start) / 60000) % 45 !== 0) {
 			revert();
 		}
-
-		const weekday = (event.start?.getDay() as any) - 1;
-		const oldWeekday = (oldEvent.start?.getDay() as any) - 1;
-
-		const newEvent: DisciplineSchedule = {
-			discipline_id: Number(event.id),
-			weekday,
-			start_time: formatTime(start),
-			end_time: formatTime(end),
-			quantity,
-		};
-
-		const newSchedules = [...newWeekSchedules];
-
-		const alreadyInSchedules = newWeekSchedules.findIndex(
-			({ discipline_id, weekday }) =>
-				oldWeekday === weekday && discipline_id === newEvent.discipline_id
-		);
-
-		if (alreadyInSchedules >= 0) {
-			newSchedules.splice(alreadyInSchedules, 1);
-		}
-
-		newSchedules.push(newEvent);
-		setNewWeekSchedules(newSchedules);
 	};
 
-	const handleChangeClassPeriod = (period: string) => {
+	const onRemoveSchedule = async ({ event }: EventRemoveArg) => {
+		if (event.extendedProps?.schedule_id) {
+			const response = await removeSchedule(event.extendedProps?.schedule_id);
+		}
+	};
+
+	const handleChangeClassPeriod = (
+		event: React.ChangeEvent<HTMLSelectElement>
+	) => {
+		const period = event.target.value;
 		const foundClass = classes.find(
-			({ reference_period, course_id }) =>
+			({ reference_period, course_id, shift }) =>
 				classDetails?.course_id === course_id &&
+				shift === classDetails?.shift &&
 				period === reference_period.toString()
 		);
 
 		if (foundClass) router.push(`turmas/${foundClass?.id}`);
+		else {
+			event.preventDefault();
+		}
+	};
+
+	const handleChangeClassShift = (
+		event: React.ChangeEvent<HTMLSelectElement>
+	) => {
+		const selectedShift = event.target.value as Shifts;
+		const foundClass = classes.find(
+			({ shift, course_id, reference_period }) =>
+				classDetails?.course_id === course_id &&
+				shift === selectedShift &&
+				reference_period === classDetails.reference_period
+		);
+
+		if (foundClass) router.push(`turmas/${foundClass?.id}`);
+		else {
+			event.preventDefault();
+		}
 	};
 
 	const initDraggableElement = () => {
@@ -169,24 +196,23 @@ export default function Class({ params }: ClassProps) {
 			itemSelector: ".fc-event",
 			eventData: function (eventEl) {
 				let title = eventEl.getAttribute("title");
-				let id = eventEl.getAttribute("id");
+				let discipline = eventEl.dataset.discipline
+					? JSON.parse(eventEl.dataset.discipline)
+					: {};
 
 				return {
-					id: id,
+					id: uuidv4(),
 					title: formatDisciplineName(`${title}`),
 					duration: "00:45:00",
 					...eventColors.new,
-					dadoTeste: "este dado foi adicionado manualmente",
+					discipline,
 				};
 			},
 		});
 	};
 
 	useEffect(() => {
-		getWeekSchedules(id);
-		getMonthSchedules(id);
 		getClassDetails();
-		getClassDisciplines();
 		initDraggableElement();
 	}, []);
 
@@ -201,7 +227,10 @@ export default function Class({ params }: ClassProps) {
 						{editableMode ? (
 							<div className="flex items-center gap-3">
 								<Button
-									onClick={() => setEditableMode(false)}
+									onClick={() => {
+										getClassDetails();
+										setEditableMode(false);
+									}}
 									size="xs"
 									className="transparent"
 									color="failure"
@@ -246,6 +275,7 @@ export default function Class({ params }: ClassProps) {
 
 					<p className="text-gray mb-4">Aulas semanais desta turma</p>
 					<WeekCalendar
+						getCalendarRef={(ref) => (calendarRef.current = ref)}
 						slotMinTime={{
 							hour: shiftsSchedule[classDetails?.shift || "Tarde"].startHour,
 						}}
@@ -256,7 +286,7 @@ export default function Class({ params }: ClassProps) {
 						editable={editableMode}
 						events={weekSchedules}
 						eventChange={onChangeSchedule}
-						eventReceive={onReceiveSchedule}
+						eventRemove={onRemoveSchedule}
 					/>
 				</section>
 				<section>
@@ -330,12 +360,26 @@ export default function Class({ params }: ClassProps) {
 							</button>
 						</div> */}
 						<Select
-							onChange={(event) => handleChangeClassPeriod(event.target.value)}
+							onChange={(event) => handleChangeClassPeriod(event)}
 							className="text-xs text-black mt-3 "
 						>
 							{reference_periods.map(({ label, value }, index) => (
 								<option
 									selected={value === classDetails?.reference_period.toString()}
+									key={index}
+									value={value}
+								>
+									{label}
+								</option>
+							))}
+						</Select>
+						<Select
+							onChange={(event) => handleChangeClassShift(event)}
+							className="text-xs text-black mt-3 "
+						>
+							{shifts.map(({ label, value }, index) => (
+								<option
+									selected={value === classDetails?.shift}
 									key={index}
 									value={value}
 								>
@@ -358,10 +402,10 @@ export default function Class({ params }: ClassProps) {
 										.map(({ name }) => name)
 										.join(", ")}
 									disciplineName={discipline.name}
-									availableQuantity={discipline.workload_in_clock}
+									availableQuantity={discipline.workload_in_clock / (0.75 * 20)}
 									editable={editableMode}
-									id={discipline.id.toString()}
 									title={discipline.name}
+									data-discipline={JSON.stringify(discipline)}
 								/>
 							))}
 						</div>
