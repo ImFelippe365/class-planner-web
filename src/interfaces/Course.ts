@@ -14,6 +14,7 @@ export interface Class {
 	course: Course;
 	reference_period: number;
 	shift: Shifts;
+
 	class_leader_id?: number;
 }
 

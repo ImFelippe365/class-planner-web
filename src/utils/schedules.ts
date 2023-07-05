@@ -96,4 +96,8 @@ export const reference_years = [
 		label: "3° ano",
 		value: "3",
 	},
+	{
+		label: "4° ano",
+		value: "4",
+	},
 ];

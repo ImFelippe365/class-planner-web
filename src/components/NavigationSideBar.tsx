@@ -6,6 +6,7 @@ import {
 	LogOut,
 	User,
 	Users,
+	Bell,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -42,6 +43,12 @@ export default function NavigationSideBar(): React.ReactNode {
 			name: "Turmas",
 			icon: <Users />,
 			path: "turmas",
+		},
+		
+		{
+			name: "Notificações",
+			icon: <Bell />,
+			path: "alertas",
 		},
 	];
 
