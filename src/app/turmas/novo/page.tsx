@@ -23,7 +23,7 @@ interface CreateClass {
 	course_id: string;
 	reference_period: number;
 	shift: string;
-	class_leader_id: number;
+	class_leader_id: number | undefined;
 }
 
 export default function AddClass() {
@@ -76,23 +76,6 @@ export default function AddClass() {
 	useEffect(() => {
 		getAllCourses();
 		getAllStudents();
-
-		// let draggableEl = document.getElementById("external-events") as HTMLElement;
-
-		// new Draggable(draggableEl, {
-		// 	itemSelector: ".fc-event",
-		// 	eventData: function (eventEl) {
-		// 		let title = eventEl.getAttribute("title");
-		// 		let id = eventEl.getAttribute("data");
-
-		// 		return {
-		// 			id: id,
-		// 			title: title,
-		// 			duration: "00:45:00",
-		// 			...eventColors.new,
-		// 		};
-		// 	},
-		// });
 	}, []);
 
 	const onSubmit = async (newClass: CreateClass) => {

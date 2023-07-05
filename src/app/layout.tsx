@@ -28,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps) {
 				async
 				src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"
 			></script>
+			<script async src="../path/to/flowbite/dist/flowbite.min.js"></script>
 			<body className={inter.className}>
 				<Flowbite>
 					<Provider>

@@ -4,13 +4,15 @@ import Breadcrumb from "@/components/Breadcrumb";
 import Button from "@/components/Button";
 import ClassCard from "@/components/ClassCard";
 import { useGlobal } from "@/hooks/GlobalContext";
-import { Users } from "lucide-react";
+import { CalendarPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Classes() {
-	const { courses, classes, getAllClasses } = useGlobal();
+
 	const routes = useRouter();
+	const { courses, classes, getAllClasses } = useGlobal();
+
 
 	useEffect(() => {
 		getAllClasses();
@@ -28,11 +30,12 @@ export default function Classes() {
 			</Breadcrumb>
 
 			<section className="grid auto-rows-auto grid-cols-cardsGrid gap-5">
-				{classes.map(({ id, reference_period }) => (
+				{classes.map(({ id, course, reference_period }) => (
 					<ClassCard
 						key={id}
-						courseGrade="d"
-						courseNickname="23"
+						href={`turmas/${id}`}
+						courseGrade={course.degree}
+						courseNickname={course.name}
 						period={reference_period}
 					/>
 				))}

@@ -45,6 +45,7 @@ module.exports = {
 			},
 			gridTemplateColumns: {
 				container: '330px auto',
+				classContainer: 'auto 400px',
 				cardsGrid: 'repeat(auto-fill, minmax(224px, 1fr))'
 			},
 			gridTemplateRows: {

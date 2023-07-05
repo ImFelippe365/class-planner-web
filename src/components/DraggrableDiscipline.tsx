@@ -10,7 +10,7 @@ interface DraggrableDisciplineProps {
 export default function DraggrableDiscipline({
 	id,
 	title,
-	quantity
+	quantity,
 }: DraggrableDisciplineProps) {
 	return (
 		<div
