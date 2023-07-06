@@ -16,30 +16,33 @@ import Select from "@/components/Select";
 import { Course } from "@/interfaces/Course";
 import { SelectOptions } from "@/interfaces/Utils";
 import { reference_periods, reference_years } from "@/utils/schedules";
-import { Checkbox, CheckboxProps, Label } from "flowbite-react";
-
-interface CreateDiscipline {
-	name: string;
-	code: string;
-	workload_in_class: number;
-	workload_in_clock: number;
-	is_optional: boolean;
-	course: {
-		course_id: string;
-		period: number;
-	}[];
-}
+import { Checkbox, Label } from "flowbite-react";
+import { CreateDiscipline } from "@/interfaces/Discipline";
+import { Trash2 } from "lucide-react";
 
 export default function AddDiscipline(): React.ReactNode {
+	const [courses, setCourses] = useState<Course[]>([]);
+	const [coursesOptions, setCoursesOptions] = useState<SelectOptions[]>([]);
+	const [isOptional, setIsOptional] = useState(false);
+	const [numSelectedCourses, setNumSelectedCourses] = useState(0)
+
 	const schema = yup.object({
 		name: yup.string().required("Campo nome é obrigatório"),
 		code: yup.string().required("Campo código é obrigatório"),
-		workload_in_class: yup.number().positive().required("Campo carga horária é obrigatório"),
+		workload_in_class: yup
+			.number()
+			.positive()
+			.required("Campo carga horária é obrigatório"),
 		is_optional: yup.boolean(),
 		course: yup.array(yup.object({
 			course_id: yup.string().required("Campo curso é obrigatório"),
-			period: yup.number().positive().required("Campo período é obrigatório").min(1, 'O período de referência deve ser maior que 0')
-		})).min(1, 'A disciplina precisa estar vinculada a pelo menos 1 curso'),
+			period: yup
+				.number()
+				.positive()
+				.required("Campo período é obrigatório")
+				.min(1, 'O período de referência deve ser maior que 0')
+		})).min(1, 'A disciplina precisa estar vinculada a pelo menos 1 curso')
+			.max(courses.length, `O número máximo de cursos que podem estar associados a essa disciplina é ${courses.length}`),
 	});
 
 	const {
@@ -51,18 +54,50 @@ export default function AddDiscipline(): React.ReactNode {
 		resolver: yupResolver(schema),
 	});
 
-	const [courses, setCourses] = useState<Course[]>([]);
-	const [coursesOptions, setCoursesOptions] = useState<SelectOptions[]>([]);
-	const [isOptional, setIsOptional] = useState(false);
+	const filterOptions = (index: number) => {
+		let selectedCourses: Array<number> = []
 
-	const { fields, append } = useFieldArray({
+		for (let i = 0; i < index; i++) {
+			selectedCourses.push(Number(watch(`course.${i}.course_id`)))
+		}
+
+		return coursesOptions.filter(
+			(item) => !selectedCourses.includes(Number(item.value))
+		)
+	};
+
+	const { fields, append, remove } = useFieldArray({
 		control,
 		name: 'course',
 	})
 
+	const getAllCourses = async () => {
+		const { data } = await api.get("courses/");
+
+		const newCourses = data.map(({ id, name }: Course) => {
+			return { label: name, value: Number(id) };
+		});
+
+		setCourses(data);
+		setCoursesOptions(newCourses);
+	};
+
 	function addCourseLink(data: any) {
-		append({ course_id: '', period: 0 })
+		if (courses.length > numSelectedCourses) {
+			append({ course_id: '', period: 0 })
+			setNumSelectedCourses(numSelectedCourses + 1)
+		}
 	}
+
+	function removeCourseLink(index: number) {
+		remove(index)
+		setNumSelectedCourses(numSelectedCourses - 1)
+	}
+
+	useEffect(() => {
+		getAllCourses();
+	}, [])
+
 
 	const router = useRouter();
 
@@ -77,23 +112,9 @@ export default function AddDiscipline(): React.ReactNode {
 		router.back();
 	};
 
-	const getAllCourses = async () => {
-		const { data } = await api.get("courses/");
-
-		const newCourses = data.map(({ id, name }: Course) => {
-			return { label: name, value: Number(id) };
-		});
-
-		setCourses(data);
-		setCoursesOptions(newCourses);
-	};
-
-	useEffect(() => {
-		getAllCourses();
-	}, [])
 
 	return (
-		<form className="w-full" onSubmit={handleSubmit(onSubmit,)}>
+		<form className="w-full" onSubmit={handleSubmit(onSubmit)}>
 			<Breadcrumb title="Cadastrar disciplina" />
 
 			<Input
@@ -112,7 +133,7 @@ export default function AddDiscipline(): React.ReactNode {
 					formState,
 					fieldState: { error },
 				}) => (
-					<div className="mt-2 flex ">
+					<div className="mt-2 flex">
 
 						<div className="flex gap-2">
 							<Checkbox
@@ -146,7 +167,7 @@ export default function AddDiscipline(): React.ReactNode {
 				placeholder="Digite a carga horária da disciplina" label="Carga horária (aula)"
 			/>
 
-			<div>
+			<div className="flex flex-col gap-6">
 				<div className="mt-3 flex justify-between items-center">
 					<span className="font-semibold text-lg text-primary-dark flex-wrap">Cursos associados</span>
 					<Button
@@ -158,33 +179,42 @@ export default function AddDiscipline(): React.ReactNode {
 
 				{fields.map((field, index) => {
 					return (
-						<div key={field.id}>
-							<Select
-								containerClassName="mt-2"
-								control={control}
-								options={coursesOptions}
-								name={`course.${index}.course_id`}
-								placeholder="Selecione um curso"
-								label="Curso"
-							/>
+						<div key={field.id} className="flex justify-between items-center gap-4 bg-primary-background rounded-lg p-4 pt-2">
+							<div className="w-full">
+								<Select
+									containerClassName="mt-2"
+									control={control}
+									options={filterOptions(index)}
+									name={`course.${index}.course_id`}
+									placeholder="Selecione um curso"
+									label="Curso"
+								/>
 
-							<Select
-								containerClassName="mt-2"
-								control={control}
-								disabled={!watch(`course.${index}.course_id`)}
-								options={
-									courses?.find(({ id }) => id.toString() === watch(`course.${index}.course_id`))
+								<Select
+									containerClassName="mt-2"
+									control={control}
+									disabled={!watch(`course.${index}.course_id`)}
+									options={
+										courses?.find(({ id }) => id.toString() === watch(`course.${index}.course_id`))
+											?.degree === "Ensino superior"
+											? reference_periods
+											: reference_years
+									}
+									name={`course.${index}.period`}
+									placeholder={`Selecione um ${courses?.find(({ id }) => id.toString() === watch(`course.${index}.course_id`))
 										?.degree === "Ensino superior"
-										? reference_periods
-										: reference_years
-								}
-								name={`course.${index}.period`}
-								placeholder={`Selecione um ${courses?.find(({ id }) => id.toString() === watch(`course.${index}.course_id`))
-									?.degree === "Ensino superior"
-									? 'período'
-									: 'ano'}
-								 de referência`}
-							/>
+										? 'período'
+										: 'ano'}
+								 	de referência`}
+									label="Período de	 referência"
+								/>
+							</div>
+							<Button color="failure" className="h-full">
+								<Trash2
+									className=""
+									onClick={() => removeCourseLink(index)}
+								/>
+							</Button>
 						</div>
 					)
 				})}
