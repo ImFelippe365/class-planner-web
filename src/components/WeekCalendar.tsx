@@ -13,10 +13,13 @@ import {
 	SlotLabelContentArg,
 	SlotLaneContentArg,
 } from "@fullcalendar/core";
-import { shortWeekdays } from "@/utils/dates";
+import { shortWeekdays, weekdays } from "@/utils/dates";
 import { useSchedule } from "@/hooks/ScheduleContext";
 import Button from "./Button";
-import { Trash } from "lucide-react";
+import { Ban, Clock, Trash, User } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { Schedule } from "@/interfaces/Course";
+import Image from "next/image";
 
 interface SelectedSchedule {
 	id: string;
@@ -25,10 +28,12 @@ interface SelectedSchedule {
 
 interface WeekCalendarProps extends CalendarOptions {
 	getCalendarRef: (ref: any) => void;
+	clickable?: boolean;
 }
 
 export default function WeekCalendar({
 	getCalendarRef,
+	clickable,
 	...props
 }: WeekCalendarProps) {
 	const calendarRef = useRef<any>(null);
@@ -70,6 +75,7 @@ export default function WeekCalendar({
 		);
 	};
 
+
 	const ScheduleEvent = (props: EventContentArg) => {
 		const {
 			isSelected,
@@ -97,23 +103,27 @@ export default function WeekCalendar({
 		${scheduleEndHours}:${scheduleEndMinutes}`;
 
 		return (
-			<div
-				{...props}
-				className={`flex flex-1 justify-between flex-col p-3 text-white`}
-			>
-				<div>
-					<span className="font-normal text-xs block">
-						{quantity.toFixed(0)} {quantity > 1 ? "aulas" : "aula"}
-					</span>
+			<>
+				<div
+					{...props}
+					className={`flex flex-1 z-40 justify-between flex-col p-3 text-white relative ${
+						clickable && "cursor-pointer"
+					}`}
+				>
+					<div>
+						<span className="font-normal text-xs block">
+							{quantity.toFixed(0)} {quantity > 1 ? "aulas" : "aula"}
+						</span>
 
-					<span className="font-semibold block overflow-hidden w-28">
-						{title}
+						<span className="font-semibold block overflow-hidden w-28">
+							{title}
+						</span>
+					</div>
+					<span className="font-normal text-xs">
+						{isDragging ? timeText : scheduleTime}
 					</span>
 				</div>
-				<span className="font-normal text-xs">
-					{isDragging ? timeText : scheduleTime}
-				</span>
-			</div>
+			</>
 		);
 	};
 
@@ -197,7 +207,13 @@ export default function WeekCalendar({
 				slotDuration={{
 					minute: 5,
 				}}
-				eventClick={props.editable ? onSelectSchedule : () => {}}
+				eventClick={
+					props.editable
+						? onSelectSchedule
+						: clickable
+						? props.eventClick
+						: () => {}
+				}
 				dayHeaderContent={DayHeader}
 				slotLabelContent={SlotLabel}
 				slotLaneContent={(props: SlotLaneContentArg) => (
@@ -212,7 +228,7 @@ export default function WeekCalendar({
 					const selected = alreadySelected >= 0 ? "opacity-50" : "";
 
 					return props.event.display !== "background"
-						? `border-none rounded-lg ${selected}`
+						? `border-none rounded-lg ${selected} !z-40`
 						: "bg-yellow-500";
 				}}
 				eventContent={ScheduleEvent}

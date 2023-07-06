@@ -14,7 +14,7 @@ export const intervalEvents = [
 	{
 		daysOfWeek: [1, 2, 3, 4, 5],
 		startTime: "08:31:00",
-		endTime: "09:34:00",
+		endTime: "08:49:00",
 		display: "background",
 	},
 	{
