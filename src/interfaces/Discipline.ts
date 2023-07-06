@@ -15,6 +15,17 @@ export interface Discipline {
 	}[];
 }
 
+export interface CreateDiscipline {
+	name: string;
+	code: string;
+	workload_in_class: number;
+	workload_in_clock: number;
+	is_optional: boolean;
+	course: {
+		course_id: string;
+		period: number;
+	}[];
+}
 
 export interface CourseDiscipline{
 	id: number;
@@ -28,3 +39,4 @@ export interface CourseDiscipline{
 	course_degree: string;
 	period: number;
 }
+
