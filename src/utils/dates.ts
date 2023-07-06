@@ -7,3 +7,5 @@ export const longWeekdays = [
 	"Quinta-feira",
 	"Sexta-feira",
 ];
+
+export const weekdays = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];

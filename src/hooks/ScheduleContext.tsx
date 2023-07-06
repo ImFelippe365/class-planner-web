@@ -10,7 +10,7 @@ import {
 import { eventColors } from "@/utils/eventColors";
 import { intervalEvents } from "@/utils/intervalEvents";
 import { Schedule } from "@/interfaces/Course";
-import { DisciplineSchedule, EventSchedule } from "@/interfaces/Schedule";
+import { CancelSchedule, DisciplineSchedule, EventSchedule } from "@/interfaces/Schedule";
 import { formatDisciplineName } from "@/utils/formatDisciplineName";
 
 interface ScheduleProviderProps {
@@ -30,12 +30,16 @@ interface ScheduleContextValues {
 	getWeekSchedules: (class_id: string) => Promise<void>;
 	getMonthSchedules: (class_id: string) => Promise<void>;
 
+	getTeacherWeekSchedules: (class_id: string) => Promise<Schedule[]>;
+	getTeacherMonthSchedules: (class_id: string) => Promise<Schedule[]>;
+
 	createSchedule: (newEvent: DisciplineSchedule) => Promise<any>;
 	changeSchedule: (
 		schedule_id: string,
 		newEvent: DisciplineSchedule
 	) => Promise<any>;
 	removeSchedule: (schedule_id: string) => Promise<any>;
+	cancelSchedule: (data: CancelSchedule) => Promise<any>;
 }
 
 const ScheduleContext = createContext({} as ScheduleContextValues);
@@ -72,7 +76,7 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 
 				return newSchedule;
 			});
-			
+
 			setWeekSchedules([...schedules, ...(intervalEvents as any)]);
 		} catch (error) {
 			console.warn("Erro ao requisitar os horários da semana  ->", error);
@@ -88,6 +92,57 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 			console.warn("Erro ao requisitar os horários do mês ->", error);
 		}
 	}, []);
+
+	const getTeacherWeekSchedules = useCallback(
+		async (class_id: string): Promise<Schedule[]> => {
+			try {
+				const { data } = await api.get(`/teachers/${class_id}/schedules/week/`);
+
+				const schedules = data.map((schedule: Schedule) => {
+					const eventColor = schedule.class_to_replace
+						? eventColors.replaced
+						: schedule.canceled_class
+						? eventColors.canceled
+						: eventColors.normal;
+
+					const newSchedule = {
+						id: schedule.id,
+						title: formatDisciplineName(schedule.discipline.name),
+						startTime: schedule.start_time,
+						endTime: schedule.end_time,
+						extendedProps: {
+							schedule: schedule,
+							schedule_id: schedule.id,
+						},
+						daysOfWeek: [schedule.weekday + 1],
+						...eventColor,
+					};
+
+					return newSchedule;
+				});
+				
+				return [...schedules, ...(intervalEvents as any)];
+			} catch (error) {
+				console.warn("Erro ao requisitar os horários da semana  ->", error);
+				return []
+			}
+		},
+		[]
+	);
+
+	const getTeacherMonthSchedules = useCallback(
+		async (class_id: string): Promise<Schedule[]> => {
+			try {
+				const { data } = await api.get(`/teachers/${class_id}/schedules/month/`);
+
+				return data;
+			} catch (error) {
+				console.warn("Erro ao requisitar os horários do mês ->", error);
+				return []
+			}
+		},
+		[]
+	);
 
 	const createSchedule = useCallback(
 		async (newEvent: DisciplineSchedule): Promise<any> => {
@@ -128,6 +183,19 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 		[]
 	);
 
+	const cancelSchedule = useCallback(
+		async (data: CancelSchedule): Promise<any> => {
+			try {
+				const response = await api.post(`schedules/canceled/`, data);
+
+				return response;
+			} catch (error) {
+				console.log("Erro ao deletar horário ->", error);
+			}
+		},
+		[]
+	);
+
 	const contextValues = {
 		weekSchedules,
 		setWeekSchedules,
@@ -138,10 +206,13 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 
 		getWeekSchedules,
 		getMonthSchedules,
+		getTeacherWeekSchedules,
+		getTeacherMonthSchedules,
 
 		createSchedule,
 		changeSchedule,
 		removeSchedule,
+		cancelSchedule
 	};
 
 	return (

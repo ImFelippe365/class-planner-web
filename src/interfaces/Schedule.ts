@@ -18,3 +18,12 @@ export interface DisciplineSchedule {
 	end_time: string;
 	class_id?: string;
 }
+
+export interface CancelSchedule {
+	schedule_id: number;
+	canceled_date: string;
+	reason?: string;
+	quantity_available: number;
+	is_available: boolean;
+	teachers_id?: string[];
+}
