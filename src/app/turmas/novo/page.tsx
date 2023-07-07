@@ -19,6 +19,8 @@ import DraggrableDiscipline from "@/components/DraggrableDiscipline";
 import { Draggable } from "@fullcalendar/interaction";
 import { intervalEvents } from "@/utils/intervalEvents";
 import { Check } from "lucide-react";
+import { Student } from "@/interfaces/Student";
+
 interface CreateClass {
 	course_id: string;
 	reference_period: number;

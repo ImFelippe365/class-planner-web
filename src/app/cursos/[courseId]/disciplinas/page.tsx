@@ -63,6 +63,7 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 						name={discipline.name}
 						period={period}
 						courseId={params.courseId}
+						isOptional={discipline.is_optional}
 					>
 						<DeleteModal key={id} type="discipline">
 							<Button key={id} color="sucess"
