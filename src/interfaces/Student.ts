@@ -1,7 +1,7 @@
 import { Teacher } from "@/interfaces/Teacher";
 import { Discipline } from "@/interfaces/Discipline";
 import { Class } from "./Course";
-interface Student {
+export interface Student {
 	id: number;
 	name: string;
 	registration: string;

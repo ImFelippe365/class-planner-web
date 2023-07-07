@@ -9,6 +9,7 @@ interface DisciplineCardProps {
 	courseGrade: string | undefined;
 	courseId: number;
 	children: React.ReactNode;
+	isOptional: boolean
 }
 
 export default function DisciplineCard({
@@ -18,6 +19,7 @@ export default function DisciplineCard({
 	courseGrade,
 	courseId,
 	children,
+	isOptional,
 }: DisciplineCardProps): React.ReactNode {
 	return (
 		<div className="bg-primary-background rounded-xl p-4 items-center">
@@ -29,10 +31,11 @@ export default function DisciplineCard({
 				</Dropdown>
 			</div>
 
-			<div className="text-primary mt-3 h-20">
-				<p className="text-xs">
-					{period}º {courseGrade == "Ensino técnico" ? "Ano" : "Período"}
-				</p>
+			<div className="text-primary mt-3 h-20 text-xs">
+				{isOptional ?
+					(<p>Optativa</p>)
+					: (<p>{period}º {courseGrade == "Ensino técnico" ? "Ano" : "Período"}</p>)
+				}
 				<p className="text-sm font-semibold mt-1 leading-4">{name}</p>
 			</div>
 		</div>
