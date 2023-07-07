@@ -10,8 +10,13 @@ import {
 import { eventColors } from "@/utils/eventColors";
 import { intervalEvents } from "@/utils/intervalEvents";
 import { Schedule } from "@/interfaces/Course";
-import { CancelSchedule, DisciplineSchedule, EventSchedule } from "@/interfaces/Schedule";
+import {
+	CancelSchedule,
+	DisciplineSchedule,
+	EventSchedule,
+} from "@/interfaces/Schedule";
 import { formatDisciplineName } from "@/utils/formatDisciplineName";
+import uuidv4 from "@/utils/uuidv4";
 
 interface ScheduleProviderProps {
 	children: React.ReactNode;
@@ -30,8 +35,14 @@ interface ScheduleContextValues {
 	getWeekSchedules: (class_id: string) => Promise<void>;
 	getMonthSchedules: (class_id: string) => Promise<void>;
 
-	getTeacherWeekSchedules: (class_id: string) => Promise<Schedule[]>;
-	getTeacherMonthSchedules: (class_id: string) => Promise<Schedule[]>;
+	getTeacherWeekSchedules: (
+		class_id: string,
+		date?: string
+	) => Promise<Schedule[]>;
+	getTeacherMonthSchedules: (
+		class_id: string,
+		month?: number
+	) => Promise<Schedule[]>;
 
 	createSchedule: (newEvent: DisciplineSchedule) => Promise<any>;
 	changeSchedule: (
@@ -94,9 +105,13 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 	}, []);
 
 	const getTeacherWeekSchedules = useCallback(
-		async (class_id: string): Promise<Schedule[]> => {
+		async (class_id: string, date?: string): Promise<Schedule[]> => {
 			try {
-				const { data } = await api.get(`/teachers/${class_id}/schedules/week/`);
+				const { data } = await api.get(
+					date
+						? `/teachers/${class_id}/schedules/week/?date=${date}`
+						: `/teachers/${class_id}/schedules/week/`
+				);
 
 				const schedules = data.map((schedule: Schedule) => {
 					const eventColor = schedule.class_to_replace
@@ -120,25 +135,62 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 
 					return newSchedule;
 				});
-				
+
 				return [...schedules, ...(intervalEvents as any)];
 			} catch (error) {
 				console.warn("Erro ao requisitar os horários da semana  ->", error);
-				return []
+				return [];
 			}
 		},
 		[]
 	);
 
 	const getTeacherMonthSchedules = useCallback(
-		async (class_id: string): Promise<Schedule[]> => {
+		async (class_id: string, month?: number): Promise<Schedule[]> => {
 			try {
-				const { data } = await api.get(`/teachers/${class_id}/schedules/month/`);
+				const { data } = await api.get(
+					month
+						? `/teachers/${class_id}/schedules/month/?month=${month}`
+						: `/teachers/${class_id}/schedules/month/`
+				);
 
-				return data;
+				const schedules = data
+					.map((schedule: Schedule, index: number, array: Schedule[]) => {
+						// const dayAlreadyHasSchedule = array
+						// 	.slice(index)
+						// 	.find(({ class_date }) => schedule.class_date === class_date);
+
+						// if (!dayAlreadyHasSchedule) {
+						// 	return null;
+						// }
+
+						const eventColor = schedule.class_to_replace
+							? eventColors.replaced
+							: schedule.canceled_class
+							? eventColors.canceled
+							: eventColors.normal;
+
+						const newSchedule = {
+							id: uuidv4(),
+							title: formatDisciplineName(schedule.discipline.name),
+							extendedProps: {
+								schedule: schedule,
+								schedule_id: schedule.id,
+							},
+							start: new Date(`${schedule.class_date} ${schedule.start_time}`),
+							end: new Date(`${schedule.class_date} ${schedule.end_time}`),
+
+							...eventColor,
+						};
+
+						return newSchedule;
+					})
+					.filter((item: any) => item);
+
+				return schedules;
 			} catch (error) {
 				console.warn("Erro ao requisitar os horários do mês ->", error);
-				return []
+				return [];
 			}
 		},
 		[]
@@ -212,7 +264,7 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 		createSchedule,
 		changeSchedule,
 		removeSchedule,
-		cancelSchedule
+		cancelSchedule,
 	};
 
 	return (
