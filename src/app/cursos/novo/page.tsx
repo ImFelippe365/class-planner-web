@@ -20,6 +20,8 @@ interface CreateCourse {
 }
 
 export default function AddCourse() {
+	document.title = 'Class Planner | Novo curso'
+
 	const schema = yup.object({
 		name: yup.string().required("Campo nome é obrigatório"),
 		degree: yup.string().required("Campo grau é obrigatório"),

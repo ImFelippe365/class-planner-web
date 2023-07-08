@@ -12,6 +12,8 @@ import React, { useEffect, useState } from "react";
 import DeleteModal from "@/components/DeleteModal";
 
 export default function Courses(): React.ReactNode {
+	document.title = 'Class Planner | Cursos'
+
 	const routes = useRouter();
 	const { courses, getAllCourses } = useGlobal();
 	const [openModal, setOpenModal] = useState<string | undefined>();
