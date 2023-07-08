@@ -21,6 +21,8 @@ import { CreateDiscipline } from "@/interfaces/Discipline";
 import { Trash2 } from "lucide-react";
 
 export default function AddDiscipline(): React.ReactNode {
+	document.title = 'Class Planner - Nova disciplina'
+
 	const [courses, setCourses] = useState<Course[]>([]);
 	const [coursesOptions, setCoursesOptions] = useState<SelectOptions[]>([]);
 	const [isOptional, setIsOptional] = useState(false);

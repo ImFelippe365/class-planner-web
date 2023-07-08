@@ -64,6 +64,10 @@ export default function Class({ params }: ClassProps) {
 	const [classDetails, setClassDetails] = useState<Class>();
 	const [disciplines, setDisciplines] = useState<Discipline[]>([]);
 
+	document.title = classDetails
+		? `Class Planner | ${classDetails?.reference_period}° ${classDetails?.course.byname}`
+		: "Class Planner";
+
 	const calendarRef = useRef<any>(null);
 
 	const getClassDetails = async () => {

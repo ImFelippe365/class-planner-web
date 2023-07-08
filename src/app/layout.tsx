@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { ReactElement } from "react";
 import "./globals.css";
 import Provider from "@/hooks/Providers";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,18 +22,22 @@ interface LayoutProps {
 
 export default function RootLayout({ children }: LayoutProps) {
 	const pathname = usePathname();
+	document.title = "Class Planner";
 
 	return (
 		<html lang="pt-br">
-			<script
-				async
-				src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"
-			></script>
-			<script async src="../path/to/flowbite/dist/flowbite.min.js"></script>
+			<Head>
+				<script
+					async
+					src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"
+				></script>
+				<script async src="../path/to/flowbite/dist/flowbite.min.js"></script>
+				<title>Class Planner</title>
+			</Head>
 			<body className={inter.className}>
 				<Flowbite>
 					<Provider>
-						{pathname === "/sign-in" ? (
+						{(pathname === "/entrar") || (pathname === "/") ? (
 							children
 						) : (
 							<main className="grid grid-cols-container bg-background-color">

@@ -8,6 +8,8 @@ import { User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 export default function Alerts() {
+	document.title = "Class Planner | Notificações";
+	
 	const [alerts, setAlerts] = useState<Alert[]>([]);
 
 	const getStudentAlerts = async () => {

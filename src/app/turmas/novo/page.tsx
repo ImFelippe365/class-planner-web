@@ -29,6 +29,8 @@ interface CreateClass {
 }
 
 export default function AddClass() {
+	document.title = "Class Planner | Nova turma";
+
 	const schema = yup.object({
 		shift: yup.string().required("Campo turno é obrigatório"),
 		reference_period: yup

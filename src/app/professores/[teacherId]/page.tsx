@@ -53,6 +53,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
 	const weekCalendarRef = useRef<any>(null);
 
+	document.title = `Class Planner | ${teacher?.name}`
+
 	const times = weekSchedules
 		.filter(({ display }) => display !== "background")
 		.map(({ startTime }: { startTime: string }) => {
