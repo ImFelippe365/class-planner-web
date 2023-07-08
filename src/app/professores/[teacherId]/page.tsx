@@ -31,6 +31,7 @@ import Image from "next/image";
 import { weekdays } from "@/utils/dates";
 import { formatTime } from "@/utils/formatTime";
 import MonthCalendar from "@/components/MonthCalendar";
+import Modal from "@/components/Modal";
 
 interface TeacherProfileProps {
 	params: {
@@ -46,6 +47,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [scheduleToShow, setScheduleToShow] = useState<EventClickArg>();
 	const [scheduleToCancel, setScheduleToCancel] = useState<Schedule>();
 	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+	const [showCancelScheduleModal, setShowCancelScheduleModal] =
+		useState<boolean>(false);
 
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
 	const weekCalendarRef = useRef<any>(null);
@@ -124,7 +127,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const onSelectedDateChange = (date: Date) => {
 		getWeekSchedules(date);
 		setSelectedDate(date);
-		
+
 		weekCalendarRef.current.getApi().gotoDate(date);
 	};
 
@@ -216,6 +219,16 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	return (
 		<>
+			<Button onClick={() => setShowCancelScheduleModal(true)}>
+				Toggle modal
+			</Button>
+			<Modal
+				title="Cancelar aula"
+				description="Preencha as informações abaixo para cancelar a aula selecionada"
+				openModal={showCancelScheduleModal}
+				setOpenModal={setShowCancelScheduleModal}
+				body={<form></form>}
+			/>
 			<Breadcrumb title="Professores">
 				<section></section>
 			</Breadcrumb>
