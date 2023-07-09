@@ -11,30 +11,35 @@ import {
 	Ban,
 	Calendar,
 	X,
+	Plus,
+	Download,
 } from "lucide-react";
 import { api } from "@/services/api";
-import { Teacher } from "@/interfaces/Teacher";
-import ProfileButton from "@/components/ProfileButton";
 import { useEffect, useRef, useState } from "react";
-import Breadcrumb from "@/components/Breadcrumb";
 import { useSchedule } from "@/hooks/ScheduleContext";
-import { Schedule } from "@/interfaces/Course";
-import WeekCalendar from "@/components/WeekCalendar";
 import {
 	DurationInput,
 	EventClickArg,
 	EventSourceInput,
 } from "@fullcalendar/core";
-import { shiftsSchedule } from "@/utils/schedules";
-import Button from "@/components/Button";
 import Image from "next/image";
+
+import { shiftsSchedule } from "@/utils/schedules";
 import { weekdays } from "@/utils/dates";
 import { formatTime } from "@/utils/formatTime";
+
+import Breadcrumb from "@/components/Breadcrumb";
+import WeekCalendar from "@/components/WeekCalendar";
+import Button from "@/components/Button";
 import MonthCalendar from "@/components/MonthCalendar";
 import Modal from "@/components/Modal";
-import { Discipline } from "@/interfaces/Course";
 import DisciplineCard from "@/components/DisciplineCard";
 import DeleteModal from "@/components/DeleteModal";
+import CreateDisciplineBindFormModal from "../components/CreateDisciplineBindFormModal";
+
+import { Teacher } from "@/interfaces/Teacher";
+import { Schedule } from "@/interfaces/Course";
+import { Discipline } from "@/interfaces/Course";
 
 interface TeacherProfileProps {
 	params: {
@@ -52,11 +57,12 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [scheduleToShow, setScheduleToShow] = useState<EventClickArg>();
 	const [scheduleToCancel, setScheduleToCancel] = useState<Schedule>();
 	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-	const [showCancelScheduleModal, setShowCancelScheduleModal] =
-		useState<boolean>(false);
+	const [showCancelScheduleModal, setShowCancelScheduleModal] = useState<boolean>(false);
 
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
 	const weekCalendarRef = useRef<any>(null);
+
+	const [showCreateBindModal, setShowCreateBindModal] = useState<boolean>(false);
 
 	document.title = `Class Planner | ${teacher?.name}`
 
@@ -146,6 +152,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	useEffect(() => {
 		getTeacherProfile();
+		getTeacherDisciplines();
 	}, []);
 
 	const ScheduleDetails = () => {
@@ -294,16 +301,27 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 								events={monthSchedules}
 							/>
 
-							{/* <ProfileButton
-								type="export"
-								title="Exportar horários"
-								text="Mesmos horários em exibição"
-							/>
-							<ProfileButton
-								type="export"
-								title="Exportar relatório"
-								text="Relatório mensal com carga horária"
-							/> */}
+							<Button
+								color="gray"
+								className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
+							>
+								<Download className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
+								<div className="flex text-start flex-col">
+									<p className="text-primary font-semibold text-sm">Exportar horários</p>
+									<p className="text-placeholder text-xs">Mesmos horários em exibição</p>
+								</div>
+							</Button>
+
+							<Button
+								color="gray"
+								className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
+							>
+								<Download className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
+								<div className="flex text-start flex-col">
+									<p className="text-primary font-semibold text-sm">Exportar relatório</p>
+									<p className="text-placeholder text-xs">Relatório mensal com carga horária</p>
+								</div>
+							</Button>
 						</div>
 
 						<section className="w-full relative">
@@ -335,8 +353,35 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 				<Tabs.Item icon={BookOpen} title="Disciplinas" className="outline-none">
 					<div className="flex flex-row gap-6">
-						<div className="flex flex-col gap-y-4 min-w-fit">
-							<div className="gap-4 grid grid-cols-3 flex-wrap">
+						<Button
+							color="gray"
+							className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
+							onClick={() => setShowCreateBindModal(true)}
+						>
+							<Plus className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
+							<div className="flex text-start flex-col">
+								<p className="text-primary font-semibold text-sm">Vincular disciplina</p>
+								<p className="text-placeholder text-xs">Adicionar disciplina ao professor</p>
+							</div>
+						</Button>
+
+						<Modal
+							title="Vincular disciplina"
+							description="Preencha as informações abaixo para vincular uma disciplina a um professor"
+							openModal={showCreateBindModal}
+							setOpenModal={setShowCreateBindModal}
+							body={
+								<CreateDisciplineBindFormModal
+									openModal={showCreateBindModal}
+									setOpenModal={setShowCreateBindModal}
+									teacherId={Number(params.teacherId)}
+									setDisciplines={setTeacherDisciplines}
+								/>
+							}
+						/>
+
+						<div className="flex flex-col gap-y-4">
+							<div className="flex flex-wrap gap-4 justify-evenly">
 								{teacherDisciplines.map(({ id, name, course, is_optional }) => (
 									<DisciplineCard
 										key={id}
@@ -356,28 +401,6 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 								))}
 							</div>
 						</div>
-
-						<div className="gap-4 grid grid-cols-3 flex-wrap">
-							{teacherDisciplines.map(({ id, name, course, is_optional }) => (
-								<DisciplineCard
-									key={id}
-									disciplineId={id}
-									courseGrade="Ensino superior"
-									name={name}
-									period={1}
-									isOptional={is_optional}
-								>
-									<DeleteModal key={id} type="discipline">
-										<Button key={id} color="sucess"
-											className="bg-success text-white">
-											Confirmar
-										</Button>
-									</DeleteModal>
-								</DisciplineCard>
-							))}
-						</div>
-
-						<div className="flex flex-row flex-wrap gap-4"></div>
 					</div>
 				</Tabs.Item>
 			</Tabs.Group>
