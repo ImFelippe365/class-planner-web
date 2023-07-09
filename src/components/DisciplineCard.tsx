@@ -22,7 +22,7 @@ export default function DisciplineCard({
 	isOptional,
 }: DisciplineCardProps): React.ReactNode {
 	return (
-		<div className="bg-primary-background rounded-xl p-4 items-center">
+		<div className="bg-primary-background rounded-xl p-4 items-center w-52">
 			<div className="flex flex-row justify-between">
 				<BookOpen width={24} height={24} color="#007EA7" />
 
