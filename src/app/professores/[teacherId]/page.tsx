@@ -11,6 +11,7 @@ import {
 	Ban,
 	Calendar,
 	X,
+	Plus,
 } from "lucide-react";
 import { api } from "@/services/api";
 import { Teacher } from "@/interfaces/Teacher";
@@ -30,6 +31,10 @@ import Button from "@/components/Button";
 import Image from "next/image";
 import { weekdays } from "@/utils/dates";
 import { formatTime } from "@/utils/formatTime";
+import { Checkbox, Label, Modal, TextInput } from 'flowbite-react';
+import { Discipline } from "@/interfaces/Course";
+import DisciplineCard from "@/components/DisciplineCard";
+import DeleteModal from "@/components/DeleteModal";
 
 interface TeacherProfileProps {
 	params: {
@@ -41,6 +46,9 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [teacher, setTeacher] = useState<Teacher>();
 	const [weekSchedules, setWeekSchedules] = useState([]);
 	const [monthSchedules, setMonthSchedules] = useState([]);
+	const [teacherDisciplines, setTeacherDisciplines] = useState<Discipline[]>([])
+
+	const [openModal, setOpenModal] = useState<string | undefined>();
 
 	const [scheduleToShow, setScheduleToShow] = useState<EventClickArg>();
 	const [scheduleToCancel, setScheduleToCancel] = useState<Schedule>();
@@ -61,8 +69,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			minTime < 13
 				? shiftsSchedule.Manhã
 				: minTime > 18
-				? shiftsSchedule.Noite
-				: shiftsSchedule.Tarde;
+					? shiftsSchedule.Noite
+					: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.startHour,
@@ -76,8 +84,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			maxTime < 13
 				? shiftsSchedule.Manhã
 				: maxTime > 18
-				? shiftsSchedule.Noite
-				: shiftsSchedule.Tarde;
+					? shiftsSchedule.Noite
+					: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.endHour,
@@ -89,6 +97,12 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		initialStartTime(),
 		initialEndTime(),
 	];
+
+	const getTeacherDisciplines = async () => {
+		const { data } = await api.get(`teachers/${params.teacherId}/disciplines/`)
+
+		setTeacherDisciplines(data)
+	}
 
 	const getTeacherProfile = async () => {
 		const { data } = await api.get(`/teachers/${params.teacherId}/`);
@@ -104,8 +118,10 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		setMonthSchedules(teacherMonthSchedules as any);
 		setTeacher(data);
 	};
+
 	useEffect(() => {
 		getTeacherProfile();
+		getTeacherDisciplines();
 	}, []);
 
 	const ScheduleDetails = () => {
@@ -235,7 +251,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				>
 					<div className="flex flex-row gap-6">
 						<div className="flex flex-col gap-y-4 min-w-fit">
-							<ProfileButton
+							{/* <ProfileButton
 								type="export"
 								title="Exportar horários"
 								text="Mesmos horários em exibição"
@@ -244,13 +260,13 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 								type="export"
 								title="Exportar relatório"
 								text="Relatório mensal com carga horária"
-							/>
+							/> */}
 						</div>
 
 						<section className="w-full relative">
 							{scheduleToShow && <ScheduleDetails />}
 							<WeekCalendar
-								getCalendarRef={() => {}}
+								getCalendarRef={() => { }}
 								slotDuration={{
 									minute: 10,
 								}}
@@ -276,14 +292,34 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				<Tabs.Item icon={BookOpen} title="Disciplinas" className="outline-none">
 					<div className="flex flex-row gap-6">
 						<div className="flex flex-col gap-y-4 min-w-fit">
-							<ProfileButton
-								type="bind"
-								title="Vincular disciplina"
-								text="Adicionar disciplina ao professor"
-							/>
+							<ProfileButton containerOnClick={() => setOpenModal('form-elements')}>
+								<Plus className="text-primary w-14 h-14 p-3 rounded-lg bg-primary-background" />
+								<div className="flex text-start flex-col">
+									<p className="text-primary font-semibold text-sm">Vincular disciplina</p>
+									<p className="text-placeholder text-xs">Adicionar disciplina ao professor</p>
+								</div>
+							</ProfileButton>
 						</div>
 
-						<div className="flex flex-row flex-wrap gap-4"></div>
+						<div className="gap-4 grid grid-cols-3 flex-wrap">
+							{teacherDisciplines.map(({ id, name, course, is_optional }) => (
+								<DisciplineCard
+									key={id}
+									disciplineId={id}
+									courseGrade="Ensino superior"
+									name={name}
+									period={1}
+									isOptional={is_optional}
+								>
+									<DeleteModal key={id} type="discipline">
+										<Button key={id} color="sucess"
+											className="bg-success text-white">
+											Confirmar
+										</Button>
+									</DeleteModal>
+								</DisciplineCard>
+							))}
+						</div>
 					</div>
 				</Tabs.Item>
 			</Tabs.Group>

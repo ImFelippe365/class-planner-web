@@ -24,7 +24,7 @@ export default function ClassCard({
 
 			<div className="text-primary mt-3 h-20">
 				<p className="text-xs">
-					{period}º {courseGrade == "Técnico Integrado" ? "Ano" : "Período"}
+					{period}º {courseGrade == "Ensino técnico" ? "Ano" : "Período"}
 				</p>
 				<p className="text-sm font-semibold mt-1 leading-4">{courseNickname}</p>
 			</div>

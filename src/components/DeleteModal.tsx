@@ -26,7 +26,7 @@ export default function DeleteModal({ type, children }: DeleteModalProps): React
 			<Modal 
 				show={openModal === 'pop-up'} size="md" popup 
 				onClose={() => setOpenModal(undefined)}
-				className="w backdrop-opacity-25 backdrop-contrast-50">
+				className="backdrop-opacity-25 backdrop-contrast-50">
 				<Modal.Header />
 				<Modal.Body>
 					<div className="text-rigth text-primary-dark">

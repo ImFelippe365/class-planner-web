@@ -28,9 +28,9 @@ interface TaughtBy {
 }
 
 export interface Discipline {
-	code: string;
 	id: number;
-	course_period: {
+	code: string;
+	course: {
 		id: number;
 		name: string;
 		degree: string;

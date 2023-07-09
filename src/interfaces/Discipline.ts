@@ -1,3 +1,5 @@
+import { Course } from "./Course";
+
 export interface Discipline {
 	id: number;
 	name: string;
@@ -5,14 +7,7 @@ export interface Discipline {
 	workload_in_clock: number;
 	workload_in_class: number;
 	is_optional: boolean;
-	course: {
-		id: number;
-		name: string;
-		degree: string;
-		course_load: number;
-		byname: string;
-		period: number;
-	}[];
+	course: Course[];
 }
 
 export interface CreateDiscipline {
