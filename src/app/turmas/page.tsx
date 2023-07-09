@@ -10,6 +10,8 @@ import React, { useEffect, useState } from "react";
 
 export default function Classes() {
 
+	document.title = 'Class Planner | Turmas'
+
 	const routes = useRouter();
 	const { courses, classes, getAllClasses } = useGlobal();
 

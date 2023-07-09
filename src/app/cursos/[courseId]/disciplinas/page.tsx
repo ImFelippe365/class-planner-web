@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Breadcrumb from "@/components/Breadcrumb";
 import DisciplineCard from "@/components/DisciplineCard";
@@ -19,29 +19,31 @@ interface CourseDisciplineProps {
 	};
 }
 
-export default function CourseDiscipline({ params }: CourseDisciplineProps)
-	: React.ReactNode {
+export default function CourseDiscipline({
+	params,
+}: CourseDisciplineProps): React.ReactNode {
+	document.title = "Class Planner | Disciplinas";
 	const routes = useRouter();
 	const [openModal, setOpenModal] = useState<string | undefined>();
 
-	const [disciplines, setDisciplines] = useState<CourseDiscipline[]>([])
+	const [disciplines, setDisciplines] = useState<CourseDiscipline[]>([]);
 
 	const getCourseDisciplines = async () => {
-		const { data } = await api.get(`/courses/${params.courseId}/disciplines/`)
+		const { data } = await api.get(`/courses/${params.courseId}/disciplines/`);
 
-		setDisciplines(data)
-	}
+		setDisciplines(data);
+	};
 
 	const deleteDisciplineLink = async (disciplineId: number) => {
-		await api.delete(`courses/${params.courseId}/disciplines/${disciplineId}/`)
+		await api.delete(`courses/${params.courseId}/disciplines/${disciplineId}/`);
 
 		setOpenModal(undefined);
 		getCourseDisciplines();
-	}
+	};
 
 	useEffect(() => {
 		getCourseDisciplines();
-	}, [])
+	}, []);
 
 	return (
 		<>
@@ -66,8 +68,12 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 						isOptional={discipline.is_optional}
 					>
 						<DeleteModal key={id} type="discipline">
-							<Button key={id} color="sucess"
-								className="bg-success text-white" onClick={() => deleteDisciplineLink(discipline.id)}>
+							<Button
+								key={id}
+								color="sucess"
+								className="bg-success text-white"
+								onClick={() => deleteDisciplineLink(discipline.id)}
+							>
 								Confirmar
 							</Button>
 						</DeleteModal>
@@ -75,5 +81,5 @@ export default function CourseDiscipline({ params }: CourseDisciplineProps)
 				))}
 			</section>
 		</>
-	)
+	);
 }

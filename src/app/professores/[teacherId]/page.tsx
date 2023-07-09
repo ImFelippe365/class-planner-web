@@ -11,12 +11,11 @@ import {
 	Ban,
 	Calendar,
 	X,
-	Plus,
 } from "lucide-react";
 import { api } from "@/services/api";
 import { Teacher } from "@/interfaces/Teacher";
 import ProfileButton from "@/components/ProfileButton";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Breadcrumb from "@/components/Breadcrumb";
 import { useSchedule } from "@/hooks/ScheduleContext";
 import { Schedule } from "@/interfaces/Course";
@@ -31,7 +30,8 @@ import Button from "@/components/Button";
 import Image from "next/image";
 import { weekdays } from "@/utils/dates";
 import { formatTime } from "@/utils/formatTime";
-import { Checkbox, Label, Modal, TextInput } from 'flowbite-react';
+import MonthCalendar from "@/components/MonthCalendar";
+import Modal from "@/components/Modal";
 import { Discipline } from "@/interfaces/Course";
 import DisciplineCard from "@/components/DisciplineCard";
 import DeleteModal from "@/components/DeleteModal";
@@ -43,17 +43,22 @@ interface TeacherProfileProps {
 }
 
 export default function TeacherProfile({ params }: TeacherProfileProps) {
+	const [teacherDisciplines, setTeacherDisciplines] = useState<Discipline[]>([])
+
 	const [teacher, setTeacher] = useState<Teacher>();
 	const [weekSchedules, setWeekSchedules] = useState([]);
 	const [monthSchedules, setMonthSchedules] = useState([]);
-	const [teacherDisciplines, setTeacherDisciplines] = useState<Discipline[]>([])
-
-	const [openModal, setOpenModal] = useState<string | undefined>();
 
 	const [scheduleToShow, setScheduleToShow] = useState<EventClickArg>();
 	const [scheduleToCancel, setScheduleToCancel] = useState<Schedule>();
+	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+	const [showCancelScheduleModal, setShowCancelScheduleModal] =
+		useState<boolean>(false);
 
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
+	const weekCalendarRef = useRef<any>(null);
+
+	document.title = `Class Planner | ${teacher?.name}`
 
 	const times = weekSchedules
 		.filter(({ display }) => display !== "background")
@@ -98,6 +103,26 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		initialEndTime(),
 	];
 
+	const getWeekSchedules = async (date?: Date) => {
+		const weekDate = date ? date?.toLocaleString().split(",")[0] : "";
+		const teacherWeekSchedules = await getTeacherWeekSchedules(
+			`${params.teacherId}`,
+			weekDate
+		);
+
+		setWeekSchedules(teacherWeekSchedules as any);
+	};
+
+	const getMonthSchedules = async (date?: Date) => {
+		const month = date ? date?.getMonth() + 1 : undefined;
+		const teacherMonthSchedules = await getTeacherMonthSchedules(
+			`${params.teacherId}`,
+			month
+		);
+
+		setMonthSchedules(teacherMonthSchedules as any);
+	};
+
 	const getTeacherDisciplines = async () => {
 		const { data } = await api.get(`teachers/${params.teacherId}/disciplines/`)
 
@@ -107,21 +132,20 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const getTeacherProfile = async () => {
 		const { data } = await api.get(`/teachers/${params.teacherId}/`);
 
-		const teacherWeekSchedules = await getTeacherWeekSchedules(
-			`${params.teacherId}`
-		);
-		const teacherMonthSchedules = await getTeacherMonthSchedules(
-			`${params.teacherId}`
-		);
-
-		setWeekSchedules(teacherWeekSchedules as any);
-		setMonthSchedules(teacherMonthSchedules as any);
+		getMonthSchedules();
+		getWeekSchedules();
 		setTeacher(data);
+	};
+
+	const onSelectedDateChange = (date: Date) => {
+		getWeekSchedules(date);
+		setSelectedDate(date);
+
+		weekCalendarRef.current.getApi().gotoDate(date);
 	};
 
 	useEffect(() => {
 		getTeacherProfile();
-		getTeacherDisciplines();
 	}, []);
 
 	const ScheduleDetails = () => {
@@ -147,7 +171,10 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			>
 				<section className="flex items-start justify-between">
 					<h4 className="text-black font-bold text-xl">{event?.title}</h4>
-					<X className="text-black cursor-pointer hover:opacity-60 transition-all" onClick={() => setScheduleToShow(undefined)} />
+					<X
+						className="text-black cursor-pointer hover:opacity-60 transition-all"
+						onClick={() => setScheduleToShow(undefined)}
+					/>
 				</section>
 				<section className="flex items-center justify-between mt-2 text-sm">
 					<div className="flex items-center gap-2">
@@ -205,6 +232,16 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	return (
 		<>
+			<Button onClick={() => setShowCancelScheduleModal(true)}>
+				Toggle modal
+			</Button>
+			<Modal
+				title="Cancelar aula"
+				description="Preencha as informações abaixo para cancelar a aula selecionada"
+				openModal={showCancelScheduleModal}
+				setOpenModal={setShowCancelScheduleModal}
+				body={<form></form>}
+			/>
 			<Breadcrumb title="Professores">
 				<section></section>
 			</Breadcrumb>
@@ -249,8 +286,14 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					title="Horários de aula"
 					className="outline-none"
 				>
-					<div className="flex flex-row gap-6">
+					<div className="grid grid-cols-container gap-6">
 						<div className="flex flex-col gap-y-4 min-w-fit">
+							<MonthCalendar
+								onDatePress={(date) => onSelectedDateChange(date)}
+								onMonthViewChange={(date) => getMonthSchedules(date)}
+								events={monthSchedules}
+							/>
+
 							{/* <ProfileButton
 								type="export"
 								title="Exportar horários"
@@ -266,10 +309,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						<section className="w-full relative">
 							{scheduleToShow && <ScheduleDetails />}
 							<WeekCalendar
-								getCalendarRef={() => { }}
+								getCalendarRef={(ref) => (weekCalendarRef.current = ref)}
 								slotDuration={{
 									minute: 10,
 								}}
+								initialDate={selectedDate}
 								slotMinTime={weekCalendarStartTime}
 								slotMaxTime={weekCalendarEndTime}
 								height={"auto"}
@@ -292,13 +336,25 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				<Tabs.Item icon={BookOpen} title="Disciplinas" className="outline-none">
 					<div className="flex flex-row gap-6">
 						<div className="flex flex-col gap-y-4 min-w-fit">
-							<ProfileButton containerOnClick={() => setOpenModal('form-elements')}>
-								<Plus className="text-primary w-14 h-14 p-3 rounded-lg bg-primary-background" />
-								<div className="flex text-start flex-col">
-									<p className="text-primary font-semibold text-sm">Vincular disciplina</p>
-									<p className="text-placeholder text-xs">Adicionar disciplina ao professor</p>
-								</div>
-							</ProfileButton>
+							<div className="gap-4 grid grid-cols-3 flex-wrap">
+								{teacherDisciplines.map(({ id, name, course, is_optional }) => (
+									<DisciplineCard
+										key={id}
+										disciplineId={id}
+										courseGrade="Ensino superior"
+										name={name}
+										period={1}
+										isOptional={is_optional}
+									>
+										<DeleteModal key={id} type="discipline">
+											<Button key={id} color="sucess"
+												className="bg-success text-white">
+												Confirmar
+											</Button>
+										</DeleteModal>
+									</DisciplineCard>
+								))}
+							</div>
 						</div>
 
 						<div className="gap-4 grid grid-cols-3 flex-wrap">
@@ -320,6 +376,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 								</DisciplineCard>
 							))}
 						</div>
+
+						<div className="flex flex-row flex-wrap gap-4"></div>
 					</div>
 				</Tabs.Item>
 			</Tabs.Group>
