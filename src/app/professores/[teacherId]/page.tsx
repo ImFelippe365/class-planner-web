@@ -140,19 +140,32 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		setTeacherDisciplines(data);
 	};
 
-	const getTeacherProfile = async () => {
+	const getTeacherProfile = async (date?: Date) => {
 		const { data } = await api.get(`/teachers/${params.teacherId}/`);
 
-		getMonthSchedules();
-		getWeekSchedules();
+		getMonthSchedules(date);
+		getWeekSchedules(date);
 		setTeacher(data);
+
+		scheduleToShow && setScheduleToShow(undefined);
 	};
 
 	const onSelectedDateChange = (date: Date) => {
 		getWeekSchedules(date);
 		setSelectedDate(date);
+		closeCancelScheduleModal();
 
 		weekCalendarRef.current.getApi().gotoDate(date);
+	};
+
+	const handleOpenCancelScheduleModal = (schedule: Schedule) => {
+		setShowCancelScheduleModal(true);
+		setScheduleToCancel(schedule);
+	};
+
+	const closeCancelScheduleModal = () => {
+		setShowCancelScheduleModal(false);
+		setScheduleToCancel(undefined);
 	};
 
 	useEffect(() => {
@@ -185,7 +198,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					<h4 className="text-black font-bold text-xl">{event?.title}</h4>
 					<X
 						className="text-black cursor-pointer hover:opacity-60 transition-all"
-						onClick={() => setScheduleToShow(undefined)}
+						onClick={() => closeCancelScheduleModal()}
 					/>
 				</section>
 				<section className="flex items-center justify-between mt-2 text-sm">
@@ -229,14 +242,16 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</section>
 
 				<section className="flex items-center justify-end">
-					<Button
-						onClick={() => setScheduleToCancel(schedule)}
-						color="failure"
-						className="mt-4"
-					>
-						<Ban className="text-white mr-2 rounded-lg" />
-						<span className="text-white">Cancelar</span>
-					</Button>
+					{!schedule?.canceled_class && !schedule?.class_to_replace && (
+						<Button
+							onClick={() => handleOpenCancelScheduleModal(schedule)}
+							color="failure"
+							className="mt-4"
+						>
+							<Ban className="text-white mr-2 rounded-lg" />
+							<span className="text-white">Cancelar aula</span>
+						</Button>
+					)}
 				</section>
 			</div>
 		);
@@ -244,15 +259,18 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	return (
 		<>
-			<Button onClick={() => setShowCancelScheduleModal(true)}>
-				Toggle modal
-			</Button>
 			<Modal
 				title="Cancelar aula"
 				description="Preencha as informações abaixo para cancelar a aula selecionada"
 				openModal={showCancelScheduleModal}
 				setOpenModal={setShowCancelScheduleModal}
-				body={<CancelScheduleFormModal schedule={scheduleToCancel} />}
+				body={
+					<CancelScheduleFormModal
+						closeModal={closeCancelScheduleModal}
+						schedule={scheduleToCancel}
+						refreshSchedules={getTeacherProfile}
+					/>
+				}
 			/>
 			<Modal
 				title="Vincular disciplina"
@@ -316,7 +334,10 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						<div className="flex flex-col gap-y-4 min-w-fit">
 							<MonthCalendar
 								onDatePress={(date) => onSelectedDateChange(date)}
-								onMonthViewChange={(date) => getMonthSchedules(date)}
+								onMonthViewChange={(date) => {
+									setScheduleToShow(undefined);
+									getMonthSchedules(date);
+								}}
 								events={monthSchedules}
 							/>
 

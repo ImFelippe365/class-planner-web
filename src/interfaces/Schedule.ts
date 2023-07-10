@@ -16,7 +16,7 @@ export interface DisciplineSchedule {
 	weekday: number;
 	start_time: string;
 	end_time: string;
-	class_id?: string;
+	class_id?: number;
 }
 
 export interface CancelSchedule {

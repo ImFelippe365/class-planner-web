@@ -1,5 +1,5 @@
 import FullCalendar from "@fullcalendar/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import {
 	CalendarOptions,
@@ -9,36 +9,54 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface MonthCalendarProps extends CalendarOptions {
+	getCalendarRef?: (ref: any) => void;
+	defaultSelectedDate?: Date;
 	onDatePress?: (date: Date) => void;
 	onMonthViewChange?: (date: Date) => void;
+	singleActiveDay?: number;
 }
 
 export default function MonthCalendar({
+	getCalendarRef = () => {},
+	defaultSelectedDate = new Date(),
 	onDatePress = () => {},
 	onMonthViewChange = () => {},
+	singleActiveDay,
 	...props
 }: MonthCalendarProps) {
 	const calendarRef = useRef<any>(null);
-
-	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+	const [selectedDate, setSelectedDate] = useState<Date>(defaultSelectedDate);
 	const [calendarCurrentDate, setCalendarCurrentDate] = useState(selectedDate);
 
 	const onSelectDate = (date: Date) => {
-		onDatePress(date)
-		setSelectedDate(date)
-	}
+		onDatePress(date);
+		setSelectedDate(date);
+	};
 
 	const DayCell = (event: DayCellContentArg) => {
-		const selectCondition = true && event.date === selectedDate;
+		const selectCondition =
+			event.date.toLocaleDateString("pt-BR") ===
+			selectedDate.toLocaleDateString("pt-BR");
+
 		const selectedDayColor = selectCondition
-			? event.isToday
-				? "bg-white text-primary"
-				: "bg-primary text-white"
+			? "bg-primary text-white"
 			: "hover:bg-primary-dark-transparent";
 		return (
-			<div className="w-full flex items-center justify-center">
+			<div
+				className={`w-full flex items-center justify-center ${
+					singleActiveDay
+						? event.date.getDay() !== singleActiveDay && "opacity-40"
+						: ""
+				}`}
+			>
 				<button
-					onClick={() => onSelectDate(event.date)}
+					type="button"
+					onClick={() =>
+						singleActiveDay
+							? event.date.getDay() === singleActiveDay &&
+							  onSelectDate(event.date)
+							: onSelectDate(event.date)
+					}
 					className={`cursor-pointer  rounded-full w-8 h-8 text-center ${selectedDayColor}`}
 				>
 					{event.dayNumberText}
@@ -91,6 +109,7 @@ export default function MonthCalendar({
 		<section className="monthCalendarContainer">
 			<header className="flex items-center justify-between px-4 mb-3">
 				<button
+					type="button"
 					className="hover:bg-primary-background p-1 rounded-full transition-all"
 					onClick={() => onMonthChange("prev")}
 				>
@@ -98,6 +117,7 @@ export default function MonthCalendar({
 				</button>
 				<span className="text-black text-lg font-bold">{currentMonth}</span>
 				<button
+					type="button"
 					className="hover:bg-primary-background p-1 rounded-full transition-all"
 					onClick={() => onMonthChange("next")}
 				>
@@ -105,7 +125,10 @@ export default function MonthCalendar({
 				</button>
 			</header>
 			<FullCalendar
-				ref={calendarRef}
+				ref={(r) => {
+					calendarRef.current = r;
+					getCalendarRef(r);
+				}}
 				initialDate={selectedDate}
 				initialView="dayGridMonth"
 				plugins={[dayGridPlugin]}
@@ -117,7 +140,7 @@ export default function MonthCalendar({
 				weekends={false}
 				dayCellContent={DayCell}
 				dayCellClassNames={(event) =>
-					event.isToday ? "text-white" : "text-black text-center"
+					event.isToday ? "text-primary" : "text-black text-center"
 				}
 				dayMaxEvents={false}
 				dayMaxEventRows={4}
