@@ -35,7 +35,8 @@ import MonthCalendar from "@/components/MonthCalendar";
 import Modal from "@/components/Modal";
 import DisciplineCard from "@/components/DisciplineCard";
 import DeleteModal from "@/components/DeleteModal";
-import CreateDisciplineBindFormModal from "../components/CreateDisciplineBindFormModal";
+import CreateDisciplineBindFormModal from "./components/CreateDisciplineBindFormModal";
+import CancelScheduleFormModal from "./components/CancelScheduleFormModal";
 
 import { Teacher } from "@/interfaces/Teacher";
 import { Schedule } from "@/interfaces/Course";
@@ -48,7 +49,9 @@ interface TeacherProfileProps {
 }
 
 export default function TeacherProfile({ params }: TeacherProfileProps) {
-	const [teacherDisciplines, setTeacherDisciplines] = useState<Discipline[]>([])
+	const [teacherDisciplines, setTeacherDisciplines] = useState<Discipline[]>(
+		[]
+	);
 
 	const [teacher, setTeacher] = useState<Teacher>();
 	const [weekSchedules, setWeekSchedules] = useState([]);
@@ -57,14 +60,16 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [scheduleToShow, setScheduleToShow] = useState<EventClickArg>();
 	const [scheduleToCancel, setScheduleToCancel] = useState<Schedule>();
 	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-	const [showCancelScheduleModal, setShowCancelScheduleModal] = useState<boolean>(false);
+	const [showCancelScheduleModal, setShowCancelScheduleModal] =
+		useState<boolean>(false);
 
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
 	const weekCalendarRef = useRef<any>(null);
 
-	const [showCreateBindModal, setShowCreateBindModal] = useState<boolean>(false);
+	const [showCreateBindModal, setShowCreateBindModal] =
+		useState<boolean>(false);
 
-	document.title = `Class Planner | ${teacher?.name}`
+	document.title = `Class Planner | ${teacher?.name}`;
 
 	const times = weekSchedules
 		.filter(({ display }) => display !== "background")
@@ -80,8 +85,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			minTime < 13
 				? shiftsSchedule.Manhã
 				: minTime > 18
-					? shiftsSchedule.Noite
-					: shiftsSchedule.Tarde;
+				? shiftsSchedule.Noite
+				: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.startHour,
@@ -95,8 +100,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			maxTime < 13
 				? shiftsSchedule.Manhã
 				: maxTime > 18
-					? shiftsSchedule.Noite
-					: shiftsSchedule.Tarde;
+				? shiftsSchedule.Noite
+				: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.endHour,
@@ -130,10 +135,10 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	};
 
 	const getTeacherDisciplines = async () => {
-		const { data } = await api.get(`teachers/${params.teacherId}/disciplines/`)
+		const { data } = await api.get(`teachers/${params.teacherId}/disciplines/`);
 
-		setTeacherDisciplines(data)
-	}
+		setTeacherDisciplines(data);
+	};
 
 	const getTeacherProfile = async () => {
 		const { data } = await api.get(`/teachers/${params.teacherId}/`);
@@ -247,7 +252,21 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				description="Preencha as informações abaixo para cancelar a aula selecionada"
 				openModal={showCancelScheduleModal}
 				setOpenModal={setShowCancelScheduleModal}
-				body={<form></form>}
+				body={<CancelScheduleFormModal schedule={scheduleToCancel} />}
+			/>
+			<Modal
+				title="Vincular disciplina"
+				description="Preencha as informações abaixo para vincular uma disciplina a um professor"
+				openModal={showCreateBindModal}
+				setOpenModal={setShowCreateBindModal}
+				body={
+					<CreateDisciplineBindFormModal
+						openModal={showCreateBindModal}
+						setOpenModal={setShowCreateBindModal}
+						teacherId={Number(params.teacherId)}
+						setDisciplines={setTeacherDisciplines}
+					/>
+				}
 			/>
 			<Breadcrumb title="Professores">
 				<section></section>
@@ -307,8 +326,12 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 							>
 								<Download className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
 								<div className="flex text-start flex-col">
-									<p className="text-primary font-semibold text-sm">Exportar horários</p>
-									<p className="text-placeholder text-xs">Mesmos horários em exibição</p>
+									<p className="text-primary font-semibold text-sm">
+										Exportar horários
+									</p>
+									<p className="text-placeholder text-xs">
+										Mesmos horários em exibição
+									</p>
 								</div>
 							</Button>
 
@@ -318,8 +341,12 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 							>
 								<Download className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
 								<div className="flex text-start flex-col">
-									<p className="text-primary font-semibold text-sm">Exportar relatório</p>
-									<p className="text-placeholder text-xs">Relatório mensal com carga horária</p>
+									<p className="text-primary font-semibold text-sm">
+										Exportar relatório
+									</p>
+									<p className="text-placeholder text-xs">
+										Relatório mensal com carga horária
+									</p>
 								</div>
 							</Button>
 						</div>
@@ -360,25 +387,14 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						>
 							<Plus className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
 							<div className="flex text-start flex-col">
-								<p className="text-primary font-semibold text-sm">Vincular disciplina</p>
-								<p className="text-placeholder text-xs">Adicionar disciplina ao professor</p>
+								<p className="text-primary font-semibold text-sm">
+									Vincular disciplina
+								</p>
+								<p className="text-placeholder text-xs">
+									Adicionar disciplina ao professor
+								</p>
 							</div>
 						</Button>
-
-						<Modal
-							title="Vincular disciplina"
-							description="Preencha as informações abaixo para vincular uma disciplina a um professor"
-							openModal={showCreateBindModal}
-							setOpenModal={setShowCreateBindModal}
-							body={
-								<CreateDisciplineBindFormModal
-									openModal={showCreateBindModal}
-									setOpenModal={setShowCreateBindModal}
-									teacherId={Number(params.teacherId)}
-									setDisciplines={setTeacherDisciplines}
-								/>
-							}
-						/>
 
 						<div className="flex flex-col gap-y-4">
 							<div className="flex flex-wrap gap-4 justify-evenly">
@@ -392,8 +408,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 										isOptional={is_optional}
 									>
 										<DeleteModal key={id} type="discipline">
-											<Button key={id} color="sucess"
-												className="bg-success text-white">
+											<Button
+												key={id}
+												color="sucess"
+												className="bg-success text-white"
+											>
 												Confirmar
 											</Button>
 										</DeleteModal>

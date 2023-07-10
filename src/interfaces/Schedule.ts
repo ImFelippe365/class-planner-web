@@ -27,3 +27,9 @@ export interface CancelSchedule {
 	is_available: boolean;
 	teachers_id?: string[];
 }
+
+export interface CancelScheduleForm {
+	canceled_date: Date;
+	reason?: string | undefined;
+	teachers_id?: string | undefined;
+}

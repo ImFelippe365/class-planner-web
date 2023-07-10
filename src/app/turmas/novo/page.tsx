@@ -13,11 +13,6 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import WeekCalendar from "@/components/WeekCalendar";
-import { eventColors } from "@/utils/eventColors";
-import DraggrableDiscipline from "@/components/DraggrableDiscipline";
-import { Draggable } from "@fullcalendar/interaction";
-import { intervalEvents } from "@/utils/intervalEvents";
 import { Check } from "lucide-react";
 import { Student } from "@/interfaces/Student";
 
