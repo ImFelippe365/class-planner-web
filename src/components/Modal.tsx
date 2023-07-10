@@ -19,6 +19,7 @@ export default function Modal({
 	footer,
 	...props
 }: CustomModalProps) {
+	if (!openModal) return;
 	return (
 		<FRModal
 			show={openModal}

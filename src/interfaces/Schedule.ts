@@ -16,7 +16,7 @@ export interface DisciplineSchedule {
 	weekday: number;
 	start_time: string;
 	end_time: string;
-	class_id?: string;
+	class_id?: number;
 }
 
 export interface CancelSchedule {
@@ -26,4 +26,10 @@ export interface CancelSchedule {
 	quantity_available: number;
 	is_available: boolean;
 	teachers_id?: string[];
+}
+
+export interface CancelScheduleForm {
+	canceled_date: Date;
+	reason?: string | undefined;
+	teachers_id?: string | undefined;
 }

@@ -36,7 +36,7 @@
 }
 
 .monthCalendarContainer .fc-theme-standard td {
-	--fc-today-bg-color: #007ea7;
+	--fc-today-bg-color: transparent;
 
 	border: none;
 	background-color: white;

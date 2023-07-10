@@ -41,7 +41,7 @@ interface DisciplineSchedule {
 	weekday: number;
 	start_time: string;
 	end_time: string;
-	class_id?: string;
+	class_id?: number;
 }
 
 export default function Class({ params }: ClassProps) {
@@ -100,7 +100,7 @@ export default function Class({ params }: ClassProps) {
 					start_time: formatTime(start),
 					end_time: formatTime(end),
 					quantity,
-					class_id: id,
+					class_id: Number(id) || 0,
 				};
 				let response = "";
 				if (event.extendedProps?.schedule_id) {
