@@ -10,11 +10,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "@/services/api";
 import { Course, Class, Discipline } from "@/interfaces/Course";
 import Select from "@/components/Select";
+import { TeacherDiscipline } from "@/interfaces/Teacher";
 
 interface CreateDisciplineBindFormModalProps {
 	openModal: boolean;
 	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-	setDisciplines: React.Dispatch<React.SetStateAction<Discipline[]>>;
+	setDisciplines: React.Dispatch<React.SetStateAction<TeacherDiscipline[]>>;
 	teacherId: number;
 }
 

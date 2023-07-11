@@ -1,5 +1,5 @@
 import { Teacher } from "@/interfaces/Teacher";
-import { Discipline } from "@/interfaces/Discipline";
+import { DisciplineGlobal } from "@/interfaces/Discipline";
 import { Class } from "./Course";
 export interface Student {
 	id: number;
@@ -21,5 +21,5 @@ export interface Alert {
 	reason: string;
 	teacher: Teacher;
 	student: Student;
-	discipline: Discipline;
+	discipline: DisciplineGlobal;
 }

@@ -37,7 +37,7 @@ import DisciplineCard from "@/components/DisciplineCard";
 import DeleteModal from "@/components/DeleteModal";
 import CreateDisciplineBindFormModal from "../components/CreateDisciplineBindFormModal";
 
-import { Teacher } from "@/interfaces/Teacher";
+import { Teacher, TeacherDiscipline } from "@/interfaces/Teacher";
 import { Schedule } from "@/interfaces/Course";
 import { Discipline } from "@/interfaces/Course";
 
@@ -48,7 +48,7 @@ interface TeacherProfileProps {
 }
 
 export default function TeacherProfile({ params }: TeacherProfileProps) {
-	const [teacherDisciplines, setTeacherDisciplines] = useState<Discipline[]>([])
+	const [teacherDisciplines, setTeacherDisciplines] = useState<TeacherDiscipline[]>([])
 
 	const [teacher, setTeacher] = useState<Teacher>();
 	const [weekSchedules, setWeekSchedules] = useState([]);
@@ -203,19 +203,13 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					</div>
 				</section>
 
-				<h5 className="text-black font-bold text-lg mt-6 mb-2">
+				<h5 className="texty-black font-bold text-lg mt-6 mb-2">
 					Professores(as)
 				</h5>
+
 				<section>
 					{teachers.map((teacher) => (
 						<div key={teacher.id} className="flex items-center gap-2">
-							{teacher.avatar ? (
-								<Image src={teacher.avatar} alt={teacher.name} />
-							) : (
-								<div className="flex justify-center p-1 rounded-full items-center w-8 bg-primary-background">
-									<User className="text-primary" />
-								</div>
-							)}
 							<span className="text-placeholder font-semibold text-sm">
 								{teacher.name}
 							</span>
@@ -382,14 +376,15 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 						<div className="flex flex-col gap-y-4">
 							<div className="flex flex-wrap gap-4 justify-evenly">
-								{teacherDisciplines.map(({ id, name, course, is_optional }) => (
+								{teacherDisciplines.map(({ id, discipline, course }) => (
 									<DisciplineCard
 										key={id}
-										disciplineId={id}
-										courseGrade="Ensino superior"
-										name={name}
-										period={1}
-										isOptional={is_optional}
+										disciplineId={discipline.id}
+										courseGrade={course.degree}
+										name={discipline.name}
+										period={course.period}
+										isOptional={discipline.is_optional}
+										courseByname={course.byname}
 									>
 										<DeleteModal key={id} type="discipline">
 											<Button key={id} color="sucess"

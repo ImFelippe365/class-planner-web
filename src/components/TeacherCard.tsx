@@ -8,17 +8,25 @@ interface TeacherCardProps {
 	teacherId: number | string;
 	registration: string;
 	name: string;
+	teacherAvatar?: string;
 }
 
-export default function TeacherCard({ 
-	teacherId, 
+export default function TeacherCard({
+	teacherId,
 	registration,
-	name 
+	name,
+	teacherAvatar
 }: TeacherCardProps) {
 	return (
 		<div className="bg-white flex flex-row justify-between items-center max-w-md py-4 px-4 rounded-2xl drop-shadow-sm">
 			<div className="flex gap-x-4">
-				<User className="rounded-lg bg-primary-background w-12 p-3 h-fit" color="#007EA7"/>
+
+				{teacherAvatar ? (
+					<Image src={teacherAvatar} alt={name} />
+				) : (
+					<User className="rounded-lg bg-primary-background w-12 p-3 h-fit" color="#007EA7" />
+
+				)}
 
 				<div className="flex flex-col gap-y-1">
 					<p className="text-primary font-semibold text-base">{name}</p>
@@ -26,7 +34,9 @@ export default function TeacherCard({
 				</div>
 			</div>
 
-			<Link href={`/professores/${teacherId}`}><ChevronRight className="bg-primary-background rounded-full" color="#007EA7" /></Link>
+			<Link href={`/professores/${teacherId}`}>
+				<ChevronRight className="bg-primary-background rounded-full" color="#007EA7" />
+			</Link>
 		</div>
 	)
 }
