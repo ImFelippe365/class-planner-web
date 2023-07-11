@@ -44,6 +44,7 @@ export interface Discipline {
 	workload_in_clock: number;
 	taught_by: TaughtBy[];
 }
+
 export interface Schedule {
 	id: number;
 	quantity: number;

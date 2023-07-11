@@ -38,9 +38,8 @@ import DeleteModal from "@/components/DeleteModal";
 import CreateDisciplineBindFormModal from "./components/CreateDisciplineBindFormModal";
 import CancelScheduleFormModal from "./components/CancelScheduleFormModal";
 
-import { Teacher } from "@/interfaces/Teacher";
+import { Teacher, TeacherDiscipline } from "@/interfaces/Teacher";
 import { Schedule } from "@/interfaces/Course";
-import { Discipline } from "@/interfaces/Course";
 
 interface TeacherProfileProps {
 	params: {
@@ -49,7 +48,7 @@ interface TeacherProfileProps {
 }
 
 export default function TeacherProfile({ params }: TeacherProfileProps) {
-	const [teacherDisciplines, setTeacherDisciplines] = useState<Discipline[]>(
+	const [teacherDisciplines, setTeacherDisciplines] = useState<TeacherDiscipline[]>(
 		[]
 	);
 
@@ -85,8 +84,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			minTime < 13
 				? shiftsSchedule.Manhã
 				: minTime > 18
-				? shiftsSchedule.Noite
-				: shiftsSchedule.Tarde;
+					? shiftsSchedule.Noite
+					: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.startHour,
@@ -100,8 +99,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			maxTime < 13
 				? shiftsSchedule.Manhã
 				: maxTime > 18
-				? shiftsSchedule.Noite
-				: shiftsSchedule.Tarde;
+					? shiftsSchedule.Noite
+					: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.endHour,
@@ -419,14 +418,15 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 						<div className="flex flex-col gap-y-4">
 							<div className="flex flex-wrap gap-4 justify-evenly">
-								{teacherDisciplines.map(({ id, name, course, is_optional }) => (
+								{teacherDisciplines.map(({ id, discipline, course }) => (
 									<DisciplineCard
 										key={id}
-										disciplineId={id}
-										courseGrade="Ensino superior"
-										name={name}
-										period={1}
-										isOptional={is_optional}
+										disciplineId={discipline.id}
+										courseGrade={course.degree}
+										name={discipline.name}
+										period={course.period}
+										isOptional={discipline.is_optional}
+										courseByname={course.byname}
 									>
 										<DeleteModal key={id} type="discipline">
 											<Button

@@ -1,6 +1,6 @@
 import { Course } from "./Course";
 
-export interface Discipline {
+export interface DisciplineGlobal {
 	id: number;
 	name: string;
 	code: string;
