@@ -40,6 +40,7 @@ import CancelScheduleFormModal from "./components/CancelScheduleFormModal";
 
 import { Teacher, TeacherDiscipline } from "@/interfaces/Teacher";
 import { Schedule } from "@/interfaces/Course";
+import TeacherInformations from "./components/TeacherInformations";
 
 interface TeacherProfileProps {
 	params: {
@@ -51,6 +52,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [teacherDisciplines, setTeacherDisciplines] = useState<TeacherDiscipline[]>(
 		[]
 	);
+	const [amountOfLessons, setAmountOfLessons] = useState(0)
 
 	const [teacher, setTeacher] = useState<Teacher>();
 	const [weekSchedules, setWeekSchedules] = useState([]);
@@ -77,6 +79,17 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 			return Number(hours);
 		});
+
+	const getAmountOfLessons = async () => {
+		const { data } = await api.get(`teachers/${params.teacherId}/schedules/week/`)
+		
+		let quantity = 0
+		data.map((item: any) => {
+			quantity += item.quantity
+		})
+
+		setAmountOfLessons(quantity)
+	}
 
 	const initialStartTime = (): DurationInput => {
 		const minTime = Math.min(...times);
@@ -170,6 +183,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	useEffect(() => {
 		getTeacherProfile();
 		getTeacherDisciplines();
+		getAmountOfLessons();
 	}, []);
 
 	const ScheduleDetails = () => {
@@ -301,22 +315,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</div>
 			</div>
 
-			<div className="flex justify-between mt-3">
-				<div className="flex items-center gap-x-1">
-					<AtSign className="w-4 h-4 text-primary-dark" />
-					<span>{teacher?.registration}</span>
-				</div>
-
-				<div className="flex items-center gap-x-1">
-					<Mail className="w-4 h-4 text-primary-dark" />
-					<span>{teacher?.email}</span>
-				</div>
-
-				<div className="flex items-center gap-x-1">
-					<Clock className="w-4 h-4 text-primary-dark" />
-					<span> aulas/semana</span>
-				</div>
-			</div>
+			<TeacherInformations teacher={teacher} quantityClasses={amountOfLessons} />
 
 			<Tabs.Group
 				aria-label="Tabs with icons"

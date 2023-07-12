@@ -8,7 +8,7 @@ interface DisciplineCardProps {
 	name: string;
 	courseGrade: string | undefined;
 	courseId?: number;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 	isOptional: boolean
 	courseByname?: string;
 }

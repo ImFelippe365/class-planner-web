@@ -12,7 +12,7 @@ interface DropdownProps {
 	courseId?: number;
 	courseGrade?: string;
 	disciplineId?: number;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 }
 
 export default function Dropdown({
