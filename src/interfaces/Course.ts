@@ -15,7 +15,7 @@ export interface Class {
 	reference_period: number;
 	shift: Shifts;
 
-	class_leader_id?: number;
+	class_leader_id?: string;
 }
 
 interface TaughtBy {

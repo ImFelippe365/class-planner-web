@@ -42,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps) {
 						) : (
 							<main className="grid grid-cols-container bg-background-color">
 								<NavigationSideBar />
-								<div className="max-w-[1264px] w-full mx-auto mt-16 px-9 pt-6">
+								<div className="max-w-[80%] w-full mx-auto mt-16 px-9 pt-6">
 									{children}
 								</div>
 							</main>

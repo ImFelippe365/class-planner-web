@@ -44,7 +44,9 @@ module.exports = {
 				"background-black-transparent": "rgba(0,0,0,0.6)",
 			},
 			gridTemplateColumns: {
-				container: '400px auto',
+				container: '280px auto',
+				profileContainer: '400px auto',
+				studentsListContainer: 'repeat(auto-fill, minmax(340px, 1fr))',
 				classContainer: 'auto 400px',
 				cardsGrid: 'repeat(auto-fill, minmax(224px, 1fr))'
 			},
