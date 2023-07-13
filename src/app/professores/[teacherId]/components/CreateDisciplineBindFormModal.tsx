@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import Button from "@/components/Button";
 
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
