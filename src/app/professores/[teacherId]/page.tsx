@@ -38,9 +38,10 @@ import DeleteModal from "@/components/DeleteModal";
 import CreateDisciplineBindFormModal from "./components/CreateDisciplineBindFormModal";
 import CancelScheduleFormModal from "./components/CancelScheduleFormModal";
 
-import { Teacher, TeacherDiscipline } from "@/interfaces/Teacher";
+import { Teacher, TeacherClasses, TeacherDiscipline } from "@/interfaces/Teacher";
 import { Schedule } from "@/interfaces/Course";
 import TeacherInformations from "./components/TeacherInformations";
+import ClassCard from "@/components/ClassCard";
 
 interface TeacherProfileProps {
 	params: {
@@ -53,6 +54,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		[]
 	);
 	const [amountOfLessons, setAmountOfLessons] = useState(0)
+	const [teacherClasses, setTeacherClasses] = useState<TeacherClasses[]>([])
 
 	const [teacher, setTeacher] = useState<Teacher>();
 	const [weekSchedules, setWeekSchedules] = useState([]);
@@ -82,7 +84,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	const getAmountOfLessons = async () => {
 		const { data } = await api.get(`teachers/${params.teacherId}/schedules/week/`)
-		
+
 		let quantity = 0
 		data.map((item: any) => {
 			quantity += item.quantity
@@ -125,6 +127,12 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		initialStartTime(),
 		initialEndTime(),
 	];
+
+	const getTeacherClasses = async () => {
+		const { data } = await api.get(`teachers/${params.teacherId}/classes/`)
+
+		setTeacherClasses(data)
+	}
 
 	const getWeekSchedules = async (date?: Date) => {
 		const weekDate = date ? date?.toLocaleString().split(",")[0] : "";
@@ -184,6 +192,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		getTeacherProfile();
 		getTeacherDisciplines();
 		getAmountOfLessons();
+		getTeacherClasses();
 	}, []);
 
 	const ScheduleDetails = () => {
@@ -394,7 +403,89 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</Tabs.Item>
 
 				<Tabs.Item icon={Users} title="Turmas" className="outline-none">
-					<div className="flex flex-row flex-wrap justify-center gap-4"></div>
+					<div className="flex flex-row flex-wrap gap-y-5 gap-x-4 justify-between">
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+						{teacherClasses.map(({ id, course, reference_period }) =>
+							<ClassCard
+								key={id}
+								href={`turmas/${id}`}
+								courseNickname={course.byname}
+								courseGrade={course.degree}
+								period={reference_period}
+							/>
+						)}
+					</div>
 				</Tabs.Item>
 
 				<Tabs.Item icon={BookOpen} title="Disciplinas" className="outline-none">

@@ -17,12 +17,12 @@ export default function ClassCard({
 	href
 }: ClassCardProps): React.ReactNode {
 	return (
-		<Link href={href} className="bg-primary-background rounded-xl p-4 items-center drop-shadow-sm w-full">
+		<Link href={href} className="bg-primary-background rounded-xl p-4 items-center drop-shadow-sm w-52">
 			<div className="flex flex-row justify-between">
 				<Users width={24} height={24} color="#007EA7" />
 			</div>
 
-			<div className="text-primary mt-3 h-20">
+			<div className="text-primary mt-3 h-fit">
 				<p className="text-xs">
 					{period}º {courseGrade == "Ensino técnico" ? "Ano" : "Período"}
 				</p>
