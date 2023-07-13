@@ -1,3 +1,5 @@
+import { Course } from "./Course";
+
 export interface CreateTeacher {
 	registration: string;
 	name: string;
@@ -31,4 +33,13 @@ export interface TeacherDiscipline {
 		byname: string;
 		period: number;
 	};
+}
+
+export interface TeacherClasses {
+	id: number;
+	course_id: number;
+	course: Course;
+	reference_period: number;
+	shift: string;
+	class_leader_id: string | null;
 }
