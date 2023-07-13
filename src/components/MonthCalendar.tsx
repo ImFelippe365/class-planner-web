@@ -69,10 +69,7 @@ export default function MonthCalendar({
 		return (
 			<div
 				style={{
-					backgroundColor:
-						event.backgroundColor === "#007EA7" && event.isToday
-							? "white"
-							: event.backgroundColor,
+					backgroundColor: event.backgroundColor,
 				}}
 				className={`w-2 h-2 items-center justify-center rounded-full`}
 			/>
