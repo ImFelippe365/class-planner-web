@@ -6,8 +6,6 @@ import {
 	Users,
 	BookOpen,
 	User,
-	AtSign,
-	Mail,
 	Ban,
 	Calendar,
 	X,
@@ -404,78 +402,6 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 				<Tabs.Item icon={Users} title="Turmas" className="outline-none">
 					<div className="flex flex-row flex-wrap gap-y-5 gap-x-4 justify-between">
-						{teacherClasses.map(({ id, course, reference_period }) =>
-							<ClassCard
-								key={id}
-								href={`turmas/${id}`}
-								courseNickname={course.byname}
-								courseGrade={course.degree}
-								period={reference_period}
-							/>
-						)}
-						{teacherClasses.map(({ id, course, reference_period }) =>
-							<ClassCard
-								key={id}
-								href={`turmas/${id}`}
-								courseNickname={course.byname}
-								courseGrade={course.degree}
-								period={reference_period}
-							/>
-						)}
-						{teacherClasses.map(({ id, course, reference_period }) =>
-							<ClassCard
-								key={id}
-								href={`turmas/${id}`}
-								courseNickname={course.byname}
-								courseGrade={course.degree}
-								period={reference_period}
-							/>
-						)}
-						{teacherClasses.map(({ id, course, reference_period }) =>
-							<ClassCard
-								key={id}
-								href={`turmas/${id}`}
-								courseNickname={course.byname}
-								courseGrade={course.degree}
-								period={reference_period}
-							/>
-						)}
-						{teacherClasses.map(({ id, course, reference_period }) =>
-							<ClassCard
-								key={id}
-								href={`turmas/${id}`}
-								courseNickname={course.byname}
-								courseGrade={course.degree}
-								period={reference_period}
-							/>
-						)}
-						{teacherClasses.map(({ id, course, reference_period }) =>
-							<ClassCard
-								key={id}
-								href={`turmas/${id}`}
-								courseNickname={course.byname}
-								courseGrade={course.degree}
-								period={reference_period}
-							/>
-						)}
-						{teacherClasses.map(({ id, course, reference_period }) =>
-							<ClassCard
-								key={id}
-								href={`turmas/${id}`}
-								courseNickname={course.byname}
-								courseGrade={course.degree}
-								period={reference_period}
-							/>
-						)}
-						{teacherClasses.map(({ id, course, reference_period }) =>
-							<ClassCard
-								key={id}
-								href={`turmas/${id}`}
-								courseNickname={course.byname}
-								courseGrade={course.degree}
-								period={reference_period}
-							/>
-						)}
 						{teacherClasses.map(({ id, course, reference_period }) =>
 							<ClassCard
 								key={id}
