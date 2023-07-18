@@ -48,7 +48,7 @@ export default function CancelScheduleFormModal({
 			.date()
 			.required("Selecione uma data que quer cancelar a aula"),
 		reason: yup.string(),
-		teachers_id: yup.string(),
+		teacher_to_replace: yup.string(),
 	});
 
 	const {
@@ -67,10 +67,11 @@ export default function CancelScheduleFormModal({
 	const onSubmit = async (data: CancelScheduleForm) => {
 		const newData: CancelSchedule = {
 			canceled_date: data.canceled_date?.toLocaleString().split(",")[0],
-			is_available: true,
-			quantity_available: schedule?.quantity || 0,
 			reason: data.reason,
-			teachers_id: data.teachers_id ? [data.teachers_id] : [],
+			teachers_to_substitute: data.teacher_to_replace
+				? data.teacher_to_replace
+				: "",
+			canceled_by: 1,
 			schedule_id: schedule?.id || 0,
 		};
 
@@ -110,7 +111,7 @@ export default function CancelScheduleFormModal({
 							},
 							...teachersSelection,
 						]}
-						name="teachers_id"
+						name="teacher_to_replace"
 						control={control}
 					/>
 					<TextArea

@@ -23,13 +23,12 @@ export interface CancelSchedule {
 	schedule_id: number;
 	canceled_date: string;
 	reason?: string;
-	quantity_available: number;
-	is_available: boolean;
-	teachers_id?: string[];
+	teachers_to_substitute?: string;
+	canceled_by: number;
 }
 
 export interface CancelScheduleForm {
 	canceled_date: Date;
 	reason?: string | undefined;
-	teachers_id?: string | undefined;
+	teacher_to_replace?: string | undefined;
 }
