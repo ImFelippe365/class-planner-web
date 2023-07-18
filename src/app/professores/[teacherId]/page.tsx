@@ -189,6 +189,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	const closeCancelScheduleModal = () => {
 		setScheduleToShow(undefined);
+		setShowCancelScheduleModal(false);
 		setScheduleToCancel(undefined);
 	};
 
