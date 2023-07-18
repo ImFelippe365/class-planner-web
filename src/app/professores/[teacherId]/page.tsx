@@ -37,9 +37,10 @@ import CreateDisciplineBindFormModal from "./components/CreateDisciplineBindForm
 import CancelScheduleFormModal from "./components/CancelScheduleFormModal";
 
 import { Teacher, TeacherClasses, TeacherDiscipline } from "@/interfaces/Teacher";
-import { Schedule } from "@/interfaces/Course";
+import { ClassCanceled, Schedule } from "@/interfaces/Course";
 import TeacherInformations from "./components/TeacherInformations";
 import ClassCard from "@/components/ClassCard";
+import TeachCanceledClassFormModal from "./components/TeachCanceledClassFormModal";
 
 interface TeacherProfileProps {
 	params: {
@@ -64,10 +65,15 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [showCancelScheduleModal, setShowCancelScheduleModal] =
 		useState<boolean>(false);
 
+	const [classCanceled, setClassCanceled] = useState<ClassCanceled>()
+
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
 	const weekCalendarRef = useRef<any>(null);
 
 	const [showCreateBindModal, setShowCreateBindModal] =
+		useState<boolean>(false);
+
+	const [showTeachCanceledClass, setShowTeachCanceledClass] =
 		useState<boolean>(false);
 
 	document.title = `Class Planner | ${teacher?.name}`;
@@ -272,6 +278,18 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 							<span className="text-white">Cancelar aula</span>
 						</Button>
 					)}
+
+					{schedule?.canceled_class && !schedule.class_to_replace && (
+						<Button
+							onClick={() => {
+								setShowTeachCanceledClass(true)
+								setClassCanceled(schedule.canceled_class)
+								console.log(schedule.canceled_class)
+							}}
+						>
+							Ministrar aula
+						</Button>
+					)}
 				</section>
 			</div>
 		);
@@ -292,6 +310,22 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					/>
 				}
 			/>
+
+			<Modal
+				title="Ministrar aula"
+				description="Para ministrar essa aula, esperamos que os alunos desta turma estejam cientes que a aula da disciplina selecionada ocorrerá neste horário."
+				openModal={showTeachCanceledClass}
+				setOpenModal={setShowTeachCanceledClass}
+				body={
+					<TeachCanceledClassFormModal
+						openModal={showTeachCanceledClass}
+						setOpenModal={setShowTeachCanceledClass}
+						teacherId={Number(params.teacherId)}
+						classCanceled={classCanceled}
+					/>
+				}
+			/>
+
 			<Modal
 				title="Vincular disciplina"
 				description="Preencha as informações abaixo para vincular uma disciplina a um professor"

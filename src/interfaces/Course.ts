@@ -14,7 +14,6 @@ export interface Class {
 	course: Course;
 	reference_period: number;
 	shift: Shifts;
-
 	class_leader_id?: string;
 }
 
@@ -55,7 +54,24 @@ export interface Schedule {
 	schedule_class: Class;
 	discipline_id: number;
 	discipline: Discipline;
-	canceled_class: any;
+	canceled_class: ClassCanceled;
 	class_to_replace: any;
 	class_date: any;
+}
+
+export interface ClassCanceled {
+	id: number;
+	schedule_id: number;
+	schedule_class: {
+		id: number;
+		course_id: number;
+		course: Course;
+		reference_period: number;
+		shift: Shifts;
+		class_leader_id?: string;
+	};
+	canceled_date: Date,
+	reason: string | null,
+	is_available: boolean,
+	quantity_available: number;
 }
