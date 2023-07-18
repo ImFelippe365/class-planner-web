@@ -1,4 +1,4 @@
-import { Course } from "./Course";
+import { Class, Course } from "./Course";
 
 export interface CreateTeacher {
 	registration: string;
@@ -33,6 +33,7 @@ export interface TeacherDiscipline {
 		byname: string;
 		period: number;
 	};
+	teach_class: Class;
 }
 
 export interface TeacherClasses {
