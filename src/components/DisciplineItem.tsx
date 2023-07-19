@@ -26,7 +26,7 @@ export default function DisciplineItem({
 		<div
 			{...props}
 			className={`flex flex-row items-center justify-between ${
-				availableQuantity === 0 && "grayscale"
+				(availableQuantity === 0 && editable) && "grayscale"
 			} ${editable && !disabled && "cursor-move fc-event"}`}
 		>
 			<div className="flex flex-row items-center gap-4">

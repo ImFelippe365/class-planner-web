@@ -85,34 +85,47 @@ export default function Class({ params }: ClassProps) {
 
 		setDisciplines(
 			disciplinesData.map((discipline: Discipline) => {
-				const schedule = schedules.find(
-					({ extendedProps }) => extendedProps.discipline.id === discipline.id
-				) as any;
+				const availableDisciplineQuantity = schedules.reduce(
+					(accumulator, schedule: any) => {
+						if (schedule.extendedProps.discipline.id === discipline.id) {
+							const [startHour, startMinutes] = schedule?.startTime.split(":");
+							const [endHour, endMinutes] = schedule?.endTime.split(":");
 
-				if (!schedule) {
+							const start = new Date();
+							const end = new Date();
+
+							start.setHours(startHour);
+							start.setMinutes(startMinutes);
+							start.setSeconds(0);
+
+							end.setHours(endHour);
+							end.setMinutes(endMinutes);
+							end.setSeconds(0);
+
+							const quantity = end.getTime() - start.getTime();
+
+							return accumulator + quantity;
+						}
+
+						return accumulator;
+					},
+					0
+				);
+
+				const totalDisciplineQuantity = discipline.workload_in_clock / 15;
+
+				if (availableDisciplineQuantity === 0) {
 					return {
 						...discipline,
-						quantityAvailable: discipline.workload_in_clock / 15,
+						quantityAvailable: totalDisciplineQuantity,
 					};
 				}
 
-				const [startHour, startMinutes] = schedule?.startTime.split(":");
-				const [endHour, endMinutes] = schedule?.endTime.split(":");
-
-				const start = new Date();
-				const end = new Date();
-
-				start.setHours(startHour);
-				start.setMinutes(startMinutes);
-
-				end.setHours(endHour);
-				end.setMinutes(endMinutes);
-
-				const quantity = end.getTime() - start.getTime();
-
 				return {
 					...discipline,
-					quantityAvailable: quantity / 60000 / 45,
+					quantityAvailable:
+						discipline.workload_in_clock / 15 -
+						availableDisciplineQuantity / 60000 / 45,
 				};
 			})
 		);
@@ -127,7 +140,7 @@ export default function Class({ params }: ClassProps) {
 		const disciplineIndex = newDisciplines.findIndex(
 			({ id }) => id === discipline_id
 		);
-		newDisciplines[disciplineIndex].quantityAvailable = value;
+		newDisciplines[disciplineIndex].quantityAvailable += value;
 
 		setDisciplines(newDisciplines);
 	};
@@ -173,8 +186,14 @@ export default function Class({ params }: ClassProps) {
 		const end = event?.end as any;
 		const scheduleQuantity = (end - start) / 60000 / 45;
 
-		const scheduleStart = formatTime(oldEvent?.start as any);
-		const scheduleEnd = formatTime(oldEvent?.end as any);
+		const oldStart = oldEvent?.start as any;
+		const oldEnd = oldEvent?.end as any;
+
+		const oldScheduleQuantity = (oldEnd - oldStart) / 60000 / 45;
+
+		const disciplineAvailableQuantity = disciplines.find(
+			({ id }) => event.extendedProps.discipline.id === id
+		);
 
 		// Fazer verificação da hora que o horário INICIAL foi inserido, > 7, > 12, > 19
 		if (
@@ -201,28 +220,20 @@ export default function Class({ params }: ClassProps) {
 			revert();
 			return;
 		}
-
+		
 		// Verificar se o horário inserido não excede a quantidade de disciplinas a ser ofertada na semana
 		if (
-			scheduleQuantity > oldEvent.extendedProps.discipline.quantityAvailable
+			disciplineAvailableQuantity &&
+			scheduleQuantity > disciplineAvailableQuantity?.quantityAvailable
 		) {
 			revert();
 			return;
 		}
 
-		const oldStart = oldEvent?.start as any;
-		const oldEnd = oldEvent?.end as any;
-
-		if (scheduleQuantity !== (oldEnd - oldStart) / 60000 / 45) {
-			console.log(
-				event?.extendedProps?.discipline,
-				oldEvent?.extendedProps?.discipline,
-				scheduleQuantity
-			);
+		if (scheduleQuantity !== oldScheduleQuantity) {
 			changeDisciplineAvailableQuantity(
 				event.extendedProps?.discipline?.id,
-				oldEvent?.extendedProps?.discipline?.quantityAvailable -
-					scheduleQuantity
+				oldScheduleQuantity - scheduleQuantity
 			);
 		}
 	};
@@ -231,9 +242,14 @@ export default function Class({ params }: ClassProps) {
 		if (event.extendedProps?.schedule_id) {
 			const response = await removeSchedule(event.extendedProps?.schedule_id);
 		}
+
+		const start = event?.start as any;
+		const end = event?.end as any;
+		const scheduleQuantity = (end - start) / 60000 / 45;
+
 		changeDisciplineAvailableQuantity(
 			event.extendedProps?.discipline?.id,
-			event.extendedProps?.discipline?.quantityAvailable
+			-scheduleQuantity
 		);
 	};
 
@@ -281,7 +297,7 @@ export default function Class({ params }: ClassProps) {
 				let discipline = eventEl.dataset.discipline
 					? JSON.parse(eventEl.dataset.discipline)
 					: {};
-				console.log('->', discipline)
+
 				return {
 					id: uuidv4(),
 					title: formatDisciplineName(`${title}`),
@@ -370,7 +386,7 @@ export default function Class({ params }: ClassProps) {
 						eventReceive={({ event }) =>
 							changeDisciplineAvailableQuantity(
 								event.extendedProps?.discipline?.id,
-								event?.extendedProps?.discipline?.quantityAvailable - 1
+								-1
 							)
 						}
 						eventChange={onChangeSchedule}
