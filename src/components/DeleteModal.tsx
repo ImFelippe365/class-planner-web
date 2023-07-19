@@ -7,7 +7,7 @@ import Button from "./Button";
 import { Trash } from "lucide-react";
 
 interface DeleteModalProps {
-	type: "discipline" | "course";
+	type: "discipline" | "course" | "teacherDiscipline";
 	children: React.ReactNode;
 }
 

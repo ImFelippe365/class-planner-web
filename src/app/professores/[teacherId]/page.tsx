@@ -193,6 +193,13 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		setScheduleToCancel(undefined);
 	};
 
+	const deleteDisciplineLink = async (linkId: number) => {
+		const { data } = await api.delete(`teachers/disciplines/${linkId}/`)
+
+		getTeacherDisciplines();
+		getTeacherClasses();
+	}
+
 	useEffect(() => {
 		getTeacherProfile();
 		getTeacherDisciplines();
@@ -478,12 +485,14 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 										period={course.period}
 										isOptional={discipline.is_optional}
 										courseByname={course.byname}
+										isTeacherDiscipline
 									>
-										<DeleteModal key={id} type="discipline">
+										<DeleteModal key={id} type="teacherDiscipline">
 											<Button
 												key={id}
 												color="sucess"
 												className="bg-success text-white"
+												onClick={() => deleteDisciplineLink(id)}
 											>
 												Confirmar
 											</Button>

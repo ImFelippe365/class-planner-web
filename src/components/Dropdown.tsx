@@ -8,12 +8,13 @@ import DeleteModal from "./DeleteModal";
 import Button from "./Button";
 
 interface DropdownProps {
-	cardType: "discipline" | "course" | "student";
+	cardType: "discipline" | "course" | "student" | "teacherDiscipline";
 	courseId?: number;
 	courseGrade?: string;
 	disciplineId?: number;
 	children?: React.ReactNode;
 	onPromoteToClassLeader?: () => void;
+	isTeacherDiscipline?: boolean;
 }
 
 export default function Dropdown({
@@ -22,7 +23,8 @@ export default function Dropdown({
 	courseId,
 	disciplineId,
 	children,
-	onPromoteToClassLeader
+	onPromoteToClassLeader,
+	isTeacherDiscipline,
 }: DropdownProps): React.ReactNode {
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -33,20 +35,18 @@ export default function Dropdown({
 					<MoreVertical
 						width={18}
 						height={18}
-						color={`${
-							cardType == "discipline"
+						color={`${cardType == "discipline"
 								? "#007EA7"
 								: courseGrade == "Ensino técnico"
-								? "#52489C"
-								: "#6D4C3D"
-						}`}
+									? "#52489C"
+									: "#6D4C3D"
+							}`}
 						className="self-center"
 					/>
 				) : (
 					<MoreVertical
-						className={`hover:bg-primary-background p-1 ${
-							isOpen && "bg-primary-background"
-						} rounded-full`}
+						className={`hover:bg-primary-background p-1 ${isOpen && "bg-primary-background"
+							} rounded-full`}
 						width={30}
 						height={30}
 						color="#007EA7"
@@ -78,13 +78,15 @@ export default function Dropdown({
 								</>
 							)}
 
-							<Link
-								href={`#`}
-								className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2"
-							>
-								<Edit2 width={16} height={16} color="#000E1A" />
-								<p className="font-semibold text-xs">Editar</p>
-							</Link>
+							{!isTeacherDiscipline && (
+								<Link
+									href={`#`}
+									className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2"
+								>
+									<Edit2 width={16} height={16} color="#000E1A" />
+									<p className="font-semibold text-xs">Editar</p>
+								</Link>
+							)}
 
 							{children}
 						</div>
