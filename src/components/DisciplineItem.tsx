@@ -2,17 +2,23 @@ import { formatDisciplineName } from "@/utils/formatDisciplineName";
 import { BookMarked, GripVertical } from "lucide-react";
 import React from "react";
 
-interface DisciplineItemProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+interface DisciplineItemProps
+	extends React.DetailedHTMLProps<
+		React.HTMLAttributes<HTMLDivElement>,
+		HTMLDivElement
+	> {
 	teacherName: string;
 	disciplineName: string;
 	editable?: boolean;
 	availableQuantity: number;
+	disabled?: boolean;
 }
 
 export default function DisciplineItem({
 	teacherName,
 	disciplineName,
 	editable = false,
+	disabled = false,
 	availableQuantity,
 	...props
 }: DisciplineItemProps) {
@@ -20,8 +26,8 @@ export default function DisciplineItem({
 		<div
 			{...props}
 			className={`flex flex-row items-center justify-between ${
-				availableQuantity === 0 && "grayscale"
-			} ${editable && "cursor-move fc-event"}`}
+				(availableQuantity === 0 && editable) && "grayscale"
+			} ${editable && !disabled && "cursor-move fc-event"}`}
 		>
 			<div className="flex flex-row items-center gap-4">
 				<div className="p-4 bg-primary-background rounded-lg">

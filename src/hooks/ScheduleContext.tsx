@@ -32,7 +32,7 @@ interface ScheduleContextValues {
 	editableMode: boolean;
 	setEditableMode: React.Dispatch<React.SetStateAction<boolean>>;
 
-	getWeekSchedules: (class_id: string) => Promise<void>;
+	getWeekSchedules: (class_id: string) => Promise<EventSchedule[]>;
 	getMonthSchedules: (class_id: string) => Promise<void>;
 
 	getTeacherWeekSchedules: (
@@ -89,6 +89,8 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 			});
 
 			setWeekSchedules([...schedules, ...(intervalEvents as any)]);
+
+			return schedules
 		} catch (error) {
 			console.warn("Erro ao requisitar os horários da semana  ->", error);
 		}
