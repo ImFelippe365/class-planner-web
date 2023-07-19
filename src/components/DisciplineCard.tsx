@@ -11,6 +11,7 @@ interface DisciplineCardProps {
 	children?: React.ReactNode;
 	isOptional: boolean
 	courseByname?: string;
+	isTeacherDiscipline?: boolean;
 }
 
 export default function DisciplineCard({
@@ -22,13 +23,14 @@ export default function DisciplineCard({
 	children,
 	isOptional,
 	courseByname,
+	isTeacherDiscipline
 }: DisciplineCardProps): React.ReactNode {
 	return (
 		<div className="bg-primary-background rounded-xl p-4 items-center w-52">
 			<div className="flex flex-row justify-between">
 				<BookOpen width={24} height={24} color="#007EA7" />
 
-				<Dropdown cardType="discipline" courseId={courseId} disciplineId={disciplineId}>
+				<Dropdown cardType="discipline" isTeacherDiscipline={isTeacherDiscipline} courseId={courseId} disciplineId={disciplineId}>
 					{children}
 				</Dropdown>
 			</div>
