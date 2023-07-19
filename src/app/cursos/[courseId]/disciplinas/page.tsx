@@ -9,8 +9,7 @@ import { BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 import { api } from "@/services/api";
-import { CourseDiscipline, DisciplineGlobal } from "@/interfaces/Discipline";
-import { Course } from "@/interfaces/Course";
+import { CourseDiscipline } from "@/interfaces/Discipline";
 import DeleteModal from "@/components/DeleteModal";
 
 interface CourseDisciplineProps {

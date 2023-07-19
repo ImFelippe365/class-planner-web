@@ -69,7 +69,7 @@ export default function Dropdown({
 									</Link>
 
 									<Link
-										href={`#`}
+										href={`cursos/${courseId}/turmas`}
 										className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2"
 									>
 										<Users width={16} height={16} color="#000E1A" />
