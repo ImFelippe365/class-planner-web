@@ -44,6 +44,10 @@ interface DisciplineSchedule {
 	class_id?: number;
 }
 
+interface ClassDiscipline extends Discipline {
+	quantityAvailable: number;
+}
+
 export default function Class({ params }: ClassProps) {
 	const { id } = params;
 	const router = useRouter();
@@ -62,7 +66,7 @@ export default function Class({ params }: ClassProps) {
 	const { classes } = useGlobal();
 
 	const [classDetails, setClassDetails] = useState<Class>();
-	const [disciplines, setDisciplines] = useState<Discipline[]>([]);
+	const [disciplines, setDisciplines] = useState<ClassDiscipline[]>([]);
 
 	document.title = classDetails
 		? `Class Planner | ${classDetails?.reference_period}° ${classDetails?.course.byname}`
@@ -76,11 +80,56 @@ export default function Class({ params }: ClassProps) {
 			`/classes/${id}/disciplines/`
 		);
 
-		getWeekSchedules(id);
+		const schedules = await getWeekSchedules(id);
 		getMonthSchedules(id);
 
-		setDisciplines(disciplinesData);
+		setDisciplines(
+			disciplinesData.map((discipline: Discipline) => {
+				const schedule = schedules.find(
+					({ extendedProps }) => extendedProps.discipline.id === discipline.id
+				) as any;
+
+				if (!schedule) {
+					return {
+						...discipline,
+						quantityAvailable: discipline.workload_in_clock / 15,
+					};
+				}
+
+				const [startHour, startMinutes] = schedule?.startTime.split(":");
+				const [endHour, endMinutes] = schedule?.endTime.split(":");
+
+				const start = new Date();
+				const end = new Date();
+
+				start.setHours(startHour);
+				start.setMinutes(startMinutes);
+
+				end.setHours(endHour);
+				end.setMinutes(endMinutes);
+
+				const quantity = end.getTime() - start.getTime();
+
+				return {
+					...discipline,
+					quantityAvailable: quantity / 60000 / 45,
+				};
+			})
+		);
 		setClassDetails(classData);
+	};
+
+	const changeDisciplineAvailableQuantity = (
+		discipline_id: number,
+		value: number
+	) => {
+		const newDisciplines = [...disciplines];
+		const disciplineIndex = newDisciplines.findIndex(
+			({ id }) => id === discipline_id
+		);
+		newDisciplines[disciplineIndex].quantityAvailable = value;
+
+		setDisciplines(newDisciplines);
 	};
 
 	const onSubmitSchedules = () => {
@@ -122,7 +171,7 @@ export default function Class({ params }: ClassProps) {
 	const onChangeSchedule = ({ event, oldEvent, revert }: EventChangeArg) => {
 		const start = event?.start as any;
 		const end = event?.end as any;
-		const quantity = (end - start) / 60000 / 45;
+		const scheduleQuantity = (end - start) / 60000 / 45;
 
 		const scheduleStart = formatTime(oldEvent?.start as any);
 		const scheduleEnd = formatTime(oldEvent?.end as any);
@@ -133,6 +182,7 @@ export default function Class({ params }: ClassProps) {
 			shiftsSchedule[classDetails?.shift || "Manhã"].startHour
 		) {
 			revert();
+			return;
 		}
 
 		// Fazer verificação da hora que o horário FINAL foi inserido, 12 >, 18 >, 22: 10 >
@@ -143,13 +193,37 @@ export default function Class({ params }: ClassProps) {
 				shiftsSchedule[classDetails?.shift || "Manhã"].endMinute
 		) {
 			revert();
+			return;
 		}
-
-		// Verificar se o horário inserido não excede a quantidade de disciplinas a ser ofertada na semana
 
 		// Verificação básica se o horário de aula é válido (1 aula = 45 minutos)
 		if (((end - start) / 60000) % 45 !== 0) {
 			revert();
+			return;
+		}
+
+		// Verificar se o horário inserido não excede a quantidade de disciplinas a ser ofertada na semana
+		if (
+			scheduleQuantity > oldEvent.extendedProps.discipline.quantityAvailable
+		) {
+			revert();
+			return;
+		}
+
+		const oldStart = oldEvent?.start as any;
+		const oldEnd = oldEvent?.end as any;
+
+		if (scheduleQuantity !== (oldEnd - oldStart) / 60000 / 45) {
+			console.log(
+				event?.extendedProps?.discipline,
+				oldEvent?.extendedProps?.discipline,
+				scheduleQuantity
+			);
+			changeDisciplineAvailableQuantity(
+				event.extendedProps?.discipline?.id,
+				oldEvent?.extendedProps?.discipline?.quantityAvailable -
+					scheduleQuantity
+			);
 		}
 	};
 
@@ -157,6 +231,10 @@ export default function Class({ params }: ClassProps) {
 		if (event.extendedProps?.schedule_id) {
 			const response = await removeSchedule(event.extendedProps?.schedule_id);
 		}
+		changeDisciplineAvailableQuantity(
+			event.extendedProps?.discipline?.id,
+			event.extendedProps?.discipline?.quantityAvailable
+		);
 	};
 
 	const handleChangeClassPeriod = (
@@ -203,7 +281,7 @@ export default function Class({ params }: ClassProps) {
 				let discipline = eventEl.dataset.discipline
 					? JSON.parse(eventEl.dataset.discipline)
 					: {};
-
+				console.log('->', discipline)
 				return {
 					id: uuidv4(),
 					title: formatDisciplineName(`${title}`),
@@ -289,6 +367,12 @@ export default function Class({ params }: ClassProps) {
 						}}
 						editable={editableMode}
 						events={weekSchedules}
+						eventReceive={({ event }) =>
+							changeDisciplineAvailableQuantity(
+								event.extendedProps?.discipline?.id,
+								event?.extendedProps?.discipline?.quantityAvailable - 1
+							)
+						}
 						eventChange={onChangeSchedule}
 						eventRemove={onRemoveSchedule}
 					/>
@@ -406,8 +490,9 @@ export default function Class({ params }: ClassProps) {
 										.map(({ name }) => name)
 										.join(", ")}
 									disciplineName={discipline.name}
-									availableQuantity={discipline.workload_in_clock / (0.75 * 20)}
+									availableQuantity={discipline.quantityAvailable}
 									editable={editableMode}
+									disabled={discipline.quantityAvailable === 0}
 									title={discipline.name}
 									data-discipline={JSON.stringify(discipline)}
 								/>
