@@ -36,11 +36,16 @@ import DeleteModal from "@/components/DeleteModal";
 import CreateDisciplineBindFormModal from "./components/CreateDisciplineBindFormModal";
 import CancelScheduleFormModal from "./components/CancelScheduleFormModal";
 
-import { Teacher, TeacherClasses, TeacherDiscipline } from "@/interfaces/Teacher";
+import {
+	Teacher,
+	TeacherClasses,
+	TeacherDiscipline,
+} from "@/interfaces/Teacher";
 import { ClassCanceled, Schedule } from "@/interfaces/Course";
 import TeacherInformations from "./components/TeacherInformations";
 import ClassCard from "@/components/ClassCard";
 import TeachCanceledClassFormModal from "./components/TeachCanceledClassFormModal";
+import { formatDisciplineName } from "@/utils/formatDisciplineName";
 
 interface TeacherProfileProps {
 	params: {
@@ -49,11 +54,11 @@ interface TeacherProfileProps {
 }
 
 export default function TeacherProfile({ params }: TeacherProfileProps) {
-	const [teacherDisciplines, setTeacherDisciplines] = useState<TeacherDiscipline[]>(
-		[]
-	);
-	const [amountOfLessons, setAmountOfLessons] = useState(0)
-	const [teacherClasses, setTeacherClasses] = useState<TeacherClasses[]>([])
+	const [teacherDisciplines, setTeacherDisciplines] = useState<
+		TeacherDiscipline[]
+	>([]);
+	const [amountOfLessons, setAmountOfLessons] = useState(0);
+	const [teacherClasses, setTeacherClasses] = useState<TeacherClasses[]>([]);
 
 	const [teacher, setTeacher] = useState<Teacher>();
 	const [weekSchedules, setWeekSchedules] = useState([]);
@@ -65,7 +70,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [showCancelScheduleModal, setShowCancelScheduleModal] =
 		useState<boolean>(false);
 
-	const [classCanceled, setClassCanceled] = useState<ClassCanceled>()
+	const [classCanceled, setClassCanceled] = useState<ClassCanceled>();
 
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
 	const weekCalendarRef = useRef<any>(null);
@@ -87,15 +92,17 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		});
 
 	const getAmountOfLessons = async () => {
-		const { data } = await api.get(`teachers/${params.teacherId}/schedules/week/`)
+		const { data } = await api.get(
+			`teachers/${params.teacherId}/schedules/week/`
+		);
 
-		let quantity = 0
+		let quantity = 0;
 		data.map((item: any) => {
-			quantity += item.quantity
-		})
+			quantity += item.quantity;
+		});
 
-		setAmountOfLessons(quantity)
-	}
+		setAmountOfLessons(quantity);
+	};
 
 	const initialStartTime = (): DurationInput => {
 		const minTime = Math.min(...times);
@@ -103,8 +110,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			minTime < 13
 				? shiftsSchedule.Manhã
 				: minTime > 18
-					? shiftsSchedule.Noite
-					: shiftsSchedule.Tarde;
+				? shiftsSchedule.Noite
+				: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.startHour,
@@ -118,8 +125,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			maxTime < 13
 				? shiftsSchedule.Manhã
 				: maxTime > 18
-					? shiftsSchedule.Noite
-					: shiftsSchedule.Tarde;
+				? shiftsSchedule.Noite
+				: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.endHour,
@@ -133,10 +140,10 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	];
 
 	const getTeacherClasses = async () => {
-		const { data } = await api.get(`teachers/${params.teacherId}/classes/`)
+		const { data } = await api.get(`teachers/${params.teacherId}/classes/`);
 
-		setTeacherClasses(data)
-	}
+		setTeacherClasses(data);
+	};
 
 	const getWeekSchedules = async (date?: Date) => {
 		const weekDate = date ? date?.toLocaleString().split(",")[0] : "";
@@ -194,11 +201,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	};
 
 	const deleteDisciplineLink = async (linkId: number) => {
-		const { data } = await api.delete(`teachers/disciplines/${linkId}/`)
+		const { data } = await api.delete(`teachers/disciplines/${linkId}/`);
 
 		getTeacherDisciplines();
 		getTeacherClasses();
-	}
+	};
 
 	useEffect(() => {
 		getTeacherProfile();
@@ -255,6 +262,23 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					</div>
 				</section>
 
+				<h5 className="text-black font-bold text-lg mt-6 mb-2">Turma</h5>
+				<section>
+					<div className="flex items-center gap-2">
+						<div className="flex justify-center p-1 rounded-full items-center w-8 bg-primary-background">
+							<Users size={20} className="text-primary" />
+						</div>
+						<span className="text-placeholder font-semibold text-sm">
+							{schedule.schedule_class.course.byname}{" "}
+							{schedule.schedule_class.reference_period}º{" "}
+							{schedule.schedule_class.course.degree === "Ensino superior"
+								? "período"
+								: "ano"}{" "}
+							- {schedule.schedule_class.shift}
+						</span>
+					</div>
+				</section>
+
 				<h5 className="text-black font-bold text-lg mt-6 mb-2">
 					Professores(as)
 				</h5>
@@ -275,6 +299,51 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					))}
 				</section>
 
+				{schedule.class_to_replace && (
+					<>
+						<h4 className="text-gray font-normal text-sm mt-5 mb-2 text-center">
+							Neste dia, será substituída por:
+						</h4>
+						<section>
+							<section>
+								<h5 className="text-black font-bold text-lg mb-2">
+									Substituto
+								</h5>
+								<div className="flex items-center gap-2">
+									{schedule.class_to_replace.teacher.avatar ? (
+										<Image
+											src={schedule.class_to_replace.teacher.avatar}
+											alt={schedule.class_to_replace.teacher.name}
+										/>
+									) : (
+										<div className="flex justify-center p-1 rounded-full items-center w-8 bg-primary-background">
+											<User className="text-primary" />
+										</div>
+									)}
+									<span className="text-placeholder font-semibold text-sm">
+										{schedule.class_to_replace.teacher.name}
+									</span>
+								</div>
+							</section>
+							<section>
+								<h5 className="text-black font-bold mt-3 text-lg mb-2">
+									Disciplina
+								</h5>
+								<div className="flex items-center gap-2">
+									<div className="flex justify-center p-1 rounded-full items-center w-8 bg-primary-background">
+										<BookOpen size={20} className="text-primary" />
+									</div>
+									<span className="text-placeholder font-semibold text-sm">
+										{formatDisciplineName(
+											schedule.class_to_replace.discipline.name
+										)}
+									</span>
+								</div>
+							</section>
+						</section>
+					</>
+				)}
+
 				<section className="flex items-center justify-end">
 					{!schedule?.canceled_class && !schedule?.class_to_replace && (
 						<Button
@@ -290,9 +359,9 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					{schedule?.canceled_class && !schedule.class_to_replace && (
 						<Button
 							onClick={() => {
-								setShowTeachCanceledClass(true)
-								setClassCanceled(schedule.canceled_class)
-								console.log(schedule.canceled_class)
+								setShowTeachCanceledClass(true);
+								setClassCanceled(schedule.canceled_class);
+								console.log(schedule.canceled_class);
 							}}
 						>
 							Ministrar aula
@@ -364,7 +433,10 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</div>
 			</div>
 
-			<TeacherInformations teacher={teacher} quantityClasses={amountOfLessons} />
+			<TeacherInformations
+				teacher={teacher}
+				quantityClasses={amountOfLessons}
+			/>
 
 			<Tabs.Group
 				aria-label="Tabs with icons"
@@ -444,7 +516,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 				<Tabs.Item icon={Users} title="Turmas" className="outline-none">
 					<div className="flex flex-row flex-wrap gap-y-5 gap-x-4 justify-between">
-						{teacherClasses.map(({ id, course, reference_period }) =>
+						{teacherClasses.map(({ id, course, reference_period }) => (
 							<ClassCard
 								key={id}
 								href={`turmas/${id}`}
@@ -452,7 +524,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 								courseGrade={course.degree}
 								period={reference_period}
 							/>
-						)}
+						))}
 					</div>
 				</Tabs.Item>
 
