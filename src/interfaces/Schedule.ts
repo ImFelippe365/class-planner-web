@@ -23,7 +23,7 @@ export interface CancelSchedule {
 	schedule_id: number;
 	canceled_date: string;
 	reason?: string;
-	teachers_to_substitute?: string;
+	teacher_to_replace?: string;
 	canceled_by: number;
 }
 

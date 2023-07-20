@@ -1,4 +1,4 @@
-import { Class, Course } from "./Course";
+import { Class, Course, Discipline, Schedule } from "./Course";
 
 export interface CreateTeacher {
 	registration: string;
@@ -43,4 +43,43 @@ export interface TeacherClasses {
 	reference_period: number;
 	shift: string;
 	class_leader_id: string | null;
+}
+
+export type TeacherRequestStatus = "Aceito" | "Pendente" | "Recusado";
+
+export interface TeacherRequest {
+	id: number;
+	schedule_id: number;
+	schedule: {
+		id: number;
+		quantity: number;
+		weekday: number;
+		start_time: string;
+		end_time: string;
+		class_id: number;
+		discipline_id: number;
+		discipline: Discipline;
+		schedule_class: {
+			id: number;
+			course_id: number;
+			course: Course;
+			reference_period: number;
+			shift: string;
+			class_leader_id?: number | undefined;
+		};
+		requested_by: {
+			id: number;
+			registration: string;
+			name: string;
+			avatar: string | null;
+			department: string;
+			email: string;
+		};
+	};
+	canceled_date: string;
+	reason: string;
+	canceled_by: number;
+	teacher_to_replace: number;
+	replace_class_status: TeacherRequestStatus;
+	schedule_class: Class;
 }

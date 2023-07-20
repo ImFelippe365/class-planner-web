@@ -68,7 +68,7 @@ export default function CancelScheduleFormModal({
 		const newData: CancelSchedule = {
 			canceled_date: data.canceled_date?.toLocaleString().split(",")[0],
 			reason: data.reason,
-			teachers_to_substitute: data.teacher_to_replace
+			teacher_to_replace: data.teacher_to_replace
 				? data.teacher_to_replace
 				: "",
 			canceled_by: 1,

@@ -7,6 +7,7 @@ import {
 	User,
 	Users,
 	Bell,
+	Replace,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,7 +18,7 @@ export default function NavigationSideBar(): React.ReactNode {
 		"w-full py-4 px-6 flex items-center gap-4 justify-start rounded-lg font-semibold hover:bg-primary-background transition-all";
 	const pathname = usePathname();
 	const [_, path] = pathname.split("/");
-	
+
 	const routes = [
 		{
 			name: "Visão Geral",
@@ -44,11 +45,16 @@ export default function NavigationSideBar(): React.ReactNode {
 			icon: <Users />,
 			path: "turmas",
 		},
-		
+
 		{
 			name: "Notificações",
 			icon: <Bell />,
 			path: "alertas",
+		},
+		{
+			name: "Substituir professores",
+			icon: <Replace />,
+			path: "pedidos-para-substituicao",
 		},
 	];
 
