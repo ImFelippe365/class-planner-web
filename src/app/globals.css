@@ -2,26 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+/* FullCalendar Styles */
+
+/* .fc-theme-standard td, .fc-theme-standard th {
+	border-color: transparent !important;
+} */
+
+.fc-theme-standard .fc-scrollgrid {
+	border-color: transparent !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.fc .fc-timegrid-col.fc-day-today {
+	background-color: transparent !important;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.fc-event-main {
+	display: flex !important;
+}
+
+.fc-scroller-harness {
+	overflow: visible !important;
+}
+
+.fc-theme-standard th {
+	border-width: 0px 0px 1px 0px;
+	background-color: transparent !important;
+}
+
+.monthCalendarContainer .fc-theme-standard th {
+	border: none;
+	color: #3d3d3d;
+	padding-bottom: 4px;
+}
+
+.monthCalendarContainer .fc-theme-standard td {
+	--fc-today-bg-color: transparent;
+
+	border: none;
+	background-color: white;
+	/* padding: 6px; */
+	border-radius: 12px;
+	width: 40px;
+}
+.monthCalendarContainer .fc .fc-daygrid-day-number {
+	width: 100%;
+}
+
+/* .monthCalendarContainer .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+	display: none;
+} */
+
+.monthCalendarContainer .fc .fc-daygrid-day-frame {
+}
+
+.monthCalendarContainer .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.monthCalendarContainer .fc .fc-daygrid-day-bottom {
+	display: none;
+}
+
+/* Flowbite Styles */
+[type="text"]:focus,
+[type="email"]:focus,
+[type="url"]:focus,
+[type="password"]:focus,
+[type="number"]:focus,
+[type="date"]:focus,
+[type="datetime-local"]:focus,
+[type="month"]:focus,
+[type="search"]:focus,
+[type="tel"]:focus,
+[type="time"]:focus,
+[type="week"]:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus {
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+	--tw-ring-inset: var(--tw-empty, /*!*/ /*!*/);
+	--tw-ring-offset-width: 0px;
+	--tw-ring-offset-color: #fff;
+	--tw-ring-color: #007ea7 !important;
+	--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+		var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+	--tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+		calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+	box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+		var(--tw-shadow);
+	border-color: #007ea7 !important;
 }
