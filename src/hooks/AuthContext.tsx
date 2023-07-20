@@ -1,4 +1,4 @@
-import { CreateTeacher } from "@/interfaces/Teacher";
+import { CreateTeacher, Teacher } from "@/interfaces/Teacher";
 import { api, suapApi } from "@/services/api";
 import {
 	createContext,
@@ -12,15 +12,23 @@ interface AuthProviderProps {
 	children: React.ReactNode;
 }
 
-const AuthContext = createContext({});
+interface AuthContextValues {
+	user: Teacher | undefined;
+	setUser: React.Dispatch<React.SetStateAction<Teacher | undefined>>;
+	login: (username: string, password: string) => Promise<void>;
+	logout: () => Promise<void>;
+	getTeacherProfile: (registration: string) => Promise<any>;
+}
+
+const AuthContext = createContext({} as AuthContextValues);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
-	const [user, setUser] = useState();
+	const [user, setUser] = useState<Teacher | undefined>();
 
 	const registerTeacher = useCallback(async (new_teacher: CreateTeacher) => {
 		try {
 			const { data } = await api.post("teachers/", new_teacher);
-
+			
 			return data[0];
 		} catch (error) {
 			console.warn("Erro ao tentar cadastrar estudante ->", error);
@@ -30,10 +38,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const getTeacherIsRegistered = useCallback(async (registration: string) => {
 		try {
 			const { data } = await api.get(
-				`students/byregistration/${registration}/`
+				`teachers/byregistration/${registration}/`
 			);
-
-			if (data?.details == "Não encontrado") return false;
 
 			return data;
 		} catch (error) {
@@ -41,31 +47,35 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				"Erro ao tentar verificar se estudante está registrado ->",
 				JSON.stringify(error)
 			);
+			return false;
 		}
 	}, []);
 
 	const getTeacherProfile = useCallback(async () => {
 		try {
 			const { data } = await suapApi.get("minhas-informacoes/meus-dados/");
-			console.log(data.tipo_vinculo)
-			if (data.tipo_vinculo !== "Aluno") {
-				console.warn("Apenas estudantes podem se autenticar");
-				return;
-			}
+			
+			// if (data.tipo_vinculo !== "Aluno") {
+			// 	console.warn("Apenas estudantes podem se autenticar");
+			// 	return;
+			// }
 
-			let teacher = await getTeacherIsRegistered(data.vinculo.matricula);
-
+			let teacher = await getTeacherIsRegistered(data.matricula);
+			
 			if (!teacher) {
+				console.log('entrei aqui viu')
 				teacher = await registerTeacher({
-					registration: "3000",
-					name: "João Pedro",
-					department: "Professor",
+					registration: data.matricula,
+					name: data.nome_usual,
+					department: data.tipo_vinculo,
+					email: data.email,
+					avatar: data.url_foto_75x100
 				});
 			}
 
-			setUser(data);
+			setUser(teacher);
 
-			localStorage.setItem("@ClassPlanner:user", JSON.stringify(data));
+			localStorage.setItem("@ClassPlanner:user", JSON.stringify(teacher));
 		} catch (error) {
 			console.log("Erro ao tentar pegar o perfil do usuário ->", error);
 		}
@@ -85,6 +95,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			getTeacherProfile();
 		} catch (error) {
+			throw new Error("Erro ao tentar fazer login");
 			console.log("Erro ao tentar fazer login ->", JSON.stringify(error));
 		}
 	}, []);
@@ -101,7 +112,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		const storagedSession = localStorage.getItem("@ClassPlanner:user");
 
 		const user = storagedSession ? JSON.parse(storagedSession) : null;
-
+		
 		if (user) setUser(user);
 	};
 
@@ -116,7 +127,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				setUser,
 				login,
 				logout,
-				getTeacherProfile
+				getTeacherProfile,
 			}}
 		>
 			{children}
