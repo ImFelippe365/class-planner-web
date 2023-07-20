@@ -195,6 +195,9 @@ export default function Class({ params }: ClassProps) {
 		const disciplineAvailableQuantity = disciplines.find(
 			({ id }) => event.extendedProps.discipline.id === id
 		);
+		const maxDisciplinesQuantity = disciplineAvailableQuantity
+			? disciplineAvailableQuantity?.workload_in_clock / 15
+			: 0;
 
 		// Fazer verificação da hora que o horário INICIAL foi inserido, > 7, > 12, > 19
 		if (
@@ -208,9 +211,9 @@ export default function Class({ params }: ClassProps) {
 		// Fazer verificação da hora que o horário FINAL foi inserido, 12 >, 18 >, 22: 10 >
 		if (
 			end.getHours() * 60 ===
-			shiftsSchedule[classDetails?.shift || "Manhã"].endHour * 60 &&
+				shiftsSchedule[classDetails?.shift || "Manhã"].endHour * 60 &&
 			end.getMinutes() >
-			shiftsSchedule[classDetails?.shift || "Manhã"].endMinute
+				shiftsSchedule[classDetails?.shift || "Manhã"].endMinute
 		) {
 			revert();
 			return;
@@ -218,14 +221,20 @@ export default function Class({ params }: ClassProps) {
 
 		// Verificação básica se o horário de aula é válido (1 aula = 45 minutos)
 		if (((end - start) / 60000) % 45 !== 0) {
+			console.log("entrei 1");
 			revert();
 			return;
 		}
 
+		console.log(
+			"ANTES",
+			scheduleQuantity,
+			disciplineAvailableQuantity?.quantityAvailable
+		);
 		// Verificar se o horário inserido não excede a quantidade de disciplinas a ser ofertada na semana
 		if (
 			disciplineAvailableQuantity &&
-			scheduleQuantity > disciplineAvailableQuantity?.quantityAvailable
+			maxDisciplinesQuantity < disciplineAvailableQuantity?.quantityAvailable
 		) {
 			revert();
 			return;
@@ -236,6 +245,7 @@ export default function Class({ params }: ClassProps) {
 				event.extendedProps?.discipline?.id,
 				oldScheduleQuantity - scheduleQuantity
 			);
+			console.log("DEPOIS", oldScheduleQuantity - scheduleQuantity);
 		}
 	};
 
@@ -495,9 +505,7 @@ export default function Class({ params }: ClassProps) {
 					</section>
 
 					<Link href={`turmas/${params.id}/estudantes`}>
-						<Button className="mt-4 w-full">
-							Ver estudantes
-						</Button>
+						<Button className="mt-4 w-full">Ver estudantes</Button>
 					</Link>
 
 					<section>
