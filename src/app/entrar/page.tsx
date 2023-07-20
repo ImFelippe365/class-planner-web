@@ -8,6 +8,8 @@ import { Player } from "@lottiefiles/react-lottie-player";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/navigation";
+import { suapApi } from "@/services/api";
+import { useAuth } from "@/hooks/AuthContext";
 
 interface ISignIn {
 	registration: string;
@@ -23,17 +25,24 @@ export default function SignIn() {
 	const {
 		control,
 		handleSubmit,
+		setError,
 		formState: { isSubmitting },
 	} = useForm<ISignIn>({
 		resolver: yupResolver(signInSchema),
 	});
 
+	const { login } = useAuth();
 	const router = useRouter();
 
-	const onSubmit = async (data: ISignIn) => {
-		console.log(data);
+	const onSubmit = async (params: ISignIn) => {
+		try {
+			await login(params.registration, params.password);
 
-		router.push('/courses')
+			router.push("/visao-geral");
+		} catch (err) {
+			console.log(err)
+			setError("password", { message: "Matrícula ou senha incorreto(s)" });
+		}
 	};
 
 	return (

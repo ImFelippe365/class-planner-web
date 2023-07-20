@@ -3,11 +3,13 @@
 import { Flowbite } from "flowbite-react";
 import NavigationSideBar from "../components/NavigationSideBar";
 import { Inter } from "next/font/google";
-import { usePathname } from "next/navigation";
-import { ReactElement } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { ReactElement, useEffect } from "react";
 import "./globals.css";
 import Provider from "@/hooks/Providers";
 import Head from "next/head";
+import { useAuth } from "@/hooks/AuthContext";
+import Routes from "@/routes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +23,6 @@ interface LayoutProps {
 }
 
 export default function RootLayout({ children }: LayoutProps) {
-	const pathname = usePathname();
 	document.title = "Class Planner";
 
 	return (
@@ -37,16 +38,7 @@ export default function RootLayout({ children }: LayoutProps) {
 			<body className={inter.className}>
 				<Flowbite>
 					<Provider>
-						{(pathname === "/entrar") || (pathname === "/") ? (
-							children
-						) : (
-							<main className="grid grid-cols-container bg-background-color">
-								<NavigationSideBar />
-								<div className="max-w-[80%] w-full mx-auto mt-16 px-9 pt-6">
-									{children}
-								</div>
-							</main>
-						)}
+						<Routes>{children}</Routes>
 					</Provider>
 				</Flowbite>
 			</body>

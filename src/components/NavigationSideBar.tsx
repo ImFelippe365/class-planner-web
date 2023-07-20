@@ -1,3 +1,4 @@
+import { useAuth } from "@/hooks/AuthContext";
 import { Sidebar } from "flowbite-react";
 import {
 	Layers,
@@ -9,11 +10,13 @@ import {
 	Bell,
 	Replace,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function NavigationSideBar(): React.ReactNode {
+	const { user, logout } = useAuth();
 	const NavigationItemStyles =
 		"w-full py-4 px-6 flex items-center gap-4 justify-start rounded-lg font-semibold hover:bg-primary-background transition-all";
 	const pathname = usePathname();
@@ -65,15 +68,26 @@ export default function NavigationSideBar(): React.ReactNode {
 					Class Planner
 				</h1>
 				<header className="flex flex-row flex-shrink-0 flex-grow-0 justify-start items-center gap-4 px-4 w-full">
-					<User
-						fontSize={48}
-						className="text-primary bg-primary-background rounded-full p-3 w-12 h-12"
-					/>
+					{user?.avatar ? (
+						<div className="relative w-12 h-12">
+							<Image
+								alt={user.name}
+								src={`https://suap.ifrn.edu.br${user.avatar}`}
+								fill
+								className="object-cover rounded-full"
+							/>
+						</div>
+					) : (
+						<User
+							fontSize={48}
+							className="text-primary bg-primary-background rounded-full p-3 w-12 h-12"
+						/>
+					)}
 					<div>
 						<h3 className="font-semibold text-black text-sm leading-tight">
-							Jeferson Queiroga Pereira
+							{user?.name}
 						</h3>
-						<p className="text-gray text-xs">Professor</p>
+						<p className="text-gray text-xs">{user?.department}</p>
 					</div>
 				</header>
 
@@ -91,7 +105,8 @@ export default function NavigationSideBar(): React.ReactNode {
 						</Link>
 					))}
 					<Link
-						href={"#"}
+						href={"/entrar"}
+						onClick={() => logout()}
 						className={`${NavigationItemStyles} text-error mt-4 hover:bg-error-transparent`}
 					>
 						<LogOut />

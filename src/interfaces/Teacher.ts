@@ -4,6 +4,8 @@ export interface CreateTeacher {
 	registration: string;
 	name: string;
 	department: string;
+	email: string;
+	avatar: string;
 }
 
 export interface Teacher {
