@@ -16,7 +16,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function NavigationSideBar(): React.ReactNode {
-	const { user } = useAuth();
+	const { user, logout } = useAuth();
 	const NavigationItemStyles =
 		"w-full py-4 px-6 flex items-center gap-4 justify-start rounded-lg font-semibold hover:bg-primary-background transition-all";
 	const pathname = usePathname();
@@ -69,12 +69,12 @@ export default function NavigationSideBar(): React.ReactNode {
 				</h1>
 				<header className="flex flex-row flex-shrink-0 flex-grow-0 justify-start items-center gap-4 px-4 w-full">
 					{user?.avatar ? (
-						<div className="w-12 h-12 aspect-square object-cover">
+						<div className="relative w-12 h-12">
 							<Image
 								alt={user.name}
 								src={`https://suap.ifrn.edu.br${user.avatar}`}
 								fill
-								className="max-w-12 max-h-12 object-cover rounded-full"
+								className="object-cover rounded-full"
 							/>
 						</div>
 					) : (
@@ -105,7 +105,8 @@ export default function NavigationSideBar(): React.ReactNode {
 						</Link>
 					))}
 					<Link
-						href={"#"}
+						href={"/entrar"}
+						onClick={() => logout()}
 						className={`${NavigationItemStyles} text-error mt-4 hover:bg-error-transparent`}
 					>
 						<LogOut />

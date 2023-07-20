@@ -23,13 +23,18 @@ interface AuthContextValues {
 const AuthContext = createContext({} as AuthContextValues);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
-	const [user, setUser] = useState<Teacher | undefined>();
+	const [user, setUser] = useState<Teacher | undefined>(() => {
+		const storagedSession = localStorage.getItem("@ClassPlanner:user");
+
+		const savedUser = storagedSession ? JSON.parse(storagedSession) : null;
+		return savedUser;
+	});
 
 	const registerTeacher = useCallback(async (new_teacher: CreateTeacher) => {
 		try {
 			const { data } = await api.post("teachers/", new_teacher);
-			
-			return data[0];
+
+			return data;
 		} catch (error) {
 			console.warn("Erro ao tentar cadastrar estudante ->", error);
 		}
@@ -54,22 +59,22 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const getTeacherProfile = useCallback(async () => {
 		try {
 			const { data } = await suapApi.get("minhas-informacoes/meus-dados/");
-			
+
 			// if (data.tipo_vinculo !== "Aluno") {
 			// 	console.warn("Apenas estudantes podem se autenticar");
 			// 	return;
 			// }
 
 			let teacher = await getTeacherIsRegistered(data.matricula);
-			
+
 			if (!teacher) {
-				console.log('entrei aqui viu')
+				console.log("entrei aqui viu");
 				teacher = await registerTeacher({
 					registration: data.matricula,
 					name: data.nome_usual,
 					department: data.tipo_vinculo,
 					email: data.email,
-					avatar: data.url_foto_75x100
+					avatar: data.url_foto_75x100,
 				});
 			}
 
@@ -111,12 +116,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const loadSavedSession = async () => {
 		const storagedSession = localStorage.getItem("@ClassPlanner:user");
 
-		const user = storagedSession ? JSON.parse(storagedSession) : null;
-		
-		if (user) setUser(user);
+		const savedUser = storagedSession ? JSON.parse(storagedSession) : null;
+		if (savedUser) setUser(savedUser);
 	};
 
 	useEffect(() => {
+		console.log("FUI CHAMADO");
 		loadSavedSession();
 	}, []);
 

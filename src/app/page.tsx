@@ -4,13 +4,15 @@ import { Loader, Loader2 } from "lucide-react";
 import SignIn from "./entrar/page";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/AuthContext";
 
 export default function Home() {
+	const { user } = useAuth();
 	const router = useRouter();
 
 	useEffect(() => {
-		router.replace("/entrar");
-	}, []);
+		user ? router.replace("/visao-geral") : router.replace("/entrar");
+	}, [user]);
 
 	return (
 		<div className="w-full h-[100vh] flex items-center justify-center">
