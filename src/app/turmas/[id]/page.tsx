@@ -28,6 +28,7 @@ import { useGlobal } from "@/hooks/GlobalContext";
 import { useRouter } from "next/navigation";
 import uuidv4 from "@/utils/uuidv4";
 import { EventSchedule } from "@/interfaces/Schedule";
+import Link from "next/link";
 
 interface ClassProps {
 	params: {
@@ -207,9 +208,9 @@ export default function Class({ params }: ClassProps) {
 		// Fazer verificação da hora que o horário FINAL foi inserido, 12 >, 18 >, 22: 10 >
 		if (
 			end.getHours() * 60 ===
-				shiftsSchedule[classDetails?.shift || "Manhã"].endHour * 60 &&
+			shiftsSchedule[classDetails?.shift || "Manhã"].endHour * 60 &&
 			end.getMinutes() >
-				shiftsSchedule[classDetails?.shift || "Manhã"].endMinute
+			shiftsSchedule[classDetails?.shift || "Manhã"].endMinute
 		) {
 			revert();
 			return;
@@ -220,7 +221,7 @@ export default function Class({ params }: ClassProps) {
 			revert();
 			return;
 		}
-		
+
 		// Verificar se o horário inserido não excede a quantidade de disciplinas a ser ofertada na semana
 		if (
 			disciplineAvailableQuantity &&
@@ -492,6 +493,12 @@ export default function Class({ params }: ClassProps) {
 							))}
 						</Select>
 					</section>
+
+					<Link href={`turmas/${params.id}/estudantes`}>
+						<Button className="mt-4 w-full">
+							Ver estudantes
+						</Button>
+					</Link>
 
 					<section>
 						<h4 className="font-bold text-black text-lg mt-6 mb-3">
