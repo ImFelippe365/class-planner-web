@@ -22,7 +22,13 @@ export default function TeacherCard({
 			<div className="flex gap-x-4">
 
 				{teacherAvatar ? (
-					<Image src={teacherAvatar} alt={name} />
+					<Image
+						width={48}
+						height={48}
+						alt={name}
+						src={`https://suap.ifrn.edu.br${teacherAvatar}`}
+						className="rounded-lg"
+					/>
 				) : (
 					<User className="rounded-lg bg-primary-background w-12 p-3 h-fit" color="#007EA7" />
 
