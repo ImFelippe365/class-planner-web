@@ -169,9 +169,6 @@ export default function CreateDisciplineBindFormModal({
 		<>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<fieldset className="space-y-6">
-					<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-						Vincular disciplina
-					</h3>
 					<Select
 						containerClassName="mt-2"
 						control={control}

@@ -233,13 +233,13 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		const top = Number(
 			scheduleToShow?.el?.parentElement?.style.top.replace("px", "")
 		);
-
+		// rounded-tl-none
 		return (
 			<div
-				className={`bg-background-color rounded-3xl rounded-tl-none shadow-lg absolute p-8 max-w-[370px] !h-fit w-full z-50`}
+				className={`bg-background-color rounded-3xl  shadow-lg absolute p-8 max-w-[370px] !h-fit w-full z-50`}
 				style={{
 					inset: scheduleToShow?.el?.parentElement?.style.inset,
-					left: (scheduleToShow?.el.offsetWidth || 1) * scheduleDate.getDay(),
+					left: (((scheduleToShow?.el.offsetWidth || 1) * scheduleDate.getDay()) - ((scheduleToShow?.el.offsetWidth || 1))),
 					top: top + (scheduleToShow?.el.offsetHeight || 0),
 				}}
 			>
@@ -472,7 +472,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					active
 					icon={Clock}
 					title="Horários de aula"
-					className="outline-none"
+					className="outline-none w-full"
 				>
 					<div className="grid grid-cols-container gap-6">
 						<div className="flex flex-col gap-y-4 min-w-fit">
@@ -540,7 +540,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</Tabs.Item>
 
 				<Tabs.Item icon={Users} title="Turmas" className="outline-none">
-					<div className="flex flex-row flex-wrap gap-y-5 gap-x-4 justify-between">
+					<div className="grid grid-cols-cardsGrid">
 						{teacherClasses.map(({ id, course, reference_period }) => (
 							<ClassCard
 								key={id}
