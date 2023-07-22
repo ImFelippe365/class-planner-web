@@ -10,19 +10,25 @@ import { GraduationCap, Plus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DeleteModal from "@/components/DeleteModal";
-
+import { toast } from "react-toastify";
 export default function Courses(): React.ReactNode {
-	document.title = 'Class Planner | Cursos'
+	document.title = "Class Planner | Cursos";
 
 	const routes = useRouter();
 	const { courses, getAllCourses } = useGlobal();
 	const [openModal, setOpenModal] = useState<string | undefined>();
 
 	const deleteCourse = async (courseId: number) => {
-		await api.delete(`courses/${courseId}/`)
-		setOpenModal(undefined);
-		getAllCourses()
-	}
+		try {
+			await api.delete(`courses/${courseId}/`);
+			setOpenModal(undefined);
+			getAllCourses();
+
+			toast.success("Curso removido com sucesso");
+		} catch (err) {
+			toast.error("Ocorreu um problema ao tentar remover o curso");
+		}
+	};
 
 	useEffect(() => {
 		getAllCourses();
@@ -48,9 +54,12 @@ export default function Courses(): React.ReactNode {
 						courseName={name}
 					>
 						<DeleteModal key={id} type="course">
-							<Button key={id} color="sucess"
+							<Button
+								key={id}
+								color="sucess"
 								className="bg-success text-white"
-								onClick={() => deleteCourse(id)}>
+								onClick={() => deleteCourse(id)}
+							>
 								Confirmar
 							</Button>
 						</DeleteModal>

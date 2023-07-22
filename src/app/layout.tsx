@@ -8,8 +8,9 @@ import { ReactElement, useEffect } from "react";
 import "./globals.css";
 import Provider from "@/hooks/Providers";
 import Head from "next/head";
-import { useAuth } from "@/hooks/AuthContext";
 import Routes from "@/routes";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,10 +36,24 @@ export default function RootLayout({ children }: LayoutProps) {
 				<script async src="../path/to/flowbite/dist/flowbite.min.js"></script>
 				<title>Class Planner</title>
 			</Head>
-			<body className={inter.className}>
+			<body className={`${inter.className} !overflow-auto`} >
 				<Flowbite>
 					<Provider>
-						<Routes>{children}</Routes>
+						<Routes>
+							<ToastContainer
+								position="top-center"
+								autoClose={5000}
+								hideProgressBar={false}
+								newestOnTop={false}
+								closeOnClick
+								rtl={false}
+								pauseOnFocusLoss
+								draggable
+								pauseOnHover
+								theme="light"
+							/>
+							{children}
+						</Routes>
 					</Provider>
 				</Flowbite>
 			</body>

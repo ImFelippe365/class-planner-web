@@ -11,7 +11,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { api } from "@/services/api";
 import { CourseDiscipline } from "@/interfaces/Discipline";
 import DeleteModal from "@/components/DeleteModal";
-
+import { toast } from "react-toastify";
 interface CourseDisciplineProps {
 	params: {
 		courseId: number;
@@ -34,10 +34,17 @@ export default function CourseDiscipline({
 	};
 
 	const deleteDisciplineLink = async (disciplineId: number) => {
-		await api.delete(`courses/${params.courseId}/disciplines/${disciplineId}/`);
+		try {
+			await api.delete(
+				`courses/${params.courseId}/disciplines/${disciplineId}/`
+			);
 
-		setOpenModal(undefined);
-		getCourseDisciplines();
+			setOpenModal(undefined);
+			getCourseDisciplines();
+			toast.success("Disciplina removida com sucesso");
+		} catch (err) {
+			toast.error("Ocorreu um erro ao tentar remover a disciplina");
+		}
 	};
 
 	useEffect(() => {

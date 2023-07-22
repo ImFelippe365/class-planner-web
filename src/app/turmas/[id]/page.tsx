@@ -29,7 +29,7 @@ import { useRouter } from "next/navigation";
 import uuidv4 from "@/utils/uuidv4";
 import { EventSchedule } from "@/interfaces/Schedule";
 import Link from "next/link";
-
+import { toast } from "react-toastify";
 interface ClassProps {
 	params: {
 		id: string;
@@ -147,39 +147,47 @@ export default function Class({ params }: ClassProps) {
 	};
 
 	const onSubmitSchedules = () => {
-		const events = calendarRef.current.getApi().getEvents() as any[];
-		const newEvents = events
-			.filter((event) => event.id)
-			.map(async (event) => {
-				const start = event?.start as any;
-				const end = event?.end as any;
-				const quantity = (end - start) / 60000 / 45;
+		try {
+			const events = calendarRef.current.getApi().getEvents() as any[];
+			const newEvents = events
+				.filter((event) => event.id)
+				.map(async (event) => {
+					const start = event?.start as any;
+					const end = event?.end as any;
+					const quantity = (end - start) / 60000 / 45;
 
-				const weekday = (event.start?.getDay() as any) - 1;
+					const weekday = (event.start?.getDay() as any) - 1;
 
-				const newEvent: DisciplineSchedule = {
-					discipline_id: event.extendedProps.discipline.id,
-					weekday,
-					start_time: formatTime(start),
-					end_time: formatTime(end),
-					quantity,
-					class_id: Number(id) || 0,
-				};
-				let response = "";
-				if (event.extendedProps?.schedule_id) {
-					response = await changeSchedule(
-						event.extendedProps?.schedule_id,
-						newEvent
-					);
-				} else {
-					response = await createSchedule(newEvent);
-				}
+					const newEvent: DisciplineSchedule = {
+						discipline_id: event.extendedProps.discipline.id,
+						weekday,
+						start_time: formatTime(start),
+						end_time: formatTime(end),
+						quantity,
+						class_id: Number(id) || 0,
+					};
+					let response = "";
+					if (event.extendedProps?.schedule_id) {
+						response = await changeSchedule(
+							event.extendedProps?.schedule_id,
+							newEvent
+						);
+					} else {
+						response = await createSchedule(newEvent);
+					}
 
-				return newEvent;
-			});
+					return newEvent;
+				});
 
-		getClassDetails();
-		setEditableMode(false);
+			getClassDetails();
+			setEditableMode(false);
+
+			toast.success("Os horários desta turma foram modificados com sucesso");
+		} catch {
+			toast.error(
+				"Ocorreu um erro ao tentar modificar os horários desta turma"
+			);
+		}
 	};
 
 	const onChangeSchedule = ({ event, oldEvent, revert }: EventChangeArg) => {
@@ -251,16 +259,46 @@ export default function Class({ params }: ClassProps) {
 
 	const onRemoveSchedule = async ({ event }: EventRemoveArg) => {
 		if (event.extendedProps?.schedule_id) {
-			const response = await removeSchedule(event.extendedProps?.schedule_id);
-		}
+			try {
+				const response = await removeSchedule(event.extendedProps?.schedule_id);
 
-		const start = event?.start as any;
-		const end = event?.end as any;
-		const scheduleQuantity = (end - start) / 60000 / 45;
+				toast.success("Horário removido desta turma com sucesso");
+			} catch {
+				toast.error("Ocorreu um erro ao tentar remover este horário");
+			}
+		}
+		let scheduleQuantity = 0;
+
+		if (event.extendedProps.schedule_id) {
+			const [startHour, startMinutes] =
+				event.extendedProps.schedule.start_time.split(":");
+			const [endHour, endMinutes] =
+				event.extendedProps.schedule.end_time.split(":");
+
+			const start = new Date() as any;
+			const end = new Date() as any;
+
+			start.setHours(startHour);
+			start.setMinutes(startMinutes);
+			start.setSeconds(0);
+
+			end.setHours(endHour);
+			end.setMinutes(endMinutes);
+			end.setSeconds(0);
+
+			scheduleQuantity = (end - start) / 60000 / 45;
+			console.log("qtd", scheduleQuantity);
+		} else {
+			const start = event?.start as any;
+			const end = event?.end as any;
+			
+			scheduleQuantity = (end - start) / 60000 / 45;
+			console.log("qtd sem s", scheduleQuantity);
+		}
 
 		changeDisciplineAvailableQuantity(
 			event.extendedProps?.discipline?.id,
-			-scheduleQuantity
+			scheduleQuantity
 		);
 	};
 
