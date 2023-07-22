@@ -80,6 +80,7 @@ const ScheduleProvider = ({ children }: ScheduleProviderProps) => {
 					extendedProps: {
 						discipline: schedule.discipline,
 						schedule_id: schedule.id,
+						schedule
 					},
 					daysOfWeek: [schedule.weekday + 1],
 					...eventColor,

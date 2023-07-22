@@ -15,6 +15,7 @@ import { Schedule } from "@/interfaces/Course";
 import { Check } from "lucide-react";
 import { api } from "@/services/api";
 import TextArea from "@/components/TextArea";
+import { toast } from 'react-toastify'
 
 interface CancelScheduleFormModalProps {
 	schedule: Schedule | undefined;
@@ -80,8 +81,11 @@ export default function CancelScheduleFormModal({
 
 			closeModal();
 			refreshSchedules(data.canceled_date);
+
+			toast.success('Aula cancelada com sucesso')
 		} catch (err) {
 			console.log("Erro ao tentar cancelar horário de aula", err);
+			toast.error('Ocorreu um problema ao tentar cancelar esta aula')
 		}
 	};
 
