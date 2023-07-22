@@ -115,7 +115,7 @@ export default function WeekCalendar({
 							{quantity.toFixed(0)} {quantity > 1 ? "aulas" : "aula"}
 						</span>
 
-						<span className="font-semibold block overflow-hidden w-28">
+						<span className="font-semibold block overflow-hidden">
 							{title}
 						</span>
 					</div>

@@ -11,14 +11,19 @@ export default function Routes({ children }: RoutesProps) {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const { user } = useAuth();
+	const { user, hasTeacherPermissions, hasEmployeePermissions } = useAuth();
 
 	document.title = "Class Planner";
 
 	useEffect(() => {
 		if (user && pathname === "/entrar") router.replace("/visao-geral");
 		if (!user && pathname !== "/entrar") router.replace("/entrar");
-	}, [user]);
+		
+		if (pathname === "/pedidos-para-substituicao" && !hasTeacherPermissions)
+			router.replace("/visao-geral");
+		if (pathname === "/alertas" && !hasEmployeePermissions)
+			router.replace("/visao-geral");
+	}, [user, pathname]);
 
 	if (pathname === "/entrar" || pathname === "/") return children;
 	return (
