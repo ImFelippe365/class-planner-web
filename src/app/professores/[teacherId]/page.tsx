@@ -46,6 +46,7 @@ import TeacherInformations from "./components/TeacherInformations";
 import ClassCard from "@/components/ClassCard";
 import TeachCanceledClassFormModal from "./components/TeachCanceledClassFormModal";
 import { formatDisciplineName } from "@/utils/formatDisciplineName";
+import { useAuth } from "@/hooks/AuthContext";
 
 interface TeacherProfileProps {
 	params: {
@@ -72,6 +73,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	const [classCanceled, setClassCanceled] = useState<ClassCanceled>();
 
+	const { user, hasTeacherPermissions } = useAuth();
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
 	const weekCalendarRef = useRef<any>(null);
 
@@ -345,28 +347,31 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				)}
 
 				<section className="flex items-center justify-end">
-					{!schedule?.canceled_class && !schedule?.class_to_replace && (
-						<Button
-							onClick={() => handleOpenCancelScheduleModal(schedule)}
-							color="failure"
-							className="mt-4"
-						>
-							<Ban className="text-white mr-2 rounded-lg" />
-							<span className="text-white">Cancelar aula</span>
-						</Button>
-					)}
+					{!schedule?.canceled_class &&
+						!schedule?.class_to_replace &&
+						hasTeacherPermissions && (
+							<Button
+								onClick={() => handleOpenCancelScheduleModal(schedule)}
+								color="failure"
+								className="mt-4"
+							>
+								<Ban className="text-white mr-2 rounded-lg" />
+								<span className="text-white">Cancelar aula</span>
+							</Button>
+						)}
 
-					{schedule?.canceled_class && !schedule.class_to_replace && (
-						<Button
-							onClick={() => {
-								setShowTeachCanceledClass(true);
-								setClassCanceled(schedule.canceled_class);
-								console.log(schedule.canceled_class);
-							}}
-						>
-							Ministrar aula
-						</Button>
-					)}
+					{schedule?.canceled_class &&
+						!schedule.class_to_replace &&
+						hasTeacherPermissions && (
+							<Button
+								onClick={() => {
+									setShowTeachCanceledClass(true);
+									setClassCanceled(schedule.canceled_class);
+								}}
+							>
+								Ministrar aula
+							</Button>
+						)}
 				</section>
 			</div>
 		);

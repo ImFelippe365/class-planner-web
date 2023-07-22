@@ -16,7 +16,8 @@ import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function NavigationSideBar(): React.ReactNode {
-	const { user, logout } = useAuth();
+	const { user, logout, hasEmployeePermissions, hasTeacherPermissions } =
+		useAuth();
 	const NavigationItemStyles =
 		"w-full py-4 px-6 flex items-center gap-4 justify-start rounded-lg font-semibold hover:bg-primary-background transition-all";
 	const pathname = usePathname();
@@ -27,37 +28,43 @@ export default function NavigationSideBar(): React.ReactNode {
 			name: "Visão Geral",
 			icon: <Layers />,
 			path: "visao-geral",
+			permission: true
 		},
 		{
 			name: "Cursos",
 			icon: <GraduationCap />,
 			path: "cursos",
+			permission: true
 		},
 		{
 			name: "Professores",
 			icon: <Briefcase />,
 			path: "professores",
+			permission: true
 		},
 		{
 			name: "Estudantes",
 			icon: <User />,
 			path: "estudantes",
+			permission: true
 		},
 		{
 			name: "Turmas",
 			icon: <Users />,
 			path: "turmas",
+			permission: true
 		},
-
 		{
 			name: "Notificações",
 			icon: <Bell />,
 			path: "alertas",
+			permission: hasEmployeePermissions,
 		},
 		{
 			name: "Substituir professores",
 			icon: <Replace />,
 			path: "pedidos-para-substituicao",
+			permission: hasTeacherPermissions,
 		},
 	];
 
@@ -92,26 +99,28 @@ export default function NavigationSideBar(): React.ReactNode {
 				</header>
 
 				<nav className="flex flex-col items-center justify-start w-full text-primary-dark text-base gap-2">
-					{routes.map((route, index) => (
-						<Link
-							key={index.toString()}
-							href={route.path}
-							className={`${NavigationItemStyles} ${
-								path === route.path && "bg-primary-background text-primary"
-							}`}
-						>
-							{route.icon}
-							<p>{route.name}</p>
-						</Link>
-					))}
-					<Link
-						href={"/entrar"}
+					{routes.map((route, index) => {
+						if (!route?.permission) return;
+						return (
+							<Link
+								key={index.toString()}
+								href={route.path}
+								className={`${NavigationItemStyles} ${
+									path === route.path && "bg-primary-background text-primary"
+								}`}
+							>
+								{route.icon}
+								<p>{route.name}</p>
+							</Link>
+						);
+					})}
+					<button
 						onClick={() => logout()}
 						className={`${NavigationItemStyles} text-error mt-4 hover:bg-error-transparent`}
 					>
 						<LogOut />
 						<p>Sair</p>
-					</Link>
+					</button>
 				</nav>
 			</section>
 		</aside>
