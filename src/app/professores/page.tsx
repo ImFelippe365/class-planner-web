@@ -22,8 +22,14 @@ export default function Teachers(): React.ReactNode {
 			<SearchBar placeholder="Busque pelo nome" />
 
 			<section className="grid grid-cols-2 gap-4 mt-4">
-				{teachers.map(({ id, registration, name }) => (
-					<TeacherCard key={id} teacherId={id} registration={registration} name={name} />
+				{teachers.map(({ id, registration, name, avatar }) => (
+					<TeacherCard
+						key={id}
+						teacherId={id}
+						registration={registration}
+						name={name}
+						teacherAvatar={avatar}
+					/>
 				))}
 			</section>
 		</main>

@@ -30,7 +30,7 @@ export default function Select({
 			name={name}
 			control={control}
 			render={({
-				field: { onBlur, onChange, ref },
+				field: { onBlur, onChange, ref, value },
 				formState,
 				fieldState: { error },
 			}) => (
@@ -51,7 +51,8 @@ export default function Select({
 						onChange={onChange}
 						ref={ref}
 						id={name}
-						defaultValue={""}
+						defaultValue={value ? value : ""}
+						value={value ? value : ""}
 						{...props}
 					>
 						<option disabled value={""}>
