@@ -390,50 +390,52 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					</>
 				)}
 
-				<section className="flex items-center justify-end">
-					{!schedule?.canceled_class &&
-						!schedule?.class_to_replace &&
-						hasTeacherPermissions &&
-						!!teachers.find(({ id }) => id === user?.id) && (
-							<Button
-								onClick={() => handleOpenCancelScheduleModal(schedule)}
-								color="failure"
-								className="mt-4"
-							>
-								<Ban className="text-white mr-2 rounded-lg" />
-								<span className="text-white">Cancelar aula</span>
-							</Button>
-						)}
+				{new Date() < new Date(`${schedule.class_date} 23:59`) && (
+					<section className="flex items-center justify-end">
+						{!schedule?.canceled_class &&
+							!schedule?.class_to_replace &&
+							hasTeacherPermissions &&
+							!!teachers.find(({ id }) => id === user?.id) && (
+								<Button
+									onClick={() => handleOpenCancelScheduleModal(schedule)}
+									color="failure"
+									className="mt-4"
+								>
+									<Ban className="text-white mr-2 rounded-lg" />
+									<span className="text-white">Cancelar aula</span>
+								</Button>
+							)}
 
-					{schedule?.canceled_class &&
-						hasTeacherPermissions &&
-						!!teachers.find(({ id }) => id === user?.id) && (
-							<Button
-								onClick={() =>
-									handleOpenResumeScheduleModal(schedule?.canceled_class.id)
-								}
-								color="warning"
-								className="mt-4"
-							>
-								<Play fill={'white'}  className="text-white mr-2 rounded-lg" />
-								<span className="text-white">Retomar aula</span>
-							</Button>
-						)}
+						{schedule?.canceled_class &&
+							hasTeacherPermissions &&
+							!!teachers.find(({ id }) => id === user?.id) && (
+								<Button
+									onClick={() =>
+										handleOpenResumeScheduleModal(schedule?.canceled_class.id)
+									}
+									color="warning"
+									className="mt-4"
+								>
+									<Play fill={"white"} className="text-white mr-2 rounded-lg" />
+									<span className="text-white">Retomar aula</span>
+								</Button>
+							)}
 
-					{schedule?.canceled_class &&
-						!schedule.class_to_replace &&
-						hasTeacherPermissions &&
-						!teachers.find(({ id }) => id === user?.id) && (
-							<Button
-								onClick={() => {
-									setShowTeachCanceledClass(true);
-									setClassCanceled(schedule.canceled_class);
-								}}
-							>
-								Ministrar aula
-							</Button>
-						)}
-				</section>
+						{schedule?.canceled_class &&
+							!schedule.class_to_replace &&
+							hasTeacherPermissions &&
+							!teachers.find(({ id }) => id === user?.id) && (
+								<Button
+									onClick={() => {
+										setShowTeachCanceledClass(true);
+										setClassCanceled(schedule.canceled_class);
+									}}
+								>
+									Ministrar aula
+								</Button>
+							)}
+					</section>
+				)}
 			</div>
 		);
 	};
