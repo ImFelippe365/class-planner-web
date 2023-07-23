@@ -390,7 +390,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					</>
 				)}
 
-				{new Date() < new Date(`${schedule.class_date} 23:59`) && (
+				{new Date() <
+					new Date(`${schedule.class_date} ${schedule.start_time}`) && (
 					<section className="flex items-center justify-end">
 						{!schedule?.canceled_class &&
 							!schedule?.class_to_replace &&
@@ -515,14 +516,25 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			</Breadcrumb>
 
 			<div className="flex gap-4 items-center">
-				<User
-					className="rounded-lg bg-primary-background w-16 h-16 p-3"
-					color="#007EA7"
-				/>
+				{teacher?.avatar ? (
+					<div className="relative w-16 h-16">
+						<Image
+							fill
+							alt={teacher?.name}
+							src={`https://suap.ifrn.edu.br${teacher?.avatar}`}
+							className="rounded-lg object-cover"
+						/>
+					</div>
+				) : (
+					<User
+						className="rounded-lg bg-primary-background w-16 p-3 h-fit"
+						color="#007EA7"
+					/>
+				)}
 
 				<div className="text-primary-dark">
 					<p className="font-semibold">{teacher?.name}</p>
-					<p className="text-sm">Professor(a)</p>
+					<p className="text-sm">{teacher?.department}</p>
 				</div>
 			</div>
 
