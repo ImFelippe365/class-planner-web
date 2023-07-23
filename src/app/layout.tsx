@@ -51,6 +51,7 @@ export default function RootLayout({ children }: LayoutProps) {
 								draggable
 								pauseOnHover
 								theme="light"
+								className={"w-full"}
 							/>
 							{children}
 						</Routes>

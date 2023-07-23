@@ -11,6 +11,7 @@ import {
 	X,
 	Plus,
 	Download,
+	Play,
 } from "lucide-react";
 import { api } from "@/services/api";
 import { useEffect, useRef, useState } from "react";
@@ -67,8 +68,12 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	const [scheduleToShow, setScheduleToShow] = useState<EventClickArg>();
 	const [scheduleToCancel, setScheduleToCancel] = useState<Schedule>();
+	const [scheduleToResume, setScheduleToResume] = useState<number>();
 	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
 	const [showCancelScheduleModal, setShowCancelScheduleModal] =
+		useState<boolean>(false);
+	const [showResumeClassModal, setShowResumeClassModal] =
 		useState<boolean>(false);
 
 	const [classCanceled, setClassCanceled] = useState<ClassCanceled>();
@@ -196,6 +201,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		setScheduleToCancel(schedule);
 	};
 
+	const handleOpenResumeScheduleModal = (canceledScheduleId: number) => {
+		setShowResumeClassModal(true);
+		setScheduleToResume(canceledScheduleId);
+	};
+
 	const closeCancelScheduleModal = () => {
 		setScheduleToShow(undefined);
 		setShowCancelScheduleModal(false);
@@ -212,6 +222,21 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			toast.success("Vínculo com esta disciplina foi removido");
 		} catch (err) {
 			toast.error("Ocorreu um erro ao tentar remover vínculo");
+		}
+	};
+
+	const resumeCanceledClass = async () => {
+		try {
+			const response = await api.delete(
+				`schedules/canceled/${scheduleToResume}/`
+			);
+
+			getTeacherProfile();
+			setShowResumeClassModal(false);
+
+			toast.success("Esta aula não está mais cancelada e ocorrerá normalmente");
+		} catch {
+			toast.error("Ocorreu um erro ao tentar retomar a aula");
 		}
 	};
 
@@ -239,7 +264,9 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				className={`bg-background-color rounded-3xl  shadow-lg absolute p-8 max-w-[370px] !h-fit w-full z-50`}
 				style={{
 					inset: scheduleToShow?.el?.parentElement?.style.inset,
-					left: (((scheduleToShow?.el.offsetWidth || 1) * scheduleDate.getDay()) - ((scheduleToShow?.el.offsetWidth || 1))),
+					left:
+						(scheduleToShow?.el.offsetWidth || 1) * scheduleDate.getDay() -
+						(scheduleToShow?.el.offsetWidth || 1),
 					top: top + (scheduleToShow?.el.offsetHeight || 0),
 				}}
 			>
@@ -379,6 +406,21 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						)}
 
 					{schedule?.canceled_class &&
+						hasTeacherPermissions &&
+						!!teachers.find(({ id }) => id === user?.id) && (
+							<Button
+								onClick={() =>
+									handleOpenResumeScheduleModal(schedule?.canceled_class.id)
+								}
+								color="warning"
+								className="mt-4"
+							>
+								<Play fill={'white'}  className="text-white mr-2 rounded-lg" />
+								<span className="text-white">Retomar aula</span>
+							</Button>
+						)}
+
+					{schedule?.canceled_class &&
 						!schedule.class_to_replace &&
 						hasTeacherPermissions &&
 						!teachers.find(({ id }) => id === user?.id) && (
@@ -398,6 +440,30 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	return (
 		<>
+			<Modal
+				title="Retomar aula"
+				description="Deseja remover o cancelamento e retomar a aula neste dia?"
+				openModal={showResumeClassModal}
+				setOpenModal={setShowResumeClassModal}
+				size="xl"
+				body={
+					<div className="flex items-center justify-end gap-4 pt-4">
+						<Button
+							color="failure"
+							onClick={() => setShowResumeClassModal(false)}
+						>
+							Cancelar
+						</Button>
+						<Button
+							color="sucess"
+							className="bg-success text-white"
+							onClick={() => resumeCanceledClass()}
+						>
+							Confirmar
+						</Button>
+					</div>
+				}
+			/>
 			<Modal
 				title="Cancelar aula"
 				description="Preencha as informações abaixo para cancelar a aula selecionada"
