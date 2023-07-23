@@ -18,7 +18,7 @@ export interface CreateDiscipline {
 	is_optional: boolean;
 	course: {
 		course_id: string;
-		period: number;
+		period: number | null;
 	}[];
 }
 

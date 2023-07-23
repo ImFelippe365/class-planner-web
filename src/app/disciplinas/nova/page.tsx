@@ -18,8 +18,10 @@ import { SelectOptions } from "@/interfaces/Utils";
 import { reference_periods, reference_years } from "@/utils/schedules";
 import { Checkbox, Label } from "flowbite-react";
 import { CreateDiscipline } from "@/interfaces/Discipline";
-import { Trash2 } from "lucide-react";
+import { TestTube, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { stringify } from "querystring";
+
 export default function AddDiscipline(): React.ReactNode {
 	document.title = "Class Planner - Nova disciplina";
 
@@ -42,9 +44,7 @@ export default function AddDiscipline(): React.ReactNode {
 					course_id: yup.string().required("Campo curso é obrigatório"),
 					period: yup
 						.number()
-						.positive()
-						.required("Campo período é obrigatório")
-						.min(1, "O período de referência deve ser maior que 0"),
+						.notRequired()
 				})
 			)
 			.min(1, "A disciplina precisa estar vinculada a pelo menos 1 curso")
@@ -116,12 +116,29 @@ export default function AddDiscipline(): React.ReactNode {
 			);
 			newDiscipline.is_optional = isOptional;
 
-			const { data } = await api.post("disciplines/", newDiscipline);
+			if (isOptional) {
+				const courses = newDiscipline.course.map((item) => (
+					{ ...item, period: null }
+				))
+
+				newDiscipline.course = courses
+			}
+
+			const resquest = await api.post("disciplines/", newDiscipline);
 
 			router.back();
+			
 			toast.success("Disciplina criada com sucesso");
-		} catch (err) {
-			toast.error("Ocorreu um erro ao tentar criar nova disciplina");
+		} catch (err: any) {
+			const obj = JSON.parse(err['request']['response'])
+			if ("code" in obj) {
+
+				//toast.error(obj['code'][0]);
+				toast.error("Disciplina com esse código já existe");
+			} else {
+				toast.error("Ocorreu um erro ao tentar criar nova disciplina");
+			}
+			toast.error(err);
 		}
 	};
 
@@ -207,31 +224,33 @@ export default function AddDiscipline(): React.ReactNode {
 									label="Curso"
 								/>
 
-								<Select
-									containerClassName="mt-2"
-									control={control}
-									disabled={!watch(`course.${index}.course_id`)}
-									options={
-										courses?.find(
-											({ id }) =>
-												id.toString() === watch(`course.${index}.course_id`)
-										)?.degree === "Ensino superior"
-											? reference_periods
-											: reference_years
-									}
-									name={`course.${index}.period`}
-									placeholder={`Selecione um ${
-										courses?.find(
+								{!isOptional && (
+									<Select
+										containerClassName="mt-2"
+										control={control}
+										disabled={!watch(`course.${index}.course_id`)}
+										options={
+											courses?.find(
+												({ id }) =>
+													id.toString() === watch(`course.${index}.course_id`)
+											)?.degree === "Ensino superior"
+												? reference_periods
+												: reference_years
+										}
+										name={`course.${index}.period`}
+										placeholder={`Selecione um ${courses?.find(
 											({ id }) =>
 												id.toString() === watch(`course.${index}.course_id`)
 										)?.degree === "Ensino superior"
 											? "período"
 											: "ano"
-									}
+											}
 								 	de referência`}
-									label="Período de	 referência"
-								/>
+										label="Período de	 referência"
+									/>
+								)}
 							</div>
+
 							<Button color="failure" className="h-full">
 								<Trash2 className="" onClick={() => removeCourseLink(index)} />
 							</Button>

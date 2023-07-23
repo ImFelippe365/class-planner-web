@@ -11,6 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import * as yup from "yup";
 
 interface EditCourseProps {
@@ -42,9 +43,16 @@ export default function EditCourse({ params }: EditCourseProps) {
 	const router = useRouter();
 
 	const onSubmit = async (editCourse: UpdateCourse) => {
-		const { data } = await api.put(`courses/${params.courseId}/`, editCourse);
+		try {
+			await api.put(`courses/${params.courseId}/`, editCourse);
 
-		router.back();
+			router.back();
+			
+			toast.success("Curso editado com sucesso")
+		} catch (err) {
+			toast.error("Erro ao tentar editar curso")
+		}
+
 	};
 
 	const getCourse = async () => {
