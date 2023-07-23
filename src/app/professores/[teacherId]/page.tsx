@@ -12,6 +12,7 @@ import {
 	Plus,
 	Download,
 	Play,
+	ClipboardSignature,
 } from "lucide-react";
 import { api } from "@/services/api";
 import { useEffect, useRef, useState } from "react";
@@ -49,6 +50,7 @@ import TeachCanceledClassFormModal from "./components/TeachCanceledClassFormModa
 import { formatDisciplineName } from "@/utils/formatDisciplineName";
 import { useAuth } from "@/hooks/AuthContext";
 import { toast } from "react-toastify";
+
 interface TeacherProfileProps {
 	params: {
 		teacherId: string | number;
@@ -117,8 +119,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			minTime < 13
 				? shiftsSchedule.Manhã
 				: minTime > 18
-				? shiftsSchedule.Noite
-				: shiftsSchedule.Tarde;
+					? shiftsSchedule.Noite
+					: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.startHour,
@@ -132,8 +134,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			maxTime < 13
 				? shiftsSchedule.Manhã
 				: maxTime > 18
-				? shiftsSchedule.Noite
-				: shiftsSchedule.Tarde;
+					? shiftsSchedule.Noite
+					: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.endHour,
@@ -432,6 +434,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 										setClassCanceled(schedule.canceled_class);
 									}}
 								>
+									<ClipboardSignature className="text-white mr-2 rounded-lg" />
 									Ministrar aula
 								</Button>
 							)}
