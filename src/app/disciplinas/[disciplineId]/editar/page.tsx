@@ -23,10 +23,12 @@ import { toast } from "react-toastify";
 interface EditDisciplineProps {
 	params: {
 		disciplineId: number;
-	}
+	};
 }
 
-export default function EditDiscipline({ params }: EditDisciplineProps): React.ReactNode {
+export default function EditDiscipline({
+	params,
+}: EditDisciplineProps): React.ReactNode {
 	document.title = "Class Planner - Editar disciplina";
 
 	const [discipline, setDiscipline] = useState<Discipline>();
@@ -47,9 +49,7 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 			.array(
 				yup.object({
 					course_id: yup.string().required("Campo curso é obrigatório"),
-					period: yup
-						.number()
-						.notRequired(),
+					period: yup.number().notRequired(),
 				})
 			)
 			.min(1, "A disciplina precisa estar vinculada a pelo menos 1 curso")
@@ -60,39 +60,45 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 	});
 
 	const getDiscipline = async () => {
-		const { data } = await api.get(`disciplines/${params.disciplineId}/`)
+		const { data } = await api.get(`disciplines/${params.disciplineId}/`);
 
-		setDiscipline(data)
-		return data
-	}
+		setDiscipline(data);
+		return data;
+	};
 
 	const setDefaultValues = async () => {
 		const data = await getDiscipline();
+		setNumSelectedCourses(data?.course.length);
 
 		// @ts-expect-error
-		setNumSelectedCourses(discipline?.course.length)
+		setIsOptional(discipline?.is_optional);
 
-		// @ts-expect-error
-		setIsOptional(discipline?.is_optional)
+		const courses = data.course.map((item: any, index: number) => {
+			// setValue(`course.${index}.course_id`, item.id);
+			// setValue(`course.${index}.period`, item.period ? item.period : 0);
 
-		Object.keys(data).forEach((field) => {
-			if (field === 'course') {
-				data[field].map((item: any, index: number) => {
-					setValue(`course.${index}.course_id`, item.id);
-					setValue(`course.${index}.period`, item.period ? item.period : 0);
-				})
-			} else {
-				// @ts-expect-error
-				setValue(field, data[field]);
-			}
+			return {
+				course_id: item.id,
+				period: item.period,
+			};
 		});
-	}
+
+		reset({
+			code: data.code,
+			is_optional: data.is_optional,
+			name: data.name,
+			workload_in_class: data.workload_in_class,
+			workload_in_clock: data.workload_in_clock,
+			course: courses,
+		});
+	};
 
 	const {
 		control,
 		handleSubmit,
 		watch,
 		setValue,
+		reset,
 		formState: { isSubmitting },
 	} = useForm<CreateDiscipline>({
 		resolver: yupResolver(schema),
@@ -110,7 +116,7 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 		);
 	};
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, update } = useFieldArray({
 		control,
 		name: "course",
 	});
@@ -127,11 +133,15 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 	};
 
 	function addCourseLink(data: any) {
-		console.log(courses.length)
-		if (courses.length > 2) {
+		if (courses.length > discipline?.course?.length) {
 			append({ course_id: "", period: 0 });
 			setNumSelectedCourses(numSelectedCourses + 1);
 		}
+		/* else if (numSelectedCourses) {
+		} if (courses.length > numSelectedCourses) {
+			append({ course_id: "", period: 0 });
+			setNumSelectedCourses(numSelectedCourses + 1);
+		} */
 	}
 
 	function removeCourseLink(index: number) {
@@ -156,17 +166,19 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 			editDiscipline.is_optional = discipline?.is_optional;
 
 			if (discipline?.is_optional) {
-				console.log('entrou')
-				const courses = editDiscipline.course.map((item) => (
-					{ ...item, period: null }
-				))
+				console.log("entrou");
+				const courses = editDiscipline.course.map((item) => ({
+					...item,
+					period: null,
+				}));
 
-				editDiscipline.course = courses
+				editDiscipline.course = courses;
 			}
 
-			console.log(editDiscipline)
-
-			const { data } = await api.put(`disciplines/${discipline?.id}/`, editDiscipline);
+			const { data } = await api.put(
+				`disciplines/${discipline?.id}/`,
+				editDiscipline
+			);
 
 			router.back();
 			toast.success("Disciplina editada com sucesso");
@@ -189,7 +201,9 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 				defaultValue={discipline?.name}
 			/>
 
-			<p className="mt-2 font-[0.85rem]">{discipline?.is_optional ? "É optativa" : "É obrigatória"}</p>
+			<p className="mt-2 font-[0.85rem]">
+				{discipline?.is_optional ? "É optativa" : "É obrigatória"}
+			</p>
 
 			<Input
 				containerClassName="mt-2"
@@ -222,7 +236,6 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 					</Button>
 				</div>
 
-
 				{fields.map((field, index) => {
 					return (
 						<div
@@ -246,47 +259,46 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 										control={control}
 										disabled={!watch(`course.${index}.course_id`)}
 										options={
-											discipline?.course[index] ?
-												courses?.find(
-													({ id }) => {
-														console.log(id)
-														console.log(typeof (id))
-														return (id == discipline?.course[index].id)
-													}
-												)?.degree === "Ensino superior"
+											discipline?.course[index]
+												? courses?.find(({ id }) => {
+														return id == discipline?.course[index].id;
+												  })?.degree === "Ensino superior"
 													? reference_periods
 													: reference_years
-												: courses?.find(
-													({ id }) => {
-														console.log('entrou aqui', watch(`course.${index}.course_id`))
-														return (id.toString() === watch(`course.${index}.course_id`))
-													}
-												)?.degree === "Ensino superior"
-													? reference_periods
-													: reference_years
+												: courses?.find(({ id }) => {
+														return (
+															id.toString() ===
+															watch(`course.${index}.course_id`)
+														);
+												  })?.degree === "Ensino superior"
+												? reference_periods
+												: reference_years
 										}
 										name={`course.${index}.period`}
-										placeholder={`Selecione um ${courses?.find(
-											({ id }) =>
-												id.toString() === watch(`course.${index}.course_id`)
-										)?.degree === "Ensino superior"
-											? "período"
-											: "ano"
-											}
+										placeholder={`Selecione um ${
+											courses?.find(
+												({ id }) =>
+													id.toString() === watch(`course.${index}.course_id`)
+											)?.degree === "Ensino superior"
+												? "período"
+												: "ano"
+										}
 											de referência`}
 										label="Período de	 referência"
 									/>
 								)}
-
 							</div>
 
-							{index >= (discipline?.course.length) && (
+							{index >= discipline?.course.length && (
 								<Button color="failure" className="h-full">
-									<Trash2 className="" onClick={() => removeCourseLink(index)} />
+									<Trash2
+										className=""
+										onClick={() => removeCourseLink(index)}
+									/>
 								</Button>
 							)}
 						</div>
-					)
+					);
 				})}
 			</div>
 
