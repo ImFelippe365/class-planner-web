@@ -22,7 +22,7 @@ import {
 } from "@fullcalendar/core";
 import Image from "next/image";
 
-import { shiftsSchedule } from "@/utils/schedules";
+import { allScheduleStartTimes, shiftsSchedule } from "@/utils/schedules";
 import { weekdays } from "@/utils/dates";
 import { formatTime } from "@/utils/formatTime";
 
@@ -84,11 +84,13 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [showTeachCanceledClass, setShowTeachCanceledClass] =
 		useState<boolean>(false);
 
-	const [weekSchedulesTeacher, setWeekSchedulesTeacher] = useState<Schedule[]>([])
+	const [weekSchedulesTeacher, setWeekSchedulesTeacher] = useState<Schedule[]>(
+		[]
+	);
 
-	const [scheduleByTime, setScheduleByTime] = useState<Object>()
+	const [scheduleByTime, setScheduleByTime] = useState<Object>();
 
-	const [scheduleKeys, setSchedulesKeys] = useState([])
+	const [scheduleKeys, setSchedulesKeys] = useState([]);
 
 	document.title = `Class Planner | ${teacher?.name}`;
 
@@ -111,7 +113,40 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		});
 
 		setAmountOfLessons(quantity);
-		setWeekSchedulesTeacher(data)
+
+		// Separar aulas juntas 2 -> 1, 4 -> 4x 1
+		const teacherSchedules = data.reduce(
+			(accumulator: Schedule[], schedule: Schedule) => {
+				if (schedule.quantity > 1) {
+					const [start, end] = allScheduleStartTimes
+						.find(
+							(time) =>
+								time.split("-")[0].trim() === schedule.start_time.slice(0, 5)
+						)
+						?.split("-") || [schedule.start_time, schedule.end_time];
+
+					const firstSchedule = {
+						...schedule,
+						quantity: 1,
+						end_time: end.trim() + ":00",
+					};
+					const secondSchedule = {
+						...schedule,
+						quantity: 1,
+						start_time: end.trim() + ":00",
+					};
+					console.log("original", schedule);
+					console.log("schedule1", firstSchedule);
+					console.log("schedule2", secondSchedule);
+					return [...accumulator, firstSchedule, secondSchedule];
+				}
+
+				return [...accumulator, schedule];
+			},
+			[]
+		);
+		console.log(data);
+		setWeekSchedulesTeacher(teacherSchedules);
 	};
 
 	const initialStartTime = (): DurationInput => {
@@ -120,8 +155,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			minTime < 13
 				? shiftsSchedule.Manhã
 				: minTime > 18
-					? shiftsSchedule.Noite
-					: shiftsSchedule.Tarde;
+				? shiftsSchedule.Noite
+				: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.startHour,
@@ -135,8 +170,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			maxTime < 13
 				? shiftsSchedule.Manhã
 				: maxTime > 18
-					? shiftsSchedule.Noite
-					: shiftsSchedule.Tarde;
+				? shiftsSchedule.Noite
+				: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.endHour,
@@ -226,29 +261,28 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			key?: Array<Schedule>;
 		}
 
-		const scheduleTimes: Times = {}
+		const scheduleTimes: Times = {};
 
 		weekSchedulesTeacher.map((item) => {
-			let values = []
+			let values = [];
 
 			if (item.start_time in scheduleTimes) {
 				// @ts-expect-error
-				values.push(...scheduleTimes[item.start_time])
-				values.push(item)
-				
+				values.push(...scheduleTimes[item.start_time]);
+				values.push(item);
+
 				// @ts-expect-error
-				scheduleTimes[item.start_time] = [...values]
-				
+				scheduleTimes[item.start_time] = [...values];
 			} else {
 				// @ts-expect-error
-				scheduleTimes[item.start_time] = [item]
+				scheduleTimes[item.start_time] = [item];
 			}
 
-			console.log(scheduleTimes)
-		})
+			console.log(scheduleTimes);
+		});
 
-		setScheduleByTime(scheduleTimes)
-	}
+		setScheduleByTime(scheduleTimes);
+	};
 
 	useEffect(() => {
 		getTeacherProfile();
