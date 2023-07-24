@@ -3,18 +3,27 @@
 import Breadcrumb from "@/components/Breadcrumb";
 import Button from "@/components/Button";
 import ClassCard from "@/components/ClassCard";
+import SearchBar from "@/components/SearchBar";
 import { useGlobal } from "@/hooks/GlobalContext";
+import { removeAccents } from "@/utils/removeAccents";
 import { CalendarPlus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 export default function Classes() {
-
-	document.title = 'Class Planner | Turmas'
+	document.title = "Class Planner | Turmas";
 
 	const routes = useRouter();
 	const { courses, classes, getAllClasses } = useGlobal();
+	const [searchText, setSearchText] = useState("");
 
+	const searchTeacherResults = searchText
+		? classes.filter(({ course }) =>
+				removeAccents(course.name)
+					.toUpperCase()
+					.includes(removeAccents(searchText).toUpperCase())
+		  )
+		: classes;
 
 	useEffect(() => {
 		getAllClasses();
@@ -31,8 +40,17 @@ export default function Classes() {
 				</section>
 			</Breadcrumb>
 
-			<section className="grid auto-rows-auto grid-cols-cardsGrid gap-5">
-				{classes.map(({ id, course, reference_period }) => (
+			<SearchBar
+				onChange={({ target }) =>
+					setSearchText(
+						target.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+					)
+				}
+				placeholder="Busque pelo nome do curso"
+			/>
+
+			<section className="grid auto-rows-auto grid-cols-cardsGrid gap-5 mt-4">
+				{searchTeacherResults.map(({ id, course, reference_period }) => (
 					<ClassCard
 						key={id}
 						href={`turmas/${id}`}
