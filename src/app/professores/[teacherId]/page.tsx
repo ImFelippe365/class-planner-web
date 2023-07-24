@@ -11,6 +11,8 @@ import {
 	X,
 	Plus,
 	Download,
+	Play,
+	ClipboardSignature,
 } from "lucide-react";
 import { api } from "@/services/api";
 import { useEffect, useRef, useState } from "react";
@@ -46,6 +48,8 @@ import TeacherInformations from "./components/TeacherInformations";
 import ClassCard from "@/components/ClassCard";
 import TeachCanceledClassFormModal from "./components/TeachCanceledClassFormModal";
 import { formatDisciplineName } from "@/utils/formatDisciplineName";
+import { useAuth } from "@/hooks/AuthContext";
+import { toast } from "react-toastify";
 
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTeacherWeekSchedulesPDF from "./components/ExportTeacherWeekSchedules";
@@ -69,12 +73,17 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	const [scheduleToShow, setScheduleToShow] = useState<EventClickArg>();
 	const [scheduleToCancel, setScheduleToCancel] = useState<Schedule>();
+	const [scheduleToResume, setScheduleToResume] = useState<number>();
 	const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
 	const [showCancelScheduleModal, setShowCancelScheduleModal] =
+		useState<boolean>(false);
+	const [showResumeClassModal, setShowResumeClassModal] =
 		useState<boolean>(false);
 
 	const [classCanceled, setClassCanceled] = useState<ClassCanceled>();
 
+	const { user, hasTeacherPermissions, hasEmployeePermissions } = useAuth();
 	const { getTeacherWeekSchedules, getTeacherMonthSchedules } = useSchedule();
 	const weekCalendarRef = useRef<any>(null);
 
@@ -155,8 +164,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			minTime < 13
 				? shiftsSchedule.Manhã
 				: minTime > 18
-				? shiftsSchedule.Noite
-				: shiftsSchedule.Tarde;
+					? shiftsSchedule.Noite
+					: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.startHour,
@@ -170,8 +179,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			maxTime < 13
 				? shiftsSchedule.Manhã
 				: maxTime > 18
-				? shiftsSchedule.Noite
-				: shiftsSchedule.Tarde;
+					? shiftsSchedule.Noite
+					: shiftsSchedule.Tarde;
 
 		return {
 			hour: scheduleTimes.endHour,
@@ -239,6 +248,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		setScheduleToCancel(schedule);
 	};
 
+	const handleOpenResumeScheduleModal = (canceledScheduleId: number) => {
+		setShowResumeClassModal(true);
+		setScheduleToResume(canceledScheduleId);
+	};
+
 	const closeCancelScheduleModal = () => {
 		setScheduleToShow(undefined);
 		setShowCancelScheduleModal(false);
@@ -246,10 +260,31 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	};
 
 	const deleteDisciplineLink = async (linkId: number) => {
-		const { data } = await api.delete(`teachers/disciplines/${linkId}/`);
+		try {
+			const { data } = await api.delete(`teachers/disciplines/${linkId}/`);
 
-		getTeacherDisciplines();
-		getTeacherClasses();
+			getTeacherDisciplines();
+			getTeacherClasses();
+
+			toast.success("Vínculo com esta disciplina foi removido");
+		} catch (err) {
+			toast.error("Ocorreu um erro ao tentar remover vínculo");
+		}
+	};
+
+	const resumeCanceledClass = async () => {
+		try {
+			const response = await api.delete(
+				`schedules/canceled/${scheduleToResume}/`
+			);
+
+			getTeacherProfile();
+			setShowResumeClassModal(false);
+
+			toast.success("Esta aula não está mais cancelada e ocorrerá normalmente");
+		} catch {
+			toast.error("Ocorreu um erro ao tentar retomar a aula");
+		}
 	};
 
 	const filterSchedulesByTime = () => {
@@ -303,13 +338,15 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		const top = Number(
 			scheduleToShow?.el?.parentElement?.style.top.replace("px", "")
 		);
-
+		// rounded-tl-none
 		return (
 			<div
-				className={`bg-background-color rounded-3xl rounded-tl-none shadow-lg absolute p-8 max-w-[370px] !h-fit w-full z-50`}
+				className={`bg-background-color rounded-3xl  shadow-lg absolute p-8 max-w-[370px] !h-fit w-full z-50`}
 				style={{
 					inset: scheduleToShow?.el?.parentElement?.style.inset,
-					left: (scheduleToShow?.el.offsetWidth || 1) * scheduleDate.getDay(),
+					left:
+						(scheduleToShow?.el.offsetWidth || 1) * scheduleDate.getDay() -
+						(scheduleToShow?.el.offsetWidth || 1),
 					top: top + (scheduleToShow?.el.offsetHeight || 0),
 				}}
 			>
@@ -362,9 +399,16 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</h5>
 				<section>
 					{teachers.map((teacher) => (
-						<div key={teacher.id} className="flex items-center gap-2">
+						<div key={teacher.id} className="flex items-center gap-2 mb-2">
 							{teacher.avatar ? (
-								<Image src={teacher.avatar} alt={teacher.name} />
+								<div className="relative w-8 h-8">
+									<Image
+										src={`http://suap.ifrn.edu.br${teacher.avatar}`}
+										alt={teacher.name}
+										fill
+										className="object-cover rounded-full"
+									/>
+								</div>
 							) : (
 								<div className="flex justify-center p-1 rounded-full items-center w-8 bg-primary-background">
 									<User className="text-primary" />
@@ -389,10 +433,14 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 								</h5>
 								<div className="flex items-center gap-2">
 									{schedule.class_to_replace.teacher.avatar ? (
-										<Image
-											src={schedule.class_to_replace.teacher.avatar}
-											alt={schedule.class_to_replace.teacher.name}
-										/>
+										<div className="relative w-8 h-8">
+											<Image
+												src={`http://suap.ifrn.edu.br${schedule.class_to_replace.teacher.avatar}`}
+												alt={schedule.class_to_replace.teacher.name}
+												fill
+												className="object-cover rounded-full"
+											/>
+										</div>
 									) : (
 										<div className="flex justify-center p-1 rounded-full items-center w-8 bg-primary-background">
 											<User className="text-primary" />
@@ -422,36 +470,84 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					</>
 				)}
 
-				<section className="flex items-center justify-end">
-					{!schedule?.canceled_class && !schedule?.class_to_replace && (
-						<Button
-							onClick={() => handleOpenCancelScheduleModal(schedule)}
-							color="failure"
-							className="mt-4"
-						>
-							<Ban className="text-white mr-2 rounded-lg" />
-							<span className="text-white">Cancelar aula</span>
-						</Button>
-					)}
+				{new Date() <
+					new Date(`${schedule.class_date} ${schedule.start_time}`) && (
+					<section className="flex items-center justify-end">
+						{!schedule?.canceled_class &&
+							!schedule?.class_to_replace &&
+							hasTeacherPermissions &&
+							!!teachers.find(({ id }) => id === user?.id) && (
+								<Button
+									onClick={() => handleOpenCancelScheduleModal(schedule)}
+									color="failure"
+									className="mt-4"
+								>
+									<Ban className="text-white mr-2 rounded-lg" />
+									<span className="text-white">Cancelar aula</span>
+								</Button>
+							)}
 
-					{schedule?.canceled_class && !schedule.class_to_replace && (
-						<Button
-							onClick={() => {
-								setShowTeachCanceledClass(true);
-								setClassCanceled(schedule.canceled_class);
-								console.log(schedule.canceled_class);
-							}}
-						>
-							Ministrar aula
-						</Button>
-					)}
-				</section>
+						{schedule?.canceled_class &&
+							hasTeacherPermissions &&
+							!!teachers.find(({ id }) => id === user?.id) && (
+								<Button
+									onClick={() =>
+										handleOpenResumeScheduleModal(schedule?.canceled_class.id)
+									}
+									color="warning"
+									className="mt-4"
+								>
+									<Play fill={"white"} className="text-white mr-2 rounded-lg" />
+									<span className="text-white">Retomar aula</span>
+								</Button>
+							)}
+
+						{schedule?.canceled_class &&
+							!schedule.class_to_replace &&
+							hasTeacherPermissions &&
+							!teachers.find(({ id }) => id === user?.id) && (
+								<Button
+									onClick={() => {
+										setShowTeachCanceledClass(true);
+										setClassCanceled(schedule.canceled_class);
+									}}
+								>
+									<ClipboardSignature className="text-white mr-2 rounded-lg" />
+									Ministrar aula
+								</Button>
+							)}
+					</section>
+				)}
 			</div>
 		);
 	};
 
 	return (
 		<>
+			<Modal
+				title="Retomar aula"
+				description="Deseja remover o cancelamento e retomar a aula neste dia?"
+				openModal={showResumeClassModal}
+				setOpenModal={setShowResumeClassModal}
+				size="xl"
+				body={
+					<div className="flex items-center justify-end gap-4 pt-4">
+						<Button
+							color="failure"
+							onClick={() => setShowResumeClassModal(false)}
+						>
+							Cancelar
+						</Button>
+						<Button
+							color="sucess"
+							className="bg-success text-white"
+							onClick={() => resumeCanceledClass()}
+						>
+							Confirmar
+						</Button>
+					</div>
+				}
+			/>
 			<Modal
 				title="Cancelar aula"
 				description="Preencha as informações abaixo para cancelar a aula selecionada"
@@ -477,6 +573,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						setOpenModal={setShowTeachCanceledClass}
 						teacherId={Number(params.teacherId)}
 						classCanceled={classCanceled}
+						refreshSchedules={getTeacherProfile}
 					/>
 				}
 			/>
@@ -500,14 +597,25 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			</Breadcrumb>
 
 			<div className="flex gap-4 items-center">
-				<User
-					className="rounded-lg bg-primary-background w-16 h-16 p-3"
-					color="#007EA7"
-				/>
+				{teacher?.avatar ? (
+					<div className="relative w-16 h-16">
+						<Image
+							fill
+							alt={teacher?.name}
+							src={`https://suap.ifrn.edu.br${teacher?.avatar}`}
+							className="rounded-lg object-cover"
+						/>
+					</div>
+				) : (
+					<User
+						className="rounded-lg bg-primary-background w-16 p-3 h-fit"
+						color="#007EA7"
+					/>
+				)}
 
 				<div className="text-primary-dark">
 					<p className="font-semibold">{teacher?.name}</p>
-					<p className="text-sm">Professor(a)</p>
+					<p className="text-sm">{teacher?.department}</p>
 				</div>
 			</div>
 
@@ -525,7 +633,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					active
 					icon={Clock}
 					title="Horários de aula"
-					className="outline-none"
+					className="outline-none w-full"
 				>
 					<div className="grid grid-cols-container gap-6">
 						<div className="flex flex-col gap-y-4 min-w-fit">
@@ -609,7 +717,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</Tabs.Item>
 
 				<Tabs.Item icon={Users} title="Turmas" className="outline-none">
+<<<<<<< HEAD
 					<div className="flex flex-row flex-wrap gap-6 items-center justify-center">
+=======
+					<div className="grid grid-cols-cardsGrid">
+>>>>>>> 84dfa8668a8d7374f13c565474b6466e061e32dc
 						{teacherClasses.map(({ id, course, reference_period }) => (
 							<ClassCard
 								key={id}
@@ -624,21 +736,23 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 				<Tabs.Item icon={BookOpen} title="Disciplinas" className="outline-none">
 					<div className="flex flex-row gap-6">
-						<Button
-							color="gray"
-							className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
-							onClick={() => setShowCreateBindModal(true)}
-						>
-							<Plus className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
-							<div className="flex text-start flex-col">
-								<p className="text-primary font-semibold text-sm">
-									Vincular disciplina
-								</p>
-								<p className="text-placeholder text-xs">
-									Adicionar disciplina ao professor
-								</p>
-							</div>
-						</Button>
+						{hasEmployeePermissions && (
+							<Button
+								color="gray"
+								className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
+								onClick={() => setShowCreateBindModal(true)}
+							>
+								<Plus className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
+								<div className="flex text-start flex-col">
+									<p className="text-primary font-semibold text-sm">
+										Vincular disciplina
+									</p>
+									<p className="text-placeholder text-xs">
+										Adicionar disciplina ao professor
+									</p>
+								</div>
+							</Button>
+						)}
 
 						<div className="flex flex-col gap-y-4">
 							<div className="flex flex-wrap gap-4 justify-evenly">

@@ -80,7 +80,7 @@ export default function Dropdown({
 
 							{!isTeacherDiscipline && (
 								<Link
-									href={`#`}
+									href={`${cardType === "course" ? `cursos/${courseId}/editar` : `disciplinas/${disciplineId}/editar`}`}
 									className="flex flex-row w-full hover:bg-primary-background rounded-lg cursor-pointer gap-3 items-center p-2"
 								>
 									<Edit2 width={16} height={16} color="#000E1A" />

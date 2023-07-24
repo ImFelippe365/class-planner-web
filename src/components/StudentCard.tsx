@@ -1,7 +1,7 @@
 import { User } from "lucide-react";
 import Dropdown from "./Dropdown";
 import { api } from "@/services/api";
-
+import { toast } from "react-toastify";
 interface StudentCardProps {
 	studentId: number;
 	registration: string;
@@ -24,9 +24,15 @@ export default function StudentCard({
 	classId,
 }: StudentCardProps) {
 	const promoteToClassLeader = async () => {
-		await api.patch(`classes/${classId}/`, {
-			class_leader_id: studentId,
-		});
+		try {
+			await api.patch(`classes/${classId}/`, {
+				class_leader_id: studentId,
+			});
+
+			toast.success("Estudante promovido a líder da turma");
+		} catch {
+			toast.error("Ocorreu um erro ao tentar definir líder da turma");
+		}
 	};
 
 	return (

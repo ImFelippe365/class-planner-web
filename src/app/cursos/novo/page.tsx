@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { toast, ToastContainer } from "react-toastify";
 import * as yup from "yup";
 
 interface CreateCourse {
@@ -20,7 +21,7 @@ interface CreateCourse {
 }
 
 export default function AddCourse() {
-	document.title = 'Class Planner | Novo curso'
+	document.title = "Class Planner | Novo curso";
 
 	const schema = yup.object({
 		name: yup.string().required("Campo nome é obrigatório"),
@@ -40,11 +41,15 @@ export default function AddCourse() {
 	const router = useRouter();
 
 	const onSubmit = async (newCourse: CreateCourse) => {
-		const { data } = await api.post("courses/", newCourse);
+		try {
+			const { data } = await api.post("courses/", newCourse);
 
-		console.log(data);
+			router.back();
 
-		router.back();
+			toast.success("Curso criado com sucesso");
+		} catch (err) {
+			toast.error("Ocorreu um erro inesperado");
+		}
 	};
 
 	return (

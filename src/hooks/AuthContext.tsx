@@ -18,6 +18,8 @@ interface AuthContextValues {
 	login: (username: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	getTeacherProfile: (registration: string) => Promise<any>;
+	hasTeacherPermissions: boolean;
+	hasEmployeePermissions: boolean;
 }
 
 const AuthContext = createContext({} as AuthContextValues);
@@ -29,6 +31,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		const savedUser = storagedSession ? JSON.parse(storagedSession) : null;
 		return savedUser;
 	});
+
+	const hasTeacherPermissions = user?.department === "Aluno";
+	const hasEmployeePermissions = user?.department === "COADES";
 
 	const registerTeacher = useCallback(async (new_teacher: CreateTeacher) => {
 		try {
@@ -121,7 +126,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	};
 
 	useEffect(() => {
-		console.log("FUI CHAMADO");
 		loadSavedSession();
 	}, []);
 
@@ -133,6 +137,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				login,
 				logout,
 				getTeacherProfile,
+				hasTeacherPermissions,
+				hasEmployeePermissions,
 			}}
 		>
 			{children}

@@ -17,7 +17,7 @@ import * as yup from "yup";
 import { Controller, ControllerRenderProps, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SelectOptions } from "@/interfaces/Utils";
-
+import { toast } from "react-toastify";
 interface SubstituteScheduleForm {
 	discipline_id: string;
 }
@@ -77,23 +77,37 @@ export default function RequestsForReplacement() {
 		status: TeacherRequestStatus,
 		id: any = substituteScheduleData?.id
 	) => {
-		const response = await api.patch(`schedules/canceled/${id}/`, {
-			replace_class_status: status,
-		});
+		try {
+			const response = await api.patch(`schedules/canceled/${id}/`, {
+				replace_class_status: status,
+			});
 
-		getTeachersRequests();
+			getTeachersRequests();
+
+			toast.success(
+				`Você ${
+					status === "Aceito" ? "aceitou" : "recusou"
+				} com sucesso este pedido`
+			);
+		} catch {
+			toast.error("Ocorreu um erro ao tentar atualizar o status");
+		}
 	};
 
 	const onSubmit = async (data: SubstituteScheduleForm) => {
-		const response = await api.post("temporary-classes/", {
-			...data,
-			teacher_id: substituteScheduleData?.teacher_to_replace,
-			class_id: substituteScheduleData?.schedule.class_id,
-			class_canceled_id: substituteScheduleData?.id,
-		});
+		try {
+			const response = await api.post("temporary-classes/", {
+				...data,
+				teacher_id: substituteScheduleData?.teacher_to_replace,
+				class_id: substituteScheduleData?.schedule.class_id,
+				class_canceled_id: substituteScheduleData?.id,
+			});
 
-		setShowSubstituteScheduleModal(false);
-		changeTeacherRequestStatus("Aceito");
+			setShowSubstituteScheduleModal(false);
+			changeTeacherRequestStatus("Aceito");
+		} catch (err) {
+			toast.error("Ocorreu um erro ao tentar aceitar/recusar pedido");
+		}
 	};
 
 	useEffect(() => {

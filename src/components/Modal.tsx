@@ -41,8 +41,8 @@ export default function Modal({
 					<p className="text-sm text-gray font-normal">{description}</p>
 				)}
 			</FRModal.Header>
-			<FRModal.Body className="!px-9">{body}</FRModal.Body>
-			<FRModal.Footer>{footer}</FRModal.Footer>
+			{body && <FRModal.Body className="!px-9">{body}</FRModal.Body>}
+			{footer && <FRModal.Footer>{footer}</FRModal.Footer>}
 		</FRModal>
 	);
 }

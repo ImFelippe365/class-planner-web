@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { Check } from "lucide-react";
 import { Student } from "@/interfaces/Student";
-
+import { toast } from "react-toastify";
 interface CreateClass {
 	course_id: string;
 	reference_period: number;
@@ -78,11 +78,14 @@ export default function AddClass() {
 	}, []);
 
 	const onSubmit = async (newClass: CreateClass) => {
-		const { data } = await api.post("classes/", newClass);
+		try {
+			const { data } = await api.post("classes/", newClass);
 
-		console.log(data);
-
-		router.back();
+			router.back();
+			toast.success("Turma criada com sucesso");
+		} catch {
+			toast.error("Ocorreu um erro ao criar uma turma");
+		}
 	};
 
 	return (

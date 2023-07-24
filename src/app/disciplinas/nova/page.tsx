@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -18,15 +18,17 @@ import { SelectOptions } from "@/interfaces/Utils";
 import { reference_periods, reference_years } from "@/utils/schedules";
 import { Checkbox, Label } from "flowbite-react";
 import { CreateDiscipline } from "@/interfaces/Discipline";
-import { Trash2 } from "lucide-react";
+import { TestTube, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+import { stringify } from "querystring";
 
 export default function AddDiscipline(): React.ReactNode {
-	document.title = 'Class Planner - Nova disciplina'
+	document.title = "Class Planner - Nova disciplina";
 
 	const [courses, setCourses] = useState<Course[]>([]);
 	const [coursesOptions, setCoursesOptions] = useState<SelectOptions[]>([]);
 	const [isOptional, setIsOptional] = useState(false);
-	const [numSelectedCourses, setNumSelectedCourses] = useState(0)
+	const [numSelectedCourses, setNumSelectedCourses] = useState(0);
 
 	const schema = yup.object({
 		name: yup.string().required("Campo nome é obrigatório"),
@@ -36,15 +38,20 @@ export default function AddDiscipline(): React.ReactNode {
 			.positive()
 			.required("Campo carga horária é obrigatório"),
 		is_optional: yup.boolean(),
-		course: yup.array(yup.object({
-			course_id: yup.string().required("Campo curso é obrigatório"),
-			period: yup
-				.number()
-				.positive()
-				.required("Campo período é obrigatório")
-				.min(1, 'O período de referência deve ser maior que 0')
-		})).min(1, 'A disciplina precisa estar vinculada a pelo menos 1 curso')
-			.max(courses.length, `O número máximo de cursos que podem estar associados a essa disciplina é ${courses.length}`),
+		course: yup
+			.array(
+				yup.object({
+					course_id: yup.string().required("Campo curso é obrigatório"),
+					period: yup
+						.number()
+						.notRequired()
+				})
+			)
+			.min(1, "A disciplina precisa estar vinculada a pelo menos 1 curso")
+			.max(
+				courses.length,
+				`O número máximo de cursos que podem estar associados a essa disciplina é ${courses.length}`
+			),
 	});
 
 	const {
@@ -57,21 +64,21 @@ export default function AddDiscipline(): React.ReactNode {
 	});
 
 	const filterOptions = (index: number) => {
-		let selectedCourses: Array<number> = []
+		let selectedCourses: Array<number> = [];
 
 		for (let i = 0; i < index; i++) {
-			selectedCourses.push(Number(watch(`course.${i}.course_id`)))
+			selectedCourses.push(Number(watch(`course.${i}.course_id`)));
 		}
 
 		return coursesOptions.filter(
 			(item) => !selectedCourses.includes(Number(item.value))
-		)
+		);
 	};
 
 	const { fields, append, remove } = useFieldArray({
 		control,
-		name: 'course',
-	})
+		name: "course",
+	});
 
 	const getAllCourses = async () => {
 		const { data } = await api.get("courses/");
@@ -86,34 +93,54 @@ export default function AddDiscipline(): React.ReactNode {
 
 	function addCourseLink(data: any) {
 		if (courses.length > numSelectedCourses) {
-			append({ course_id: '', period: 0 })
-			setNumSelectedCourses(numSelectedCourses + 1)
+			append({ course_id: "", period: 0 });
+			setNumSelectedCourses(numSelectedCourses + 1);
 		}
 	}
 
 	function removeCourseLink(index: number) {
-		remove(index)
-		setNumSelectedCourses(numSelectedCourses - 1)
+		remove(index);
+		setNumSelectedCourses(numSelectedCourses - 1);
 	}
 
 	useEffect(() => {
 		getAllCourses();
-	}, [])
-
+	}, []);
 
 	const router = useRouter();
 
 	const onSubmit = async (newDiscipline: CreateDiscipline) => {
-		newDiscipline.workload_in_clock = Math.ceil((newDiscipline.workload_in_class * 45) / 60)
-		newDiscipline.is_optional = isOptional
+		try {
+			newDiscipline.workload_in_clock = Math.ceil(
+				(newDiscipline.workload_in_class * 45) / 60
+			);
+			newDiscipline.is_optional = isOptional;
 
-		const { data } = await api.post("disciplines/", newDiscipline);
+			if (isOptional) {
+				const courses = newDiscipline.course.map((item) => (
+					{ ...item, period: null }
+				))
 
-		console.log(data);
+				newDiscipline.course = courses
+			}
 
-		router.back();
+			const resquest = await api.post("disciplines/", newDiscipline);
+
+			router.back();
+			
+			toast.success("Disciplina criada com sucesso");
+		} catch (err: any) {
+			const obj = JSON.parse(err['request']['response'])
+			if ("code" in obj) {
+
+				//toast.error(obj['code'][0]);
+				toast.error("Disciplina com esse código já existe");
+			} else {
+				toast.error("Ocorreu um erro ao tentar criar nova disciplina");
+			}
+			toast.error(err);
+		}
 	};
-
 
 	return (
 		<form className="w-full" onSubmit={handleSubmit(onSubmit)}>
@@ -124,7 +151,8 @@ export default function AddDiscipline(): React.ReactNode {
 				control={control}
 				type="text"
 				name="name"
-				placeholder="Digite o nome da disciplina" label="Nome"
+				placeholder="Digite o nome da disciplina"
+				label="Nome"
 			/>
 
 			<Controller
@@ -136,7 +164,6 @@ export default function AddDiscipline(): React.ReactNode {
 					fieldState: { error },
 				}) => (
 					<div className="mt-2 flex">
-
 						<div className="flex gap-2">
 							<Checkbox
 								id="is_optional"
@@ -158,7 +185,8 @@ export default function AddDiscipline(): React.ReactNode {
 				control={control}
 				type="text"
 				name="code"
-				placeholder="Ex: TEC.19110" label="Código"
+				placeholder="Ex: TEC.19110"
+				label="Código"
 			/>
 
 			<Input
@@ -166,22 +194,26 @@ export default function AddDiscipline(): React.ReactNode {
 				control={control}
 				type="number"
 				name="workload_in_class"
-				placeholder="Digite a carga horária da disciplina" label="Carga horária (aula)"
+				placeholder="Digite a carga horária da disciplina"
+				label="Carga horária (aula)"
 			/>
 
 			<div className="flex flex-col gap-6">
 				<div className="mt-3 flex justify-between items-center">
-					<span className="font-semibold text-lg text-primary-dark flex-wrap">Cursos associados</span>
-					<Button
-						className="w-fit self-end"
-						onClick={addCourseLink}>
+					<span className="font-semibold text-lg text-primary-dark flex-wrap">
+						Cursos associados
+					</span>
+					<Button className="w-fit self-end" onClick={addCourseLink}>
 						Adicionar curso para disciplina
 					</Button>
 				</div>
 
 				{fields.map((field, index) => {
 					return (
-						<div key={field.id} className="flex justify-between items-center gap-4 bg-primary-background rounded-lg p-4 pt-2">
+						<div
+							key={field.id}
+							className="flex justify-between items-center gap-4 bg-primary-background rounded-lg p-4 pt-2"
+						>
 							<div className="w-full">
 								<Select
 									containerClassName="mt-2"
@@ -192,33 +224,38 @@ export default function AddDiscipline(): React.ReactNode {
 									label="Curso"
 								/>
 
-								<Select
-									containerClassName="mt-2"
-									control={control}
-									disabled={!watch(`course.${index}.course_id`)}
-									options={
-										courses?.find(({ id }) => id.toString() === watch(`course.${index}.course_id`))
-											?.degree === "Ensino superior"
-											? reference_periods
-											: reference_years
-									}
-									name={`course.${index}.period`}
-									placeholder={`Selecione um ${courses?.find(({ id }) => id.toString() === watch(`course.${index}.course_id`))
-										?.degree === "Ensino superior"
-										? 'período'
-										: 'ano'}
+								{!isOptional && (
+									<Select
+										containerClassName="mt-2"
+										control={control}
+										disabled={!watch(`course.${index}.course_id`)}
+										options={
+											courses?.find(
+												({ id }) =>
+													id.toString() === watch(`course.${index}.course_id`)
+											)?.degree === "Ensino superior"
+												? reference_periods
+												: reference_years
+										}
+										name={`course.${index}.period`}
+										placeholder={`Selecione um ${courses?.find(
+											({ id }) =>
+												id.toString() === watch(`course.${index}.course_id`)
+										)?.degree === "Ensino superior"
+											? "período"
+											: "ano"
+											}
 								 	de referência`}
-									label="Período de	 referência"
-								/>
+										label="Período de	 referência"
+									/>
+								)}
 							</div>
+
 							<Button color="failure" className="h-full">
-								<Trash2
-									className=""
-									onClick={() => removeCourseLink(index)}
-								/>
+								<Trash2 className="" onClick={() => removeCourseLink(index)} />
 							</Button>
 						</div>
-					)
+					);
 				})}
 			</div>
 
@@ -226,5 +263,5 @@ export default function AddDiscipline(): React.ReactNode {
 				Confirmar
 			</Button>
 		</form>
-	)
+	);
 }

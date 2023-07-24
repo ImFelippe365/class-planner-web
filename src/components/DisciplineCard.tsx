@@ -1,6 +1,7 @@
 import { BookOpen } from "lucide-react";
 import Dropdown from "./Dropdown";
 import React from "react";
+import { formatDisciplineName } from "@/utils/formatDisciplineName";
 
 interface DisciplineCardProps {
 	disciplineId: number;
@@ -40,7 +41,7 @@ export default function DisciplineCard({
 					(<p>Optativa {courseByname && `| ${courseByname}`}</p>)
 					: (<p>{period}º {courseGrade == "Ensino técnico" ? "Ano" : "Período"} {courseByname && `| ${courseByname}`}</p>)
 				}
-				<p className="text-sm font-semibold mt-1 leading-4">{name}</p>
+				<p className="text-sm font-semibold mt-1 leading-4">{formatDisciplineName(name)}</p>
 			</div>
 		</div>
 	);

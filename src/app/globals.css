@@ -51,6 +51,11 @@
 /* .monthCalendarContainer .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
 	display: none;
 } */
+.fc-col-header,
+.fc-timegrid-body,
+.fc-timegrid-slots table, .fc-timegrid-cols table {
+	width: 100% !important;
+}
 
 .monthCalendarContainer .fc .fc-daygrid-day-frame {
 }
