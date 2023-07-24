@@ -24,7 +24,7 @@ import {
 } from "@fullcalendar/core";
 import Image from "next/image";
 
-import { shiftsSchedule } from "@/utils/schedules";
+import { allScheduleStartTimes, shiftsSchedule } from "@/utils/schedules";
 import { weekdays } from "@/utils/dates";
 import { formatTime } from "@/utils/formatTime";
 
@@ -50,6 +50,9 @@ import TeachCanceledClassFormModal from "./components/TeachCanceledClassFormModa
 import { formatDisciplineName } from "@/utils/formatDisciplineName";
 import { useAuth } from "@/hooks/AuthContext";
 import { toast } from "react-toastify";
+
+import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
+import ExportTeacherWeekSchedulesPDF from "./components/ExportTeacherWeekSchedules";
 
 interface TeacherProfileProps {
 	params: {
@@ -90,6 +93,14 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	const [showTeachCanceledClass, setShowTeachCanceledClass] =
 		useState<boolean>(false);
 
+	const [weekSchedulesTeacher, setWeekSchedulesTeacher] = useState<Schedule[]>(
+		[]
+	);
+
+	const [scheduleByTime, setScheduleByTime] = useState<Object>();
+
+	const [scheduleKeys, setSchedulesKeys] = useState([]);
+
 	document.title = `Class Planner | ${teacher?.name}`;
 
 	const times = weekSchedules
@@ -111,6 +122,40 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		});
 
 		setAmountOfLessons(quantity);
+
+		// Separar aulas juntas 2 -> 1, 4 -> 4x 1
+		const teacherSchedules = data.reduce(
+			(accumulator: Schedule[], schedule: Schedule) => {
+				if (schedule.quantity > 1) {
+					const [start, end] = allScheduleStartTimes
+						.find(
+							(time) =>
+								time.split("-")[0].trim() === schedule.start_time.slice(0, 5)
+						)
+						?.split("-") || [schedule.start_time, schedule.end_time];
+
+					const firstSchedule = {
+						...schedule,
+						quantity: 1,
+						end_time: end.trim() + ":00",
+					};
+					const secondSchedule = {
+						...schedule,
+						quantity: 1,
+						start_time: end.trim() + ":00",
+					};
+					console.log("original", schedule);
+					console.log("schedule1", firstSchedule);
+					console.log("schedule2", secondSchedule);
+					return [...accumulator, firstSchedule, secondSchedule];
+				}
+
+				return [...accumulator, schedule];
+			},
+			[]
+		);
+		console.log(data);
+		setWeekSchedulesTeacher(teacherSchedules);
 	};
 
 	const initialStartTime = (): DurationInput => {
@@ -242,11 +287,44 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		}
 	};
 
+	const filterSchedulesByTime = () => {
+		/* if (((end - start) / 60000) % 45 !== 0) {
+			return;
+		} */
+
+		interface Times {
+			key?: Array<Schedule>;
+		}
+
+		const scheduleTimes: Times = {};
+
+		weekSchedulesTeacher.map((item) => {
+			let values = [];
+
+			if (item.start_time in scheduleTimes) {
+				// @ts-expect-error
+				values.push(...scheduleTimes[item.start_time]);
+				values.push(item);
+
+				// @ts-expect-error
+				scheduleTimes[item.start_time] = [...values];
+			} else {
+				// @ts-expect-error
+				scheduleTimes[item.start_time] = [item];
+			}
+
+			console.log(scheduleTimes);
+		});
+
+		setScheduleByTime(scheduleTimes);
+	};
+
 	useEffect(() => {
 		getTeacherProfile();
 		getTeacherDisciplines();
 		getAmountOfLessons();
 		getTeacherClasses();
+		filterSchedulesByTime();
 	}, []);
 
 	const ScheduleDetails = () => {
@@ -568,20 +646,31 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 								events={monthSchedules}
 							/>
 
-							<Button
-								color="gray"
-								className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
+							<PDFDownloadLink
+								document={
+									<ExportTeacherWeekSchedulesPDF
+										teacher={teacher}
+										teacherSchedules={weekSchedulesTeacher}
+										schedulesByTime={scheduleByTime}
+									/>
+								}
+								fileName={`agenda-${teacher?.name}.pdf`}
 							>
-								<Download className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
-								<div className="flex text-start flex-col">
-									<p className="text-primary font-semibold text-sm">
-										Exportar horários
-									</p>
-									<p className="text-placeholder text-xs">
-										Mesmos horários em exibição
-									</p>
-								</div>
-							</Button>
+								<Button
+									color="gray"
+									className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
+								>
+									<Download className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
+									<div className="flex text-start flex-col">
+										<p className="text-primary font-semibold text-sm">
+											Exportar horários
+										</p>
+										<p className="text-placeholder text-xs">
+											Mesmos horários em exibição
+										</p>
+									</div>
+								</Button>
+							</PDFDownloadLink>
 
 							<Button
 								color="gray"
@@ -600,6 +689,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						</div>
 
 						<section className="w-full relative">
+							{/* <ExportTeacherWeekSchedulesPDF teacher={teacher} teacherSchedules={weekSchedulesTeacher} schedulesByTime={scheduleByTime} />
+							<PDFViewer width={700} height={400}>
+								<ExportTeacherWeekSchedulesPDF teacher={teacher} teacherSchedules={weekSchedulesTeacher} schedulesByTime={scheduleByTime} />
+							</PDFViewer> */}
+
 							{scheduleToShow && <ScheduleDetails />}
 							<WeekCalendar
 								getCalendarRef={(ref) => (weekCalendarRef.current = ref)}
@@ -623,7 +717,11 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</Tabs.Item>
 
 				<Tabs.Item icon={Users} title="Turmas" className="outline-none">
+<<<<<<< HEAD
+					<div className="flex flex-row flex-wrap gap-6 items-center justify-center">
+=======
 					<div className="grid grid-cols-cardsGrid">
+>>>>>>> 84dfa8668a8d7374f13c565474b6466e061e32dc
 						{teacherClasses.map(({ id, course, reference_period }) => (
 							<ClassCard
 								key={id}
