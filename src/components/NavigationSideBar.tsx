@@ -55,7 +55,7 @@ export default function NavigationSideBar(): React.ReactNode {
 			permission: true
 		},
 		{
-			name: "Notificações",
+			name: "Alertas",
 			icon: <Bell />,
 			path: "alertas",
 			permission: hasEmployeePermissions,

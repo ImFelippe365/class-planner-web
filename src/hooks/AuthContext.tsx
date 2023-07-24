@@ -32,8 +32,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		return savedUser;
 	});
 
-	const hasTeacherPermissions = user?.department === "Aluno";
-	const hasEmployeePermissions = user?.department === "COADES";
+	const hasTeacherPermissions = user?.department === "Professor";
+	const hasEmployeePermissions = user?.department === "Aluno";
 
 	const registerTeacher = useCallback(async (new_teacher: CreateTeacher) => {
 		try {
