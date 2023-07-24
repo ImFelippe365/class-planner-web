@@ -69,8 +69,7 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 	const setDefaultValues = async () => {
 		const data = await getDiscipline();
 
-		// @ts-expect-error
-		setNumSelectedCourses(discipline?.course.length)
+		//setNumSelectedCourses(discipline?.course.length)
 
 		// @ts-expect-error
 		setIsOptional(discipline?.is_optional)
@@ -95,6 +94,18 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 		setValue,
 		formState: { isSubmitting },
 	} = useForm<CreateDiscipline>({
+		defaultValues: {
+			name: discipline?.name,
+			is_optional: discipline?.is_optional,
+			workload_in_class: discipline?.workload_in_class,
+			course: [
+
+				/* {
+					course_id: '1',
+					period: 3
+				} */
+			]
+		},
 		resolver: yupResolver(schema),
 	});
 
@@ -128,10 +139,18 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 
 	function addCourseLink(data: any) {
 		console.log(courses.length)
-		if (courses.length > 2) {
+		console.log(numSelectedCourses)
+		console.log()
+		if (courses.length > discipline?.course.length) {
 			append({ course_id: "", period: 0 });
 			setNumSelectedCourses(numSelectedCourses + 1);
 		}
+		/* else if (numSelectedCourses) {
+		} if (courses.length > numSelectedCourses) {
+			append({ course_id: "", period: 0 });
+			setNumSelectedCourses(numSelectedCourses + 1);
+		} */
+
 	}
 
 	function removeCourseLink(index: number) {
@@ -249,8 +268,6 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 											discipline?.course[index] ?
 												courses?.find(
 													({ id }) => {
-														console.log(id)
-														console.log(typeof (id))
 														return (id == discipline?.course[index].id)
 													}
 												)?.degree === "Ensino superior"
@@ -258,7 +275,6 @@ export default function EditDiscipline({ params }: EditDisciplineProps): React.R
 													: reference_years
 												: courses?.find(
 													({ id }) => {
-														console.log('entrou aqui', watch(`course.${index}.course_id`))
 														return (id.toString() === watch(`course.${index}.course_id`))
 													}
 												)?.degree === "Ensino superior"
