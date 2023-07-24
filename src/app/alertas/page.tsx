@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 
 export default function Alerts() {
 	document.title = "Class Planner | Notificações";
-	
+
 	const [alerts, setAlerts] = useState<Alert[]>([]);
 
 	const getStudentAlerts = async () => {
@@ -35,7 +35,13 @@ export default function Alerts() {
 					student={{
 						avatar: alert.student.avatar,
 						name: alert.student.name,
-						courseName: alert.student.student_class.course.name,
+						courseName: `${alert.student.student_class.course.byname} ${
+							alert.student.student_class.reference_period
+						}º ${
+							alert.student.student_class.course.degree === "Ensino superior"
+								? "período"
+								: "ano"
+						}`,
 					}}
 					teacher={alert.teacher}
 				/>
