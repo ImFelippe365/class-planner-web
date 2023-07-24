@@ -717,11 +717,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				</Tabs.Item>
 
 				<Tabs.Item icon={Users} title="Turmas" className="outline-none">
-<<<<<<< HEAD
 					<div className="flex flex-row flex-wrap gap-6 items-center justify-center">
-=======
-					<div className="grid grid-cols-cardsGrid">
->>>>>>> 84dfa8668a8d7374f13c565474b6466e061e32dc
 						{teacherClasses.map(({ id, course, reference_period }) => (
 							<ClassCard
 								key={id}
