@@ -1,3 +1,5 @@
+import { Student } from "./Student";
+
 export interface Course {
 	id: number;
 	name: string;
@@ -15,6 +17,7 @@ export interface Class {
 	reference_period: number;
 	shift: Shifts;
 	class_leader_id?: string;
+	class_leader?: Student
 }
 
 interface TaughtBy {

@@ -11,10 +11,12 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DeleteModal from "@/components/DeleteModal";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/AuthContext";
 export default function Courses(): React.ReactNode {
 	document.title = "Class Planner | Cursos";
 
 	const routes = useRouter();
+	const { hasEmployeePermissions } = useAuth();
 	const { courses, getAllCourses } = useGlobal();
 	const [openModal, setOpenModal] = useState<string | undefined>();
 
@@ -38,10 +40,12 @@ export default function Courses(): React.ReactNode {
 		<div className="w-full">
 			<Breadcrumb title="Cursos">
 				<section className="flex flex-row gap-6">
-					<Button onClick={() => routes.push("cursos/novo")}>
-						<GraduationCap className="mr-2" />
-						<p>Criar curso</p>
-					</Button>
+					{hasEmployeePermissions && (
+						<Button onClick={() => routes.push("cursos/novo")}>
+							<GraduationCap className="mr-2" />
+							<p>Criar curso</p>
+						</Button>
+					)}
 				</section>
 			</Breadcrumb>
 
