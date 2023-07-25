@@ -30,6 +30,7 @@ import uuidv4 from "@/utils/uuidv4";
 import { EventSchedule } from "@/interfaces/Schedule";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/AuthContext";
 interface ClassProps {
 	params: {
 		id: string;
@@ -51,6 +52,7 @@ interface ClassDiscipline extends Discipline {
 
 export default function Class({ params }: ClassProps) {
 	const { id } = params;
+	const { hasEmployeePermissions } = useAuth();
 	const router = useRouter();
 	const {
 		getMonthSchedules,
@@ -291,7 +293,7 @@ export default function Class({ params }: ClassProps) {
 		} else {
 			const start = event?.start as any;
 			const end = event?.end as any;
-			
+
 			scheduleQuantity = (end - start) / 60000 / 45;
 			console.log("qtd sem s", scheduleQuantity);
 		}
@@ -395,28 +397,30 @@ export default function Class({ params }: ClassProps) {
 								</Button>
 							</div>
 						) : (
-							<div>
-								{weekSchedules ? (
-									<Button
-										onClick={() => setEditableMode(true)}
-										size="xs"
-										className="transparent"
-										color="warning"
-									>
-										<Pencil size={16} className="text-white mr-2" />
-										<span>Editar</span>
-									</Button>
-								) : (
-									<Button
-										onClick={() => setEditableMode(true)}
-										size="xs"
-										className="transparent"
-									>
-										<CalendarPlus size={16} className="text-white mr-2" />
-										<span>Adicionar</span>
-									</Button>
-								)}
-							</div>
+							hasEmployeePermissions && (
+								<div>
+									{weekSchedules ? (
+										<Button
+											onClick={() => setEditableMode(true)}
+											size="xs"
+											className="transparent"
+											color="warning"
+										>
+											<Pencil size={16} className="text-white mr-2" />
+											<span>Editar</span>
+										</Button>
+									) : (
+										<Button
+											onClick={() => setEditableMode(true)}
+											size="xs"
+											className="transparent"
+										>
+											<CalendarPlus size={16} className="text-white mr-2" />
+											<span>Adicionar</span>
+										</Button>
+									)}
+								</div>
+							)
 						)}
 					</div>
 
@@ -446,7 +450,11 @@ export default function Class({ params }: ClassProps) {
 					<section>
 						<h4 className="font-bold text-black text-2xl">
 							{classDetails?.course.name}{" "}
-							<span className="font-normal text-gray text-base">
+							<span className="font-normal text-gray text-base block">
+								{classDetails?.reference_period}º{" "}
+								{classDetails?.course?.degree === "Ensino superior"
+									? "período"
+									: "ano"}{" "}
 								({classDetails?.shift})
 							</span>
 						</h4>
@@ -470,7 +478,7 @@ export default function Class({ params }: ClassProps) {
 
 								<div className="flex flex-col">
 									<span className="block font-bold text-base text-black leading-tight">
-										{classDetails?.class_leader_id || "Nenhum definido"}{" "}
+										{classDetails?.class_leader?.name || "Nenhum definido"}{" "}
 										{/* <span className="font-normal text-gray text-xs">
 											(20211094040028)
 										</span> */}
@@ -512,7 +520,7 @@ export default function Class({ params }: ClassProps) {
 								</svg>
 							</button>
 						</div> */}
-						<Select
+						{/* <Select
 							onChange={(event) => handleChangeClassPeriod(event)}
 							className="text-xs text-black mt-3 "
 						>
@@ -539,7 +547,7 @@ export default function Class({ params }: ClassProps) {
 									{label}
 								</option>
 							))}
-						</Select>
+						</Select> */}
 					</section>
 
 					<Link href={`turmas/${params.id}/estudantes`}>

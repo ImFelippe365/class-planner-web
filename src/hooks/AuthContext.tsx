@@ -32,8 +32,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		return savedUser;
 	});
 
-	const hasTeacherPermissions = user?.department === "Professor";
-	const hasEmployeePermissions = user?.department === "Aluno";
+	const hasTeacherPermissions = user?.department === "Aluno";
+	const hasEmployeePermissions = user?.department === "COADES";
 
 	const registerTeacher = useCallback(async (new_teacher: CreateTeacher) => {
 		try {
@@ -73,7 +73,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			let teacher = await getTeacherIsRegistered(data.matricula);
 
 			if (!teacher) {
-				console.log("entrei aqui viu");
 				teacher = await registerTeacher({
 					registration: data.matricula,
 					name: data.nome_usual,

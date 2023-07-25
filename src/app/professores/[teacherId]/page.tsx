@@ -475,8 +475,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 					<section className="flex items-center justify-end">
 						{!schedule?.canceled_class &&
 							!schedule?.class_to_replace &&
-							hasTeacherPermissions &&
-							!!teachers.find(({ id }) => id === user?.id) && (
+							(!!teachers.find(({ id }) => id === user?.id) || hasEmployeePermissions) && (
 								<Button
 									onClick={() => handleOpenCancelScheduleModal(schedule)}
 									color="failure"

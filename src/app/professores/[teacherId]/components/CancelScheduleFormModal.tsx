@@ -15,7 +15,9 @@ import { Schedule } from "@/interfaces/Course";
 import { Check } from "lucide-react";
 import { api } from "@/services/api";
 import TextArea from "@/components/TextArea";
-import { toast } from 'react-toastify'
+import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/AuthContext";
+import { Teacher } from "@/interfaces/Teacher";
 
 interface CancelScheduleFormModalProps {
 	schedule: Schedule | undefined;
@@ -35,14 +37,17 @@ export default function CancelScheduleFormModal({
 	const defaultDate = new Date(
 		`${schedule?.class_date} ${schedule?.start_time}`
 	);
+	const { user, hasEmployeePermissions } = useAuth();
 	const { teachers } = useGlobal();
 
-	const teachersSelection = teachers.map((teacher) => {
-		return {
-			label: teacher.name,
-			value: teacher.id.toString(),
-		};
-	});
+	const teachersSelection = teachers
+		.map((teacher) => {
+			return {
+				label: teacher.name,
+				value: teacher.id.toString(),
+			};
+		})
+		.filter(({ value }) => user?.id?.toString() !== value);
 
 	const schema = yup.object({
 		canceled_date: yup
@@ -82,10 +87,10 @@ export default function CancelScheduleFormModal({
 			closeModal();
 			refreshSchedules(data.canceled_date);
 
-			toast.success('Aula cancelada com sucesso')
+			toast.success("Aula cancelada com sucesso");
 		} catch (err) {
 			console.log("Erro ao tentar cancelar horário de aula", err);
-			toast.error('Ocorreu um problema ao tentar cancelar esta aula')
+			toast.error("Ocorreu um problema ao tentar cancelar esta aula");
 		}
 	};
 
@@ -106,18 +111,20 @@ export default function CancelScheduleFormModal({
 		<form onSubmit={handleSubmit(onSubmit)}>
 			<section className="grid grid-cols-container gap-6">
 				<div className="flex flex-col gap-6">
-					<Select
-						label="Substituir com professor"
-						options={[
-							{
-								label: "Nenhum",
-								value: "",
-							},
-							...teachersSelection,
-						]}
-						name="teacher_to_replace"
-						control={control}
-					/>
+					{!hasEmployeePermissions && (
+						<Select
+							label="Substituir com professor"
+							options={[
+								{
+									label: "Nenhum",
+									value: "",
+								},
+								...teachersSelection,
+							]}
+							name="teacher_to_replace"
+							control={control}
+						/>
+					)}
 					<TextArea
 						label="Motivo do cancelamento"
 						name="reason"

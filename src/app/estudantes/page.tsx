@@ -51,6 +51,7 @@ export default function Students() {
 						key={student.id}
 						name={student.name}
 						registration={student.registration}
+						studentAvatar={student.avatar}
 						studentId={student.id}
 						classId={student.student_class.id}
 						classPeriod={student.student_class.reference_period}

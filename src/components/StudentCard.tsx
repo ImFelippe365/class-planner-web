@@ -2,6 +2,7 @@ import { User } from "lucide-react";
 import Dropdown from "./Dropdown";
 import { api } from "@/services/api";
 import { toast } from "react-toastify";
+import Image from "next/image";
 interface StudentCardProps {
 	studentId: number;
 	registration: string;
@@ -11,6 +12,7 @@ interface StudentCardProps {
 	classPeriod: string | number;
 	isClassLeader?: boolean;
 	classId: number;
+	studentAvatar?: string | undefined;
 }
 
 export default function StudentCard({
@@ -22,6 +24,7 @@ export default function StudentCard({
 	classPeriod,
 	isClassLeader,
 	classId,
+	studentAvatar,
 }: StudentCardProps) {
 	const promoteToClassLeader = async () => {
 		try {
@@ -38,10 +41,21 @@ export default function StudentCard({
 	return (
 		<div className="bg-white flex flex-row justify-between items-center max-w-sm py-4 px-4 rounded-2xl drop-shadow-sm	">
 			<div className="flex gap-x-4">
-				<User
-					className="rounded-lg bg-primary-background w-12 h-12 p-3"
-					color="#007EA7"
-				/>
+				{studentAvatar ? (
+					<div className="relative w-12 h-12">
+						<Image
+							fill
+							alt={name}
+							src={`https://suap.ifrn.edu.br${studentAvatar}`}
+							className="rounded-lg object-cover"
+						/>
+					</div>
+				) : (
+					<User
+						className="rounded-lg bg-primary-background w-12 p-3 h-fit"
+						color="#007EA7"
+					/>
+				)}
 
 				<div className="flex flex-col gap-y-[2px]">
 					<div className="flex items-center">

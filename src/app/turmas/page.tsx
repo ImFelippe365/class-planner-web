@@ -4,6 +4,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import Button from "@/components/Button";
 import ClassCard from "@/components/ClassCard";
 import SearchBar from "@/components/SearchBar";
+import { useAuth } from "@/hooks/AuthContext";
 import { useGlobal } from "@/hooks/GlobalContext";
 import { removeAccents } from "@/utils/removeAccents";
 import { CalendarPlus, Users } from "lucide-react";
@@ -14,6 +15,7 @@ export default function Classes() {
 	document.title = "Class Planner | Turmas";
 
 	const routes = useRouter();
+	const { hasEmployeePermissions } = useAuth();
 	const { courses, classes, getAllClasses } = useGlobal();
 	const [searchText, setSearchText] = useState("");
 
@@ -33,10 +35,12 @@ export default function Classes() {
 		<div>
 			<Breadcrumb title="Turmas">
 				<section className="flex flex-row gap-6">
-					<Button onClick={() => routes.push("turmas/novo")}>
-						<Users className="mr-2" />
-						<p>Criar turma</p>
-					</Button>
+					{hasEmployeePermissions && (
+						<Button onClick={() => routes.push("turmas/novo")}>
+							<Users className="mr-2" />
+							<p>Criar turma</p>
+						</Button>
+					)}
 				</section>
 			</Breadcrumb>
 
