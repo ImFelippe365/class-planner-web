@@ -59,6 +59,7 @@ export default function Students() {
 						isClassLeader={
 							student.id.toString() === student.student_class.class_leader_id
 						}
+						refreshStudents={getAllStudents}
 					/>
 				))}
 			</section>

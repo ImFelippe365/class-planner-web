@@ -16,6 +16,7 @@ import { Check } from "lucide-react";
 import { api } from "@/services/api";
 import TextArea from "@/components/TextArea";
 import { toast } from 'react-toastify'
+import { useAuth } from "@/hooks/AuthContext";
 
 interface CancelScheduleFormModalProps {
 	schedule: Schedule | undefined;
@@ -36,6 +37,8 @@ export default function CancelScheduleFormModal({
 		`${schedule?.class_date} ${schedule?.start_time}`
 	);
 	const { teachers } = useGlobal();
+
+	const { user } = useAuth();
 
 	const teachersSelection = teachers.map((teacher) => {
 		return {
@@ -72,7 +75,7 @@ export default function CancelScheduleFormModal({
 			teacher_to_replace: data.teacher_to_replace
 				? data.teacher_to_replace
 				: "",
-			canceled_by: 1,
+			canceled_by: user?.id,
 			schedule_id: schedule?.id || 0,
 		};
 

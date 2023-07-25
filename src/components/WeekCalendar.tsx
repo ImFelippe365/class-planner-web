@@ -197,7 +197,7 @@ export default function WeekCalendar({
 				nowIndicator={false}
 				eventOverlap={false}
 				weekends={false}
-				height={"180vh"}
+				height={"auto"}
 				slotMinTime={{
 					hours: 13,
 				}}

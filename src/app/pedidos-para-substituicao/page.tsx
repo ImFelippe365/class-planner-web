@@ -18,6 +18,7 @@ import { Controller, ControllerRenderProps, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SelectOptions } from "@/interfaces/Utils";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/AuthContext";
 interface SubstituteScheduleForm {
 	discipline_id: string;
 }
@@ -50,14 +51,16 @@ export default function RequestsForReplacement() {
 	const [substituteScheduleData, setSubstituteScheduleData] =
 		useState<TeacherRequest>();
 
+	const { user } = useAuth();
+
 	const getTeachersRequests = async () => {
-		const { data } = await api.get(`teachers/2/replace-classes/`);
+		const { data } = await api.get(`teachers/${user?.id}/replace-classes/`);
 
 		setTeachersRequests(data);
 	};
 
 	const getTeacherDisciplines = async (schedule: TeacherRequest) => {
-		const { data } = await api.get(`teachers/2/disciplines/`);
+		const { data } = await api.get(`teachers/${user?.id}/disciplines/`);
 
 		const options = data
 			?.filter(
@@ -65,7 +68,7 @@ export default function RequestsForReplacement() {
 					teach_class.id === schedule.schedule_class.id
 			)
 			.map(({ discipline }: TeacherDiscipline) => {
-				return { label: discipline.name, value: discipline.id };
+				return { label: formatDisciplineName(discipline.name), value: discipline.id };
 			});
 
 		setSubstituteScheduleData(schedule);
@@ -85,8 +88,7 @@ export default function RequestsForReplacement() {
 			getTeachersRequests();
 
 			toast.success(
-				`Você ${
-					status === "Aceito" ? "aceitou" : "recusou"
+				`Você ${status === "Aceito" ? "aceitou" : "recusou"
 				} com sucesso este pedido`
 			);
 		} catch {
@@ -128,7 +130,7 @@ export default function RequestsForReplacement() {
 							name="discipline_id"
 							options={teacherDisciplinesOptions}
 						/>
-						<Button type="submit">Confirmar</Button>
+						<Button type="submit" className="mt-2">Confirmar</Button>
 					</form>
 				}
 			/>
@@ -139,13 +141,12 @@ export default function RequestsForReplacement() {
 						<div className="flex flex-row items-center justify-between mb-2">
 							<h3 className="text-black text-lg">
 								<span
-									className={`${
-										request.replace_class_status === "Aceito"
+									className={`${request.replace_class_status === "Aceito"
 											? "bg-success"
 											: request.replace_class_status === "Recusado"
-											? "bg-error"
-											: "bg-warning"
-									} py-1 px-4 text-sm rounded-2xl text-white`}
+												? "bg-error"
+												: "bg-warning"
+										} py-1 px-4 text-sm rounded-2xl text-white`}
 								>
 									{request.replace_class_status}
 								</span>

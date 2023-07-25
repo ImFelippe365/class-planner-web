@@ -11,6 +11,7 @@ interface StudentCardProps {
 	classPeriod: string | number;
 	isClassLeader?: boolean;
 	classId: number;
+	refreshStudents: () => void;
 }
 
 export default function StudentCard({
@@ -22,6 +23,7 @@ export default function StudentCard({
 	classPeriod,
 	isClassLeader,
 	classId,
+	refreshStudents,
 }: StudentCardProps) {
 	const promoteToClassLeader = async () => {
 		try {
@@ -30,6 +32,7 @@ export default function StudentCard({
 			});
 
 			toast.success("Estudante promovido a líder da turma");
+			refreshStudents()
 		} catch {
 			toast.error("Ocorreu um erro ao tentar definir líder da turma");
 		}

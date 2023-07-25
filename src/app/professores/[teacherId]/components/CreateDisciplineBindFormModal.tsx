@@ -12,11 +12,15 @@ import { Course, Class, Discipline } from "@/interfaces/Course";
 import Select from "@/components/Select";
 import { TeacherDiscipline } from "@/interfaces/Teacher";
 import { toast} from 'react-toastify'
+import { formatDisciplineName } from "@/utils/formatDisciplineName";
 interface CreateDisciplineBindFormModalProps {
 	openModal: boolean;
 	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
 	setDisciplines: React.Dispatch<React.SetStateAction<TeacherDiscipline[]>>;
 	teacherId: number;
+	refreshClasses: () => void;
+	refreshWeekSchedules: () => void;
+	refreshMonthSchedules: () => void;
 }
 
 interface CreateTeacherBinding {
@@ -30,6 +34,9 @@ export default function CreateDisciplineBindFormModal({
 	setOpenModal,
 	teacherId,
 	setDisciplines,
+	refreshClasses,
+	refreshWeekSchedules,
+	refreshMonthSchedules,
 }: CreateDisciplineBindFormModalProps): React.ReactNode {
 	const [coursesOptions, setCoursesOptions] = useState<SelectOptions[]>([]);
 
@@ -87,7 +94,7 @@ export default function CreateDisciplineBindFormModal({
 		const { data } = await api.get(`disciplines/`);
 
 		const disciplines = data.map(({ id, name }: Discipline) => {
-			return { label: name, value: Number(id) };
+			return { label: formatDisciplineName(name), value: Number(id) };
 		});
 
 		setAllDisciplines(data);
@@ -145,7 +152,11 @@ export default function CreateDisciplineBindFormModal({
 				"teachers/disciplines/",
 				newTeacherBinding
 			);
+			
 			toast.success("Vínculo criado com sucesso");
+			refreshClasses();
+			refreshWeekSchedules();
+			refreshMonthSchedules();
 		} catch (err) {
 			toast.error(
 				"Ocorreu um erro ao tentar vincular professor a esta disciplina"
