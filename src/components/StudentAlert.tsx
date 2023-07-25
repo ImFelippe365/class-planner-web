@@ -33,7 +33,7 @@ export default function StudentAlert({
 	});
 
 	return (
-		<div className="">
+		<div className="mt-4">
 			<section className="flex items-center gap-3">
 				<div className="w-10 h-10 flex justify-center items-center rounded-full bg-primary-background">
 					<User className="text-primary" />

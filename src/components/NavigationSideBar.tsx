@@ -74,29 +74,57 @@ export default function NavigationSideBar(): React.ReactNode {
 				<h1 className="text-black text-2xl text-center font-bold">
 					Class Planner
 				</h1>
-				<header className="flex flex-row flex-shrink-0 flex-grow-0 justify-start items-center gap-4 px-4 w-full">
-					{user?.avatar ? (
-						<div className="relative w-12 h-12">
-							<Image
-								alt={user.name}
-								src={`https://suap.ifrn.edu.br${user.avatar}`}
-								fill
-								className="object-cover rounded-full"
+
+				{hasTeacherPermissions ? (
+					<Link href={`professores/${user?.id}`} className="flex flex-row flex-shrink-0 flex-grow-0 justify-start items-center gap-4 px-4 w-full hover:bg-primary-dark-transparent transition-all rounded-2xl py-2">
+						
+							{user?.avatar ? (
+								<div className="relative w-12 h-12">
+									<Image
+										alt={user.name}
+										src={`https://suap.ifrn.edu.br${user.avatar}`}
+										fill
+										className="object-cover rounded-full"
+									/>
+								</div>
+							) : (
+								<User
+									fontSize={48}
+									className="text-primary bg-primary-background rounded-full p-3 w-12 h-12"
+								/>
+							)}
+							<div>
+								<h3 className="font-semibold text-black text-sm leading-tight">
+									{user?.name}
+								</h3>
+								<p className="text-gray text-xs">{user?.department}</p>
+							</div>
+					</Link>
+				) : (
+					<header className="flex flex-row flex-shrink-0 flex-grow-0 justify-start items-center gap-4 px-4 w-full">
+						{user?.avatar ? (
+							<div className="relative w-12 h-12">
+								<Image
+									alt={user.name}
+									src={`https://suap.ifrn.edu.br${user.avatar}`}
+									fill
+									className="object-cover rounded-full"
+								/>
+							</div>
+						) : (
+							<User
+								fontSize={48}
+								className="text-primary bg-primary-background rounded-full p-3 w-12 h-12"
 							/>
+						)}
+						<div>
+							<h3 className="font-semibold text-black text-sm leading-tight">
+								{user?.name}
+							</h3>
+							<p className="text-gray text-xs">{user?.department}</p>
 						</div>
-					) : (
-						<User
-							fontSize={48}
-							className="text-primary bg-primary-background rounded-full p-3 w-12 h-12"
-						/>
-					)}
-					<div>
-						<h3 className="font-semibold text-black text-sm leading-tight">
-							{user?.name}
-						</h3>
-						<p className="text-gray text-xs">{user?.department}</p>
-					</div>
-				</header>
+					</header>
+				)}
 
 				<nav className="flex flex-col items-center justify-start w-full text-primary-dark text-base gap-2">
 					{routes.map((route, index) => {
@@ -105,9 +133,8 @@ export default function NavigationSideBar(): React.ReactNode {
 							<Link
 								key={index.toString()}
 								href={route.path}
-								className={`${NavigationItemStyles} ${
-									path === route.path && "bg-primary-background text-primary"
-								}`}
+								className={`${NavigationItemStyles} ${path === route.path && "bg-primary-background text-primary"
+									}`}
 							>
 								{route.icon}
 								<p>{route.name}</p>

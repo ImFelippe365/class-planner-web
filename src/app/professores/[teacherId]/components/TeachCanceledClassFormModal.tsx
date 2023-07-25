@@ -10,6 +10,8 @@ import Button from "@/components/Button";
 import { ClassCanceled } from "@/interfaces/Course";
 import { useAuth } from "@/hooks/AuthContext";
 import { toast } from 'react-toastify'
+import { formatDisciplineName } from "@/utils/formatDisciplineName";
+
 interface TeachCanceledClassFormModalProps {
 	openModal: boolean;
 	setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -48,7 +50,7 @@ export default function TeachCanceledClassFormModal({
 		const { data } = await api.get(`teachers/${user?.id}/disciplines/`);
 
 		const disciplines = data.map(({ id, discipline }: TeacherDiscipline) => {
-			return { label: discipline.name, value: Number(discipline.id) };
+			return { label: formatDisciplineName(discipline.name), value: Number(discipline.id) };
 		});
 
 		setDisciplinesLoggedTeacher(data);

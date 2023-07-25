@@ -77,7 +77,7 @@ export default function CancelScheduleFormModal({
 			teacher_to_replace: data.teacher_to_replace
 				? data.teacher_to_replace
 				: "",
-			canceled_by: 1,
+			canceled_by: user?.id,
 			schedule_id: schedule?.id || 0,
 		};
 

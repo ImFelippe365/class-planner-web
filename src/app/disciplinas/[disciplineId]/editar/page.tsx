@@ -133,15 +133,10 @@ export default function EditDiscipline({
 	};
 
 	function addCourseLink(data: any) {
-		if (courses.length > discipline?.course?.length) {
+		if (courses.length > numSelectedCourses) {
 			append({ course_id: "", period: 0 });
 			setNumSelectedCourses(numSelectedCourses + 1);
 		}
-		/* else if (numSelectedCourses) {
-		} if (courses.length > numSelectedCourses) {
-			append({ course_id: "", period: 0 });
-			setNumSelectedCourses(numSelectedCourses + 1);
-		} */
 	}
 
 	function removeCourseLink(index: number) {

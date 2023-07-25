@@ -53,6 +53,7 @@ import { toast } from "react-toastify";
 
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
 import ExportTeacherWeekSchedulesPDF from "./components/ExportTeacherWeekSchedules";
+import ExportTeacherReport from "./components/ExportTeacherReport";
 
 interface TeacherProfileProps {
 	params: {
@@ -99,7 +100,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 	const [scheduleByTime, setScheduleByTime] = useState<Object>();
 
-	const [scheduleKeys, setSchedulesKeys] = useState([]);
+	const [monthSchedulesTeacher, setMonthSchedulesTeacher] = useState<Schedule[]>([])
 
 	document.title = `Class Planner | ${teacher?.name}`;
 
@@ -216,6 +217,10 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 			month
 		);
 
+		const { data } = await api.get(`/teachers/${params.teacherId}/schedules/month/`)
+
+		setMonthSchedulesTeacher(data)
+
 		setMonthSchedules(teacherMonthSchedules as any);
 	};
 
@@ -265,6 +270,8 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 			getTeacherDisciplines();
 			getTeacherClasses();
+			getWeekSchedules();
+			getMonthSchedules();
 
 			toast.success("Vínculo com esta disciplina foi removido");
 		} catch (err) {
@@ -288,10 +295,6 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 	};
 
 	const filterSchedulesByTime = () => {
-		/* if (((end - start) / 60000) % 45 !== 0) {
-			return;
-		} */
-
 		interface Times {
 			key?: Array<Schedule>;
 		}
@@ -312,8 +315,6 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 				// @ts-expect-error
 				scheduleTimes[item.start_time] = [item];
 			}
-
-			console.log(scheduleTimes);
 		});
 
 		setScheduleByTime(scheduleTimes);
@@ -338,7 +339,7 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 		const top = Number(
 			scheduleToShow?.el?.parentElement?.style.top.replace("px", "")
 		);
-		// rounded-tl-none
+
 		return (
 			<div
 				className={`bg-background-color rounded-3xl  shadow-lg absolute p-8 max-w-[370px] !h-fit w-full z-50`}
@@ -588,6 +589,9 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						setOpenModal={setShowCreateBindModal}
 						teacherId={Number(params.teacherId)}
 						setDisciplines={setTeacherDisciplines}
+						refreshClasses={getTeacherClasses}
+						refreshMonthSchedules={getMonthSchedules}
+						refreshWeekSchedules={getWeekSchedules}
 					/>
 				}
 			/>
@@ -671,26 +675,37 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 								</Button>
 							</PDFDownloadLink>
 
-							<Button
-								color="gray"
-								className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
+							<PDFDownloadLink
+								document={
+									<ExportTeacherReport
+										teacher={teacher}
+										teacherMonthSchedules={monthSchedulesTeacher}
+										currentDate={new Date()}
+									/>
+								}
+								fileName={`relatorio-mensal-${teacher?.name}.pdf`}
 							>
-								<Download className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
-								<div className="flex text-start flex-col">
-									<p className="text-primary font-semibold text-sm">
-										Exportar relatório
-									</p>
-									<p className="text-placeholder text-xs">
-										Relatório mensal com carga horária
-									</p>
-								</div>
-							</Button>
+								<Button
+									color="gray"
+									className="flex items-center justify-start bg-white p-1 rounded-lg shadow outline-none border-none min-w-[16rem] max-w-[16rem]"
+								>
+									<Download className="text-primary w-14 h-14 p-3 mr-1 rounded-lg bg-primary-background" />
+									<div className="flex text-start flex-col">
+										<p className="text-primary font-semibold text-sm">
+											Exportar relatório
+										</p>
+										<p className="text-placeholder text-xs">
+											Relatório mensal com carga horária
+										</p>
+									</div>
+								</Button>
+							</PDFDownloadLink>
+
 						</div>
 
 						<section className="w-full relative">
-							{/* <ExportTeacherWeekSchedulesPDF teacher={teacher} teacherSchedules={weekSchedulesTeacher} schedulesByTime={scheduleByTime} />
-							<PDFViewer width={700} height={400}>
-								<ExportTeacherWeekSchedulesPDF teacher={teacher} teacherSchedules={weekSchedulesTeacher} schedulesByTime={scheduleByTime} />
+							{/* <PDFViewer width={700} height={400}>
+								<ExportTeacherReport teacher={teacher} teacherMonthSchedules={monthSchedulesTeacher} currentDate={new Date()} />
 							</PDFViewer> */}
 
 							{scheduleToShow && <ScheduleDetails />}
