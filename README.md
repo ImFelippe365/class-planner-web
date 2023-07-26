@@ -6,8 +6,7 @@
 </p>
 <br /> -->
 
-Sistema desenvolvido em Next.js capaz de gerenciar os horários das aulas no IFRN - Campus Pau dos Ferros, onde é possível organizar e propagar as informações acerca das aulas que ocorrem. O intuito é conciliar as 
-
+Sistema desenvolvido em Next.js capaz de gerenciar os horários das aulas no IFRN - Campus Pau dos Ferros, onde é possível organizar e propagar as informações acerca das aulas que ocorrem. O intuito é informar aos estudantes quando não houver aula ou a mesma ser substituída, e fornecer mais autonomia para os professores para controlar seus horários de aulas.
 ## ⚠️ Importante
 
 Equipe: Felippe Rian & [Bruna Maria](https://github.com/brunamariap)
@@ -22,6 +21,7 @@ Projeto desenvolvido na disciplina de Desenvolvimento de Projetos II, utilizando
 - [⚙️ Modelo lógico]()
 - [🔗 Diagrama de classes]()
 - [📝 Diagrama de sequência]()
+- [Documento geral]()
 
 ## Tecnologias utilizadas
 
@@ -30,9 +30,15 @@ Projeto desenvolvido na disciplina de Desenvolvimento de Projetos II, utilizando
 
 ## Instalação
 
-Antes de instalar, é importante criar um ambiente virtual e inicia-lo para baixar as dependencias dentro dele.
-Para instalar e usar pelo repositório, clone o repositório e instale as dependências usando o seguinte comando no diretório raiz.
+Após clonar o repositório, basta executar o comando abaixo para instalar as dependências do projeto.
 
+```bash
+npm install 
+# or
+yarn install
+```
+
+Após instalar, basta rodar com o comando a seguir para executar o projeto
 ```bash
 npm run dev
 # or
