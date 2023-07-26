@@ -41,10 +41,10 @@ export default function ExportTeacherReport({
 			display: "flex",
 			flexDirection: "row",
 			flexWrap: "wrap",
-			gap: 12,
+			columnGap: 12,
 		},
 		classesTaught: {
-			width: 100,
+			width: 123,
 			display: "flex",
 			flexDirection: "row",
 			flexWrap: "wrap",
@@ -52,9 +52,10 @@ export default function ExportTeacherReport({
 			color: "#FFFFFF",
 			backgroundColor: "#4A9E68",
 			padding: 8,
+			marginTop: 12,
 		},
 		futureClasses: {
-			width: 100,
+			width: 123,
 			display: "flex",
 			flexDirection: "row",
 			flexWrap: "wrap",
@@ -62,9 +63,10 @@ export default function ExportTeacherReport({
 			color: "#FFFFFF",
 			backgroundColor: "#007EA7",
 			padding: 8,
+			marginTop: 12,
 		},
 		canceledClasses: {
-			width: 100,
+			width: 123,
 			display: "flex",
 			flexDirection: "row",
 			flexWrap: "wrap",
@@ -72,9 +74,10 @@ export default function ExportTeacherReport({
 			color: "#FFFFFF",
 			backgroundColor: "#C92A2A",
 			padding: 8,
+			marginTop: 12,
 		},
 		substituteClasses: {
-			width: 100,
+			width: 123,
 			display: "flex",
 			flexDirection: "row",
 			flexWrap: "wrap",
@@ -82,7 +85,11 @@ export default function ExportTeacherReport({
 			color: "#FFFFFF",
 			backgroundColor: "#FF8600",
 			padding: 8,
+			marginTop: 12,
 		},
+		classDate: {
+			fontSize: 10,
+		}
 	})
 
 	teacherMonthSchedules.sort((scheduele1, scheduele2) => {
@@ -121,9 +128,17 @@ export default function ExportTeacherReport({
 		}
 	}, {})
 
-	console.log(classesTaught)
-
 	console.log(filteredDisciplines)
+
+	/* quantityClassDisciplines = Object.entries(filteredDisciplines).map(([className, disciplineName]) => {
+		Object.entries(disciplineName).map(([disciplineKey, scheduleArray]) => {
+			scheduleArray.map((schedule) => {
+				console.log(schedule)
+				return schedule
+			})
+		})
+	} */
+
 
 	return (
 		<Document>
@@ -135,6 +150,7 @@ export default function ExportTeacherReport({
 					alignItems: "center",
 					marginTop: 16,
 					marginBottom: 16,
+					paddingBottom: 16,
 				}}
 			>
 				<View style={tw("w-[90%] pb-3 flex flex-col")} >
@@ -155,13 +171,14 @@ export default function ExportTeacherReport({
 						<View style={styles.classContent} >
 							{classesTaught.map((schedule) => (
 								<View style={styles.classesTaught}>
-									<Text>
+									<Text style={styles.classDate}>
 										{(new Date(schedule.class_date)).toLocaleDateString()}
 									</Text>
-									<Text>
+									<Text style={styles.classDate}>
 										{schedule.start_time} - {schedule.end_time}:
 									</Text>
 									<Text style={tw("mt-3")}>{formatDisciplineName(schedule.discipline.name)}</Text>
+									<Text>Quantidade: {schedule.quantity}</Text>
 									<Text>{schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}</Text>
 								</View>
 							))}
@@ -173,13 +190,14 @@ export default function ExportTeacherReport({
 						<View style={styles.classContent} >
 							{futureClasses.map((schedule) => (
 								<View style={styles.futureClasses}>
-									<Text>
+									<Text style={styles.classDate}>
 										{(new Date(schedule.class_date)).toLocaleDateString()}
 									</Text>
-									<Text>
+									<Text style={styles.classDate}>
 										{schedule.start_time} - {schedule.end_time}:
 									</Text>
 									<Text style={tw("mt-3")}>{formatDisciplineName(schedule.discipline.name)}</Text>
+									<Text>Quantidade: {schedule.quantity}</Text>
 									<Text>{schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}</Text>
 								</View>
 							))}
@@ -191,13 +209,14 @@ export default function ExportTeacherReport({
 						<View style={styles.classContent} >
 							{canceledClasses.map((schedule) => (
 								<View style={styles.canceledClasses}>
-									<Text>
+									<Text style={styles.classDate}>
 										{(new Date(schedule.class_date)).toLocaleDateString()}
 									</Text>
-									<Text>
+									<Text style={styles.classDate}>
 										{schedule.start_time} - {schedule.end_time}:
 									</Text>
 									<Text style={tw("mt-3")}>{formatDisciplineName(schedule.discipline.name)}</Text>
+									<Text>Quantidade: {schedule.quantity}</Text>
 									<Text>{schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}</Text>
 								</View>
 							))}
@@ -212,34 +231,20 @@ export default function ExportTeacherReport({
 									<Text>
 										{(new Date(schedule.class_date)).toLocaleDateString()}
 									</Text>
-									<Text>
+									<Text style={styles.classDate}>
 										{schedule.start_time} - {schedule.end_time}:
 									</Text>
 									<Text style={tw("mt-3")}>{formatDisciplineName(schedule.discipline.name)}</Text>
+									<Text>Quantidade: {schedule.quantity}</Text>
 									<Text>{schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}</Text>
-									<Text>Substituída por {schedule.class_to_replace.teacher.name}</Text>
+									<Text style={tw("mt-3")}>Substituída por {schedule.class_to_replace.teacher.name}</Text>
 								</View>
 							))}
 						</View>
 					</View>
 
-					<View style={tw("mt-4")}>
-						<Text style={tw("text-xl")}>Aulas que foram substituídas</Text>
-						<View style={tw("text-xl")} >
-							{substituteClasses.map((schedule) => (
-								<>
-									<Text>
-										{(new Date(schedule.class_date)).toLocaleDateString()}
-									</Text>
-									<Text>
-										{schedule.start_time} - {schedule.end_time}: {formatDisciplineName(schedule.discipline.name)} - {schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}
-									</Text>
-								</>
-							))}
-						</View>
-					</View>
 
-					<View style={tw("mt-4")}>
+					{/* <View style={tw("mt-4")}>
 						<Text style={tw("text-xl")}>Disciplinas por turma</Text>
 						<View style={tw("text-xl")} >
 
@@ -247,30 +252,24 @@ export default function ExportTeacherReport({
 							{Object.entries(filteredDisciplines).map(([className, disciplineName]) => (
 								<View>
 									<Text>{className}</Text>
-									{/* <Text>{disciplineName}</Text> */}
-									{Object.entries(disciplineName).map(({disciplineNamekey, scheduleArray }) => (
+									{Object.entries(disciplineName).map(([disciplineKey, scheduleArray]) => (
 										<>
-											<Text>{disciplineNamekey}</Text>
-											{/* {scheduleArray.map((schedule: Schedule) => (
+											<Text>{disciplineKey}</Text>
+											{scheduleArray.map((schedule: Schedule) => (
 												<>
-													<Text>{schedule.quantity}</Text>
+													{schedule.class_date in classesTaught && (
+														<Text>{schedule.quantity}</Text>
+													)}
 												</>
-											))} */}
+											))}
 										</>
 									))}
 
 								</View>
 							))}
 
-							{/* <Text>
-										{(new Date(schedule.class_date)).toLocaleDateString()}
-									</Text>
-									<Text>
-										{schedule.start_time} - {schedule.end_time}: {formatDisciplineName(schedule.discipline.name)} - {schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}
-									</Text> */}
-
 						</View>
-					</View>
+					</View> */}
 
 				</View>
 			</Page>

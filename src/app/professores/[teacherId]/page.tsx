@@ -704,11 +704,6 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						</div>
 
 						<section className="w-full relative">
-							<ExportTeacherReport teacher={teacher} teacherMonthSchedules={monthSchedulesTeacher} currentDate={new Date()} />
-							<PDFViewer width={700} height={400}>
-								<ExportTeacherReport teacher={teacher} teacherMonthSchedules={monthSchedulesTeacher} currentDate={new Date()} />
-							</PDFViewer>
-
 							{scheduleToShow && <ScheduleDetails />}
 							<WeekCalendar
 								getCalendarRef={(ref) => (weekCalendarRef.current = ref)}
