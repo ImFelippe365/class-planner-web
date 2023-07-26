@@ -19,6 +19,8 @@ const tw = createTw({
 				primary: "#007EA7",
 				gray: "#676767",
 				black: "#3D3D3D",
+				contrast: "#4A9E68",
+				canceled: "#C92A2A",
 			},
 			fontFamily: {
 				inter: ["Inter", "sans-serif"],
@@ -27,15 +29,68 @@ const tw = createTw({
 	},
 });
 
-const styles = StyleSheet.create({
-
-})
 
 export default function ExportTeacherReport({
 	teacher,
 	teacherMonthSchedules,
 	currentDate
 }: ExportTeacherReportProps) {
+
+	const styles = StyleSheet.create({
+		classContent: {
+			display: "flex",
+			flexDirection: "row",
+			flexWrap: "wrap",
+			columnGap: 12,
+		},
+		classesTaught: {
+			width: 123,
+			display: "flex",
+			flexDirection: "row",
+			flexWrap: "wrap",
+			fontSize: 12,
+			color: "#FFFFFF",
+			backgroundColor: "#4A9E68",
+			padding: 8,
+			marginTop: 12,
+		},
+		futureClasses: {
+			width: 123,
+			display: "flex",
+			flexDirection: "row",
+			flexWrap: "wrap",
+			fontSize: 12,
+			color: "#FFFFFF",
+			backgroundColor: "#007EA7",
+			padding: 8,
+			marginTop: 12,
+		},
+		canceledClasses: {
+			width: 123,
+			display: "flex",
+			flexDirection: "row",
+			flexWrap: "wrap",
+			fontSize: 12,
+			color: "#FFFFFF",
+			backgroundColor: "#C92A2A",
+			padding: 8,
+			marginTop: 12,
+		},
+		substituteClasses: {
+			width: 123,
+			display: "flex",
+			flexDirection: "row",
+			flexWrap: "wrap",
+			fontSize: 12,
+			color: "#FFFFFF",
+			backgroundColor: "#FF8600",
+			padding: 8,
+			marginTop: 12,
+		},
+		classDate: {
+			fontSize: 10,
+		}
+	})
 
 	teacherMonthSchedules.sort((scheduele1, scheduele2) => {
 		const date1 = new Date(`${scheduele1.class_date} ${scheduele1.start_time}`);
@@ -59,37 +114,6 @@ export default function ExportTeacherReport({
 		return (new Date(`${schedule.class_date} ${schedule.start_time}`) < currentDate) && !schedule.canceled_class
 	})
 
-	interface ArrayObjects {
-		key?: Array<Schedule>;
-	}
-
-	let schedulesByClass = {};
-
-	/* const filterDisciplines = teacherMonthSchedules.map((schedule) => {
-
-		let classSchedules = []
-		let className = schedule.schedule_class.course.byname + schedule.schedule_class.shift[0] + schedule.schedule_class.reference_period
-		let disciplineName = formatDisciplineName(schedule.discipline.name)
-
-		const currentClass = []
-		if (className in schedulesByClass && !(schedulesByClass[className][disciplineName])) {
-
-			classSchedules.push({ [disciplineName]: [schedule] })
-			schedulesByClass[className] = [...classSchedules]
-		} else if (className in schedulesByClass && schedulesByClass[className][disciplineName]) {
-
-			classSchedules.push({ [disciplineName]: [...schedulesByClass[className][disciplineName], schedule] })
-			schedulesByClass[className] = [...classSchedules]
-		} else {
-
-			schedulesByClass = { [className]: { [disciplineName]: [schedule] } }
-		}
-
-
-		return schedulesByClass
-	}) */
-	//console.log(filterDisciplines)
-
 	const filteredDisciplines = teacherMonthSchedules.reduce((accumulator: any, schedule) => {
 
 		let className = schedule.schedule_class.course.byname + schedule.schedule_class.shift[0] + schedule.schedule_class.reference_period
@@ -106,6 +130,16 @@ export default function ExportTeacherReport({
 
 	console.log(filteredDisciplines)
 
+	/* quantityClassDisciplines = Object.entries(filteredDisciplines).map(([className, disciplineName]) => {
+		Object.entries(disciplineName).map(([disciplineKey, scheduleArray]) => {
+			scheduleArray.map((schedule) => {
+				console.log(schedule)
+				return schedule
+			})
+		})
+	} */
+
+
 	return (
 		<Document>
 			<Page
@@ -116,6 +150,7 @@ export default function ExportTeacherReport({
 					alignItems: "center",
 					marginTop: 16,
 					marginBottom: 16,
+					paddingBottom: 16,
 				}}
 			>
 				<View style={tw("w-[90%] pb-3 flex flex-col")} >
@@ -133,94 +168,108 @@ export default function ExportTeacherReport({
 
 					<View style={tw("mt-4")}>
 						<Text style={tw("text-xl h-10")}>Aulas ministradas</Text>
-						<View style={tw("text-xl")} >
+						<View style={styles.classContent} >
 							{classesTaught.map((schedule) => (
-								<>
-									<Text>
+								<View style={styles.classesTaught}>
+									<Text style={styles.classDate}>
 										{(new Date(schedule.class_date)).toLocaleDateString()}
 									</Text>
-									<Text>
-										{schedule.start_time} - {schedule.end_time}: {formatDisciplineName(schedule.discipline.name)} - {schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}
+									<Text style={styles.classDate}>
+										{schedule.start_time} - {schedule.end_time}:
 									</Text>
-								</>
+									<Text style={tw("mt-3")}>{formatDisciplineName(schedule.discipline.name)}</Text>
+									<Text>Quantidade: {schedule.quantity}</Text>
+									<Text>{schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}</Text>
+								</View>
 							))}
 						</View>
 					</View>
 
 					<View style={tw("mt-4")}>
 						<Text style={tw("text-xl h-10")}>Aulas futuras</Text>
-						<View style={tw("text-xl")} >
+						<View style={styles.classContent} >
 							{futureClasses.map((schedule) => (
-								<>
-									<Text>
+								<View style={styles.futureClasses}>
+									<Text style={styles.classDate}>
 										{(new Date(schedule.class_date)).toLocaleDateString()}
 									</Text>
-									<Text>
-										{schedule.start_time} - {schedule.end_time}: {formatDisciplineName(schedule.discipline.name)} - {schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}
+									<Text style={styles.classDate}>
+										{schedule.start_time} - {schedule.end_time}:
 									</Text>
-								</>
+									<Text style={tw("mt-3")}>{formatDisciplineName(schedule.discipline.name)}</Text>
+									<Text>Quantidade: {schedule.quantity}</Text>
+									<Text>{schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}</Text>
+								</View>
 							))}
 						</View>
 					</View>
 
 					<View style={tw("mt-4")}>
-						<Text style={tw("text-xl")}>Aulas canceladas</Text>
-						<View style={tw("text-xl")} >
+						<Text style={tw("text-xl h-10")}>Aulas canceladas</Text>
+						<View style={styles.classContent} >
 							{canceledClasses.map((schedule) => (
-								<>
-									<Text>
+								<View style={styles.canceledClasses}>
+									<Text style={styles.classDate}>
 										{(new Date(schedule.class_date)).toLocaleDateString()}
 									</Text>
-									<Text>
-										{schedule.start_time} - {schedule.end_time}: {formatDisciplineName(schedule.discipline.name)} - {schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}
+									<Text style={styles.classDate}>
+										{schedule.start_time} - {schedule.end_time}:
 									</Text>
-								</>
+									<Text style={tw("mt-3")}>{formatDisciplineName(schedule.discipline.name)}</Text>
+									<Text>Quantidade: {schedule.quantity}</Text>
+									<Text>{schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}</Text>
+								</View>
 							))}
 						</View>
 					</View>
 
 					<View style={tw("mt-4")}>
-						<Text style={tw("text-xl")}>Aulas que foram substituídas</Text>
-						<View style={tw("text-xl")} >
+						<Text style={tw("text-xl h-10")}>Aulas que foram substituídas</Text>
+						<View style={styles.classContent} >
 							{substituteClasses.map((schedule) => (
-								<>
+								<View style={styles.substituteClasses}>
 									<Text>
 										{(new Date(schedule.class_date)).toLocaleDateString()}
 									</Text>
-									<Text>
-										{schedule.start_time} - {schedule.end_time}: {formatDisciplineName(schedule.discipline.name)} - {schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}
+									<Text style={styles.classDate}>
+										{schedule.start_time} - {schedule.end_time}:
 									</Text>
-								</>
+									<Text style={tw("mt-3")}>{formatDisciplineName(schedule.discipline.name)}</Text>
+									<Text>Quantidade: {schedule.quantity}</Text>
+									<Text>{schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}</Text>
+									<Text style={tw("mt-3")}>Substituída por {schedule.class_to_replace.teacher.name}</Text>
+								</View>
 							))}
 						</View>
 					</View>
 
-					<View style={tw("mt-4")}>
+
+					{/* <View style={tw("mt-4")}>
 						<Text style={tw("text-xl")}>Disciplinas por turma</Text>
 						<View style={tw("text-xl")} >
 
 
-							{/* {Object.entries(filteredDisciplines).map(([key, value]) => (
+							{Object.entries(filteredDisciplines).map(([className, disciplineName]) => (
 								<View>
-									<Text>{key}</Text>
-									<Text>Total de aulas previstas</Text>
-									{value.map((schedule: Schedule) => (
-										<View>
-											<Text>{schedule.start_time}</Text>
-										</View>
+									<Text>{className}</Text>
+									{Object.entries(disciplineName).map(([disciplineKey, scheduleArray]) => (
+										<>
+											<Text>{disciplineKey}</Text>
+											{scheduleArray.map((schedule: Schedule) => (
+												<>
+													{schedule.class_date in classesTaught && (
+														<Text>{schedule.quantity}</Text>
+													)}
+												</>
+											))}
+										</>
 									))}
-								</View>
-							))} */}
 
-							{/* <Text>
-										{(new Date(schedule.class_date)).toLocaleDateString()}
-									</Text>
-									<Text>
-										{schedule.start_time} - {schedule.end_time}: {formatDisciplineName(schedule.discipline.name)} - {schedule.schedule_class.course.byname}{schedule.schedule_class.shift[0]}{schedule.schedule_class.reference_period}
-									</Text> */}
+								</View>
+							))}
 
 						</View>
-					</View>
+					</View> */}
 
 				</View>
 			</Page>

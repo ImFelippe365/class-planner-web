@@ -473,51 +473,51 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 
 				{new Date() <
 					new Date(`${schedule.class_date} ${schedule.start_time}`) && (
-					<section className="flex items-center justify-end">
-						{!schedule?.canceled_class &&
-							!schedule?.class_to_replace &&
-							(!!teachers.find(({ id }) => id === user?.id) || hasEmployeePermissions) && (
-								<Button
-									onClick={() => handleOpenCancelScheduleModal(schedule)}
-									color="failure"
-									className="mt-4"
-								>
-									<Ban className="text-white mr-2 rounded-lg" />
-									<span className="text-white">Cancelar aula</span>
-								</Button>
-							)}
+						<section className="flex items-center justify-end">
+							{!schedule?.canceled_class &&
+								!schedule?.class_to_replace &&
+								(!!teachers.find(({ id }) => id === user?.id) || hasEmployeePermissions) && (
+									<Button
+										onClick={() => handleOpenCancelScheduleModal(schedule)}
+										color="failure"
+										className="mt-4"
+									>
+										<Ban className="text-white mr-2 rounded-lg" />
+										<span className="text-white">Cancelar aula</span>
+									</Button>
+								)}
 
-						{schedule?.canceled_class &&
-							hasTeacherPermissions &&
-							!!teachers.find(({ id }) => id === user?.id) && (
-								<Button
-									onClick={() =>
-										handleOpenResumeScheduleModal(schedule?.canceled_class.id)
-									}
-									color="warning"
-									className="mt-4"
-								>
-									<Play fill={"white"} className="text-white mr-2 rounded-lg" />
-									<span className="text-white">Retomar aula</span>
-								</Button>
-							)}
+							{schedule?.canceled_class &&
+								hasTeacherPermissions &&
+								!!teachers.find(({ id }) => id === user?.id) && (
+									<Button
+										onClick={() =>
+											handleOpenResumeScheduleModal(schedule?.canceled_class.id)
+										}
+										color="warning"
+										className="mt-4"
+									>
+										<Play fill={"white"} className="text-white mr-2 rounded-lg" />
+										<span className="text-white">Retomar aula</span>
+									</Button>
+								)}
 
-						{schedule?.canceled_class &&
-							!schedule.class_to_replace &&
-							hasTeacherPermissions &&
-							!teachers.find(({ id }) => id === user?.id) && (
-								<Button
-									onClick={() => {
-										setShowTeachCanceledClass(true);
-										setClassCanceled(schedule.canceled_class);
-									}}
-								>
-									<ClipboardSignature className="text-white mr-2 rounded-lg" />
-									Ministrar aula
-								</Button>
-							)}
-					</section>
-				)}
+							{schedule?.canceled_class &&
+								!schedule.class_to_replace &&
+								hasTeacherPermissions &&
+								!teachers.find(({ id }) => id === user?.id) && (
+									<Button
+										onClick={() => {
+											setShowTeachCanceledClass(true);
+											setClassCanceled(schedule.canceled_class);
+										}}
+									>
+										<ClipboardSignature className="text-white mr-2 rounded-lg" />
+										Ministrar aula
+									</Button>
+								)}
+						</section>
+					)}
 			</div>
 		);
 	};
@@ -704,10 +704,6 @@ export default function TeacherProfile({ params }: TeacherProfileProps) {
 						</div>
 
 						<section className="w-full relative">
-							{/* <PDFViewer width={700} height={400}>
-								<ExportTeacherReport teacher={teacher} teacherMonthSchedules={monthSchedulesTeacher} currentDate={new Date()} />
-							</PDFViewer> */}
-
 							{scheduleToShow && <ScheduleDetails />}
 							<WeekCalendar
 								getCalendarRef={(ref) => (weekCalendarRef.current = ref)}
