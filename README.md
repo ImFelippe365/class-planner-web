@@ -16,10 +16,9 @@ Projeto desenvolvido na disciplina de Desenvolvimento de Projetos II, utilizando
 
 ## Documentação
 
-- [🌐 Documento geral]()
 - [📄 Requisitos funcionais/não funcionais](https://docs.google.com/document/d/1W0PZumCOEnWrw8nvs900WqyFFRIyaeNj_PJDtZl1DhM/edit?usp=sharing)
 - [👩🏻‍💻 Casos de uso](https://drive.google.com/file/d/1HHqFz7Sb1RquMtgSM0DuvqeMxMB2EQo3/view?usp=sharing)
-- [🔗 Diagrama de classes]()
+- [🔗 Diagrama de classes](https://drive.google.com/file/d/1erp659dM3bxscE1tWZPmXEuS7V5sG7QI/view?usp=sharing)
 - [⚙️ Visão funcional](https://drive.google.com/file/d/1HHqFz7Sb1RquMtgSM0DuvqeMxMB2EQo3/view?usp=sharing)
 - [🔌 Visão de implantação](https://drive.google.com/file/d/1Re7xWZ-Pn726eTdb5cy-uro7NDB54fok/view)
 - [🛠️ Visão de desenvolvimento](https://drive.google.com/file/d/1FxTzWoDgvyjRcIi4fNmS6tAe74MIEBfk/view?usp=sharing)
