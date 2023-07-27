@@ -8,6 +8,11 @@
 
 Sistema desenvolvido em Next.js capaz de gerenciar os horários das aulas no IFRN - Campus Pau dos Ferros, onde é possível organizar e propagar as informações acerca das aulas que ocorrem. O intuito é informar aos estudantes quando não houver aula ou a mesma ser substituída, e fornecer mais autonomia para os professores para controlar seus horários de aulas.
 
+
+Este projeto funciona juntamente com outras duas aplicações:
+- [Class Planner Mobile](https://github.com/ImFelippe365/class-planner-mobile)
+- [Class Planner API](https://github.com/brunamariap/class-planner-api)
+  
 ## ⚠️ Importante
 
 Equipe: Felippe Rian & [Bruna Maria](https://github.com/brunamariap)
