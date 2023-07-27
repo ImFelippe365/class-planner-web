@@ -1,4 +1,4 @@
-# Class Planner - Gerenciador de horários de aulas ![Badge](https://img.shields.io/static/v1?label=tailwindcss&message=v3.1.8&color=lightblue&style=flat&logo=TAILWINDCSS)  ![Badge](https://img.shields.io/static/v1?label=next&message=v4.1.3&color=black&style=flat&logo=DJANGO)
+# Class Planner - Gerenciador de horários de aulas ![Badge](https://img.shields.io/static/v1?label=tailwindcss&message=v3.1.8&color=lightblue&style=flat&logo=TAILWINDCSS)  ![Badge](https://img.shields.io/static/v1?label=nextjs&message=v4.1.3&color=black&style=flat&logo=nextdotjs)
  
 <!-- <br />
 <p align="center">
